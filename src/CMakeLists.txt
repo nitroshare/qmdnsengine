@@ -29,7 +29,12 @@ target_include_directories(qmdnsengine PUBLIC
 target_link_libraries(qmdnsengine Qt5::Network)
 
 install(TARGETS qmdnsengine
+    EXPORT        qmdnsengine-export
     RUNTIME       DESTINATION bin
     LIBRARY       DESTINATION lib
     PUBLIC_HEADER DESTINATION include/qmdnsengine
+)
+
+install(EXPORT qmdnsengine-export
+    DESTINATION lib/cmake/qmdnsengine
 )
