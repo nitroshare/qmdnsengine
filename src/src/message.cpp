@@ -24,6 +24,8 @@
 
 #include <qmdnsengine/mdns.h>
 #include <qmdnsengine/message.h>
+#include <qmdnsengine/query.h>
+#include <qmdnsengine/record.h>
 
 #include "message_p.h"
 
@@ -96,6 +98,26 @@ bool Message::isResponse() const
 void Message::setResponse(bool isResponse)
 {
     d->isResponse = isResponse;
+}
+
+QList<Query> Message::queries() const
+{
+    return d->queries;
+}
+
+void Message::addQuery(const Query &query)
+{
+    d->queries.append(query);
+}
+
+QList<Record> Message::records() const
+{
+    return d->records;
+}
+
+void Message::addRecord(const Record &record)
+{
+    d->records.append(record);
 }
 
 void Message::reply(const Message &other)

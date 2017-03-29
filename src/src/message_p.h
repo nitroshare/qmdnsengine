@@ -26,9 +26,13 @@
 #define QMDNSENGINE_MESSAGE_P_H
 
 #include <QHostAddress>
+#include <QList>
 
 namespace QMdnsEngine
 {
+
+class Query;
+class Record;
 
 class MessagePrivate
 {
@@ -40,6 +44,8 @@ public:
     quint16 port;
     quint16 transactionId;
     bool isResponse;
+    QList<Query> queries;
+    QList<Record> records;
 };
 
 }

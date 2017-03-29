@@ -26,11 +26,15 @@
 #define QMDNSENGINE_MESSAGE_H
 
 #include <QHostAddress>
+#include <QList>
 
 #include "qmdnsengine_export.h"
 
 namespace QMdnsEngine
 {
+
+class Query;
+class Record;
 
 class QMDNSENGINE_EXPORT MessagePrivate;
 
@@ -108,6 +112,26 @@ public:
      * @brief Set whether the message is a response
      */
     void setResponse(bool isResponse);
+
+    /**
+     * @brief Retrieve a list of queries in the message
+     */
+    QList<Query> queries() const;
+
+    /**
+     * @brief Add a query to the message
+     */
+    void addQuery(const Query &query);
+
+    /**
+     * @brief Retrieve a list of records in the message
+     */
+    QList<Record> records() const;
+
+    /**
+     * @brief Add a record to the message
+     */
+    void addRecord(const Record &record);
 
     /**
      * @brief Reply to another message
