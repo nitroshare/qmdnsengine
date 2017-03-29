@@ -17,6 +17,11 @@ set(SRC
     src/record.cpp
 )
 
+if(WIN32)
+    configure_file(resource.rc.in "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
+    set(SRC ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
+endif()
+
 add_library(qmdnsengine SHARED ${HEADERS} ${SRC})
 
 set_target_properties(qmdnsengine PROPERTIES

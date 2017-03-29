@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2.0)
 project(qmdnsengine)
 
 set(PROJECT_NAME "QMdnsEngine")
-set(PROJECT_DESC "Multicast DNS library for Qt applications")
+set(PROJECT_DESCRIPTION "Multicast DNS library for Qt applications")
 set(PROJECT_AUTHOR "Nathan Osman")
 set(PROJECT_URL "https://github.com/nitroshare/qmdnsengine")
 
