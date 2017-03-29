@@ -22,31 +22,10 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_MDNS_H
-#define QMDNSENGINE_MDNS_H
+#include <qmdnsengine/dns.h>
 
-#include <QHostAddress>
-
-#include "qmdnsengine_export.h"
-
-namespace QMdnsEngine
-{
-
-/**
- * @brief Retrieve the standard port for mDNS
- */
-QMDNSENGINE_EXPORT quint16 mdnsPort();
-
-/**
- * @brief Retrieve the IPv4 address to send mDNS queries to
- */
-QMDNSENGINE_EXPORT QHostAddress mdnsIpv4Address();
-
-/**
- * @brief Retrieve the IPv6 address to send mDNS queries to
- */
-QMDNSENGINE_EXPORT QHostAddress mdnsIpv6Address();
-
-}
-
-#endif // QMDNSENGINE_MDNS_H
+const quint16 QMdnsEngine::A = 1;
+const quint16 QMdnsEngine::AAAA = 28;
+const quint16 QMdnsEngine::NSEC = 47;
+const quint16 QMdnsEngine::PTR = 33;
+const quint16 QMdnsEngine::TXT = 16;

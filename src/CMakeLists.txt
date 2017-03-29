@@ -1,10 +1,12 @@
 set(HEADERS
+    include/qmdnsengine/dns.h
     include/qmdnsengine/mdns.h
     include/qmdnsengine/message.h
     include/qmdnsengine/qmdnsengine_export.h
 )
 
 set(SRC
+    src/dns.cpp
     src/mdns.cpp
     src/message.cpp
 )
