@@ -25,16 +25,38 @@
 #ifndef QMDNSENGINE_DNS_H
 #define QMDNSENGINE_DNS_H
 
-#include <QtGlobal>
+#include <QByteArray>
+
+#include "qmdnsengine_export.h"
 
 namespace QMdnsEngine
 {
 
-extern const quint16 A;
-extern const quint16 AAAA;
-extern const quint16 NSEC;
-extern const quint16 PTR;
-extern const quint16 TXT;
+class Message;
+
+QMDNSENGINE_EXPORT extern const quint16 A;
+QMDNSENGINE_EXPORT extern const quint16 AAAA;
+QMDNSENGINE_EXPORT extern const quint16 NSEC;
+QMDNSENGINE_EXPORT extern const quint16 PTR;
+QMDNSENGINE_EXPORT extern const quint16 SRV;
+QMDNSENGINE_EXPORT extern const quint16 TXT;
+
+/**
+ * @brief Parse a name from a raw DNS packet
+ * @param packet raw DNS packet data
+ * @param offset offset into the packet where the name begins
+ * @param name reference to QByteArray to store the name in
+ * @return true if no errors occurred
+ */
+QMDNSENGINE_EXPORT bool parseName(const QByteArray &packet, quint16 &offset, QByteArray &name);
+
+/**
+ * @brief Populate a Message with data from a raw DNS packet
+ * @param packet raw DNS packet data
+ * @param message reference to Message to populate
+ * @return true if no errors occurred
+ */
+QMDNSENGINE_EXPORT bool fromPacket(const QByteArray &packet, Message &message);
 
 }
 
