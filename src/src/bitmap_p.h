@@ -22,38 +22,24 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_RECORD_P_H
-#define QMDNSENGINE_RECORD_P_H
+#ifndef QMDNSENGINE_BITMAP_P_H
+#define QMDNSENGINE_BITMAP_P_H
 
-#include <QByteArray>
-#include <QHostAddress>
-#include <QMap>
+#include <QtGlobal>
 
-#include <qmdnsengine/bitmap.h>
+namespace QMdnsEngine
+{
 
-namespace QMdnsEngine {
-
-class RecordPrivate
+class BitmapPrivate
 {
 public:
 
-    RecordPrivate();
+    BitmapPrivate();
 
-    QByteArray name;
-    quint16 type;
-    bool flushCache;
-    quint32 ttl;
-
-    QHostAddress address;
-    QByteArray target;
-    QByteArray nextDomainName;
-    quint16 priority;
-    quint16 weight;
-    quint16 port;
-    QMap<QByteArray, QByteArray> attributes;
-    Bitmap bitmap;
+    quint8 length;
+    quint8 data[32];
 };
 
 }
 
-#endif // QMDNSENGINE_RECORD_P_H
+#endif // QMDNSENGINE_BITMAP_P_H

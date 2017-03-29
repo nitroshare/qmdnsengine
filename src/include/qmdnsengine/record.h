@@ -29,6 +29,8 @@
 #include <QHostAddress>
 #include <QMap>
 
+#include <qmdnsengine/bitmap.h>
+
 #include "qmdnsengine_export.h"
 
 namespace QMdnsEngine
@@ -186,6 +188,18 @@ public:
      * @brief Add an attribute to the record
      */
     void addAttribute(const QByteArray &key, const QByteArray &value);
+
+    /**
+     * @brief Retrieve the bitmap for the record
+     *
+     * This field is used by QMdnsEngine::NSEC records.
+     */
+    Bitmap bitmap() const;
+
+    /**
+     * @brief Set the bitmap for the record
+     */
+    void setBitmap(const Bitmap &bitmap);
 
 private:
 

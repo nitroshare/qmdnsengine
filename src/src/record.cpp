@@ -166,3 +166,13 @@ void Record::addAttribute(const QByteArray &key, const QByteArray &value)
 {
     d->attributes.insert(key, value);
 }
+
+Bitmap Record::bitmap() const
+{
+    return d->bitmap;
+}
+
+void Record::setBitmap(const Bitmap &bitmap)
+{
+    d->bitmap = bitmap;
+}

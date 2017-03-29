@@ -22,38 +22,52 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_RECORD_P_H
-#define QMDNSENGINE_RECORD_P_H
-
-#include <QByteArray>
-#include <QHostAddress>
-#include <QMap>
-
 #include <qmdnsengine/bitmap.h>
 
-namespace QMdnsEngine {
+#include "bitmap_p.h"
 
-class RecordPrivate
+using namespace QMdnsEngine;
+
+BitmapPrivate::BitmapPrivate()
+    : length(0)
 {
-public:
-
-    RecordPrivate();
-
-    QByteArray name;
-    quint16 type;
-    bool flushCache;
-    quint32 ttl;
-
-    QHostAddress address;
-    QByteArray target;
-    QByteArray nextDomainName;
-    quint16 priority;
-    quint16 weight;
-    quint16 port;
-    QMap<QByteArray, QByteArray> attributes;
-    Bitmap bitmap;
-};
-
 }
 
-#endif // QMDNSENGINE_RECORD_P_H
+Bitmap::Bitmap()
+    : d(new BitmapPrivate)
+{
+}
+
+Bitmap::Bitmap(const Bitmap &other)
+    : d(new BitmapPrivate)
+{
+    *this = other;
+}
+
+Bitmap &Bitmap::operator=(const Bitmap &other)
+{
+    *d = *other.d;
+}
+
+Bitmap::~Bitmap()
+{
+    delete d;
+}
+
+quint8 Bitmap::length() const
+{
+    return d->length;
+}
+
+const quint8 *Bitmap::data() const
+{
+    return d->data;
+}
+
+void Bitmap::setData(quint8 length, const quint8 *data)
+{
+    d->length = length;
+    for (int i = 0; i < d->length; ++i) {
+        d->data[i] = data[i];
+    }
+}

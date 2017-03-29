@@ -22,38 +22,53 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_RECORD_P_H
-#define QMDNSENGINE_RECORD_P_H
+#ifndef QMDNSENGINE_BITMAP_H
+#define QMDNSENGINE_BITMAP_H
 
-#include <QByteArray>
-#include <QHostAddress>
-#include <QMap>
+#include "qmdnsengine_export.h"
 
-#include <qmdnsengine/bitmap.h>
+namespace QMdnsEngine
+{
 
-namespace QMdnsEngine {
+class QMDNSENGINE_EXPORT BitmapPrivate;
 
-class RecordPrivate
+/**
+ * @brief 256-bit bitmap
+ *
+ * Bitmaps are used in QMdnsEngine::NSEC records to indicate which records are
+ * available. mDNS only uses the first block (0).
+ */
+class QMDNSENGINE_EXPORT Bitmap
 {
 public:
 
-    RecordPrivate();
+    Bitmap();
+    Bitmap(const Bitmap &other);
+    Bitmap &operator=(const Bitmap &other);
+    virtual ~Bitmap();
 
-    QByteArray name;
-    quint16 type;
-    bool flushCache;
-    quint32 ttl;
+    /**
+     * @brief Retrieve the length of the block in bytes
+     */
+    quint8 length() const;
 
-    QHostAddress address;
-    QByteArray target;
-    QByteArray nextDomainName;
-    quint16 priority;
-    quint16 weight;
-    quint16 port;
-    QMap<QByteArray, QByteArray> attributes;
-    Bitmap bitmap;
+    /**
+     * @brief Retrieve a pointer to the underlying data in the bitmap
+     *
+     * Use the length() method to determine how many bytes contain valid data.
+     */
+    const quint8 *data() const;
+
+    /**
+     * @brief Set the data to be stored in the bitmap
+     */
+    void setData(quint8 length, const quint8 *data);
+
+private:
+
+    BitmapPrivate *const d;
 };
 
 }
 
-#endif // QMDNSENGINE_RECORD_P_H
+#endif // QMDNSENGINE_BITMAP_H
