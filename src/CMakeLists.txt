@@ -4,6 +4,7 @@ set(HEADERS
     include/qmdnsengine/message.h
     include/qmdnsengine/qmdnsengine_export.h
     include/qmdnsengine/query.h
+    include/qmdnsengine/record.h
 )
 
 set(SRC
@@ -11,6 +12,7 @@ set(SRC
     src/mdns.cpp
     src/message.cpp
     src/query.cpp
+    src/record.cpp
 )
 
 add_library(qmdnsengine SHARED ${HEADERS} ${SRC})
