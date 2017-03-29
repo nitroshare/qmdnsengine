@@ -25,21 +25,40 @@
 #ifndef QMDNSENGINE_MDNS_H
 #define QMDNSENGINE_MDNS_H
 
+#include <QHostAddress>
+
 #include "qmdnsengine_export.h"
 
-namespace QMdnsEngine {
+namespace QMdnsEngine
+{
 
-    /**
-     * @brief DNS record types
-     */
-    enum {
-        A = 1,
-        AAAA = 28,
-        NSEC = 47,
-        PTR = 12,
-        SRV = 33,
-        TXT = 16
-    };
+/**
+ * @brief DNS record types
+ */
+enum {
+    A = 1,
+    AAAA = 28,
+    NSEC = 47,
+    PTR = 12,
+    SRV = 33,
+    TXT = 16
+};
+
+/**
+ * @brief Retrieve the standard port for mDNS
+ */
+QMDNSENGINE_EXPORT quint16 mdnsPort();
+
+/**
+ * @brief Retrieve the IPv4 address to send mDNS queries to
+ */
+QMDNSENGINE_EXPORT QHostAddress mdnsIpv4Address();
+
+/**
+ * @brief Retrieve the IPv6 address to send mDNS queries to
+ */
+QMDNSENGINE_EXPORT QHostAddress mdnsIpv6Address();
+
 }
 
 #endif // QMDNSENGINE_MDNS_H

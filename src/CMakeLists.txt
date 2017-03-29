@@ -1,8 +1,6 @@
-configure_file(qmdnsengine_export.h.in "${CMAKE_CURRENT_BINARY_DIR}/qmdnsengine_export.h")
-
 set(HEADERS
-    "${CMAKE_CURRENT_BINARY_DIR}/qmdnsengine_export.h"
     include/qmdnsengine/mdns.h
+    include/qmdnsengine/qmdnsengine_export.h
 )
 
 set(SRC
