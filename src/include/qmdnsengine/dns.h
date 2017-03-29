@@ -26,6 +26,7 @@
 #define QMDNSENGINE_DNS_H
 
 #include <QByteArray>
+#include <QMap>
 
 #include "qmdnsengine_export.h"
 
@@ -47,8 +48,24 @@ QMDNSENGINE_EXPORT extern const quint16 TXT;
  * @param offset offset into the packet where the name begins
  * @param name reference to QByteArray to store the name in
  * @return true if no errors occurred
+ *
+ * The offset will be incremented by the number of bytes read. Name
+ * compression requires access to the contents of the packet.
  */
 QMDNSENGINE_EXPORT bool parseName(const QByteArray &packet, quint16 &offset, QByteArray &name);
+
+/**
+ * @brief Write a name to a raw DNS packet
+ * @param packet raw DNS packet to write to
+ * @param offset offset to update with the number of bytes written
+ * @param name name to write to the packet
+ * @param nameMap map of names already written to their offsets
+ *
+ * The offset will be incremented by the number of bytes read. The name map
+ * will be updated with offsets of any names written so that it can be passed
+ * to future invocations of this function.
+ */
+QMDNSENGINE_EXPORT void writeName(QByteArray &packet, quint16 &offset, const QByteArray &name, QMap<QByteArray, quint16> &nameMap);
 
 /**
  * @brief Populate a Message with data from a raw DNS packet
@@ -57,6 +74,13 @@ QMDNSENGINE_EXPORT bool parseName(const QByteArray &packet, quint16 &offset, QBy
  * @return true if no errors occurred
  */
 QMDNSENGINE_EXPORT bool fromPacket(const QByteArray &packet, Message &message);
+
+/**
+ * @brief Create a raw DNS packet from a Message
+ * @param message Message to create the packet from
+ * @param packet storage for raw DNS packet
+ */
+QMDNSENGINE_EXPORT void toPacket(const Message &message, QByteArray &packet);
 
 }
 

@@ -44,12 +44,20 @@ const quint16 TXT = 16;
 template<class T>
 bool parseInteger(const QByteArray &packet, quint16 &offset, T &value)
 {
-    if (offset + sizeof(T) > packet.length()) {
+    if (offset + sizeof(T) > static_cast<unsigned int>(packet.length())) {
         return false;  // out-of-bounds
     }
     value = qFromBigEndian<T>(reinterpret_cast<const uchar*>(packet.constData() + offset));
     offset += sizeof(T);
     return true;
+}
+
+template<class T>
+void writeInteger(QByteArray &packet, quint16 &offset, T value)
+{
+    value = qToBigEndian<T>(value);
+    packet.append(reinterpret_cast<const char*>(&value), sizeof(T));
+    offset += sizeof(T);
 }
 
 bool parseName(const QByteArray &packet, quint16 &offset, QByteArray &name)
@@ -99,6 +107,30 @@ bool parseName(const QByteArray &packet, quint16 &offset, QByteArray &name)
         offset = offsetEnd;
     }
     return true;
+}
+
+void writeName(QByteArray &packet, quint16 &offset, const QByteArray &name, QMap<QByteArray, quint16> &nameMap)
+{
+    QByteArray fragment = name;
+    if (fragment.endsWith('.')) {
+        fragment.chop(1);
+    }
+    while (fragment.length()) {
+        if (nameMap.contains(fragment)) {
+            writeInteger<quint16>(packet, offset, nameMap.value(fragment) | 0xc000);
+            return;
+        }
+        nameMap.insert(fragment, offset);
+        int index = fragment.indexOf('.');
+        if (index == -1) {
+            index = fragment.length();
+        }
+        writeInteger<quint8>(packet, offset, index);
+        packet.append(fragment.left(index));
+        offset += index;
+        fragment.remove(0, index + 1);
+    }
+    writeInteger<quint8>(packet, offset, 0);
 }
 
 bool fromPacket(const QByteArray &packet, Message &message)
@@ -236,6 +268,75 @@ bool fromPacket(const QByteArray &packet, Message &message)
         message.addRecord(record);
     }
     return true;
+}
+
+void toPacket(const Message &message, QByteArray &packet)
+{
+    quint16 offset = 0;
+    writeInteger<quint16>(packet, offset, message.transactionId());
+    writeInteger<quint16>(packet, offset, message.isResponse() ? 0x8400 : 0);
+    writeInteger<quint16>(packet, offset, message.queries().length());
+    writeInteger<quint16>(packet, offset, message.records().length());
+    writeInteger<quint16>(packet, offset, 0);
+    writeInteger<quint16>(packet, offset, 0);
+    QMap<QByteArray, quint16> nameMap;
+    foreach (Query query, message.queries()) {
+        writeName(packet, offset, query.name(), nameMap);
+        writeInteger<quint16>(packet, offset, query.type());
+        writeInteger<quint16>(packet, offset, query.unicastResponse() ? 0x8001 : 1);
+    }
+    foreach (Record record, message.records()) {
+        writeName(packet, offset, record.name(), nameMap);
+        writeInteger<quint16>(packet, offset, record.type());
+        writeInteger<quint16>(packet, offset, record.flushCache() ? 0x8001 : 1);
+        writeInteger<quint32>(packet, offset, record.ttl());
+        offset += 2;
+        QByteArray data;
+        switch (record.type()) {
+        case A:
+            writeInteger<quint32>(data, offset, record.address().toIPv4Address());
+            break;
+        case AAAA:
+        {
+            Q_IPV6ADDR ipv6Addr = record.address().toIPv6Address();
+            data.append(reinterpret_cast<const char*>(&ipv6Addr), sizeof(Q_IPV6ADDR));
+            offset += data.length();
+            break;
+        }
+        case NSEC:
+        {
+            quint8 length = record.bitmap().length();
+            writeName(data, offset, record.nextDomainName(), nameMap);
+            writeInteger<quint8>(data, offset, 0);
+            writeInteger<quint8>(data, offset, length);
+            data.append(reinterpret_cast<const char*>(record.bitmap().data()), length);
+            offset += length;
+            break;
+        }
+        case PTR:
+            writeName(data, offset, record.target(), nameMap);
+            break;
+        case SRV:
+            writeInteger<quint16>(data, offset, record.priority());
+            writeInteger<quint16>(data, offset, record.weight());
+            writeInteger<quint16>(data, offset, record.port());
+            writeName(data, offset, record.target(), nameMap);
+            break;
+        case TXT:
+            for (auto i = record.attributes().constBegin(); i != record.attributes().constEnd(); ++i) {
+                QByteArray entry = i.key() + "=" + i.value();
+                writeInteger<quint8>(data, offset, entry.length());
+                data.append(entry);
+                offset += entry.length();
+            }
+            break;
+        default:
+            break;
+        }
+        offset -= 2;
+        writeInteger<quint16>(packet, offset, data.length());
+        packet.append(data);
+    }
 }
 
 }
