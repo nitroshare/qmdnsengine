@@ -60,7 +60,8 @@ public:
      * @brief Set the address for the message
      *
      * When sending messages, this is the address that the message will be
-     * sent to.
+     * sent to. QMdnsEngine::MdnsIpv4Address and QMdnsEngine::MdnsIpv6Address
+     * can be used for mDNS.
      */
     void setAddress(const QHostAddress &address);
 
@@ -69,7 +70,7 @@ public:
      *
      * When receiving messages, this is the port that the message was received
      * from. For traditional queries, this will be an ephemeral port. For mDNS
-     * queries, this will always equal QMdnsEngine::port().
+     * queries, this will always equal QMdnsEngine::MdnsPort.
      */
     quint16 port() const;
 
@@ -77,7 +78,7 @@ public:
      * @brief Set the port for the message
      *
      * When sending messages, this is the port that the message will be sent
-     * to. This should be set to QMdnsEngine::port() unless the message is a
+     * to. This should be set to QMdnsEngine::MdnsPort unless the message is a
      * reply to a traditional DNS query.
      */
     void setPort(quint16 port);

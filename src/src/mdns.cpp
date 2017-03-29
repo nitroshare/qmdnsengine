@@ -24,19 +24,11 @@
 
 #include <qmdnsengine/mdns.h>
 
-using namespace QMdnsEngine;
-
-quint16 mdnsPort()
+namespace QMdnsEngine
 {
-    return 5353;
-}
 
-QHostAddress mdnsIpv4Address()
-{
-    return QHostAddress("224.0.0.251");
-}
+const quint16 MdnsPort = 5353;
+const QHostAddress MdnsIpv4Address("224.0.0.251");
+const QHostAddress MdnsIpv6Address("ff02::fb");
 
-QHostAddress mdnsIpv6Address()
-{
-    return QHostAddress("ff02::fb");
 }

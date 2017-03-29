@@ -32,20 +32,9 @@
 namespace QMdnsEngine
 {
 
-/**
- * @brief Retrieve the standard port for mDNS
- */
-QMDNSENGINE_EXPORT quint16 mdnsPort();
-
-/**
- * @brief Retrieve the IPv4 address to send mDNS queries to
- */
-QMDNSENGINE_EXPORT QHostAddress mdnsIpv4Address();
-
-/**
- * @brief Retrieve the IPv6 address to send mDNS queries to
- */
-QMDNSENGINE_EXPORT QHostAddress mdnsIpv6Address();
+QMDNSENGINE_EXPORT extern const quint16 MdnsPort;
+QMDNSENGINE_EXPORT extern const QHostAddress MdnsIpv4Address;
+QMDNSENGINE_EXPORT extern const QHostAddress MdnsIpv6Address;
 
 }
 

@@ -100,11 +100,11 @@ void Message::setResponse(bool isResponse)
 
 void Message::reply(const Message &other)
 {
-    if (other.port() == mdnsPort()) {
+    if (other.port() == MdnsPort) {
         if (other.address().protocol() == QAbstractSocket::IPv4Protocol) {
-            setAddress(mdnsIpv4Address());
+            setAddress(MdnsIpv4Address);
         } else {
-            setAddress(mdnsIpv6Address());
+            setAddress(MdnsIpv4Address);
         }
     } else {
         setAddress(other.address());
