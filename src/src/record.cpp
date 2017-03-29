@@ -52,6 +52,7 @@ Record::Record(const Record &other)
 Record &Record::operator=(const Record &other)
 {
     *d = *other.d;
+    return *this;
 }
 
 Record::~Record()
@@ -133,6 +134,7 @@ quint16 Record::priority() const
 {
     return d->priority;
 }
+
 void Record::setPriority(quint16 priority)
 {
     d->priority = priority;
@@ -142,6 +144,7 @@ quint16 Record::weight() const
 {
     return d->weight;
 }
+
 void Record::setWeight(quint16 weight)
 {
     d->weight = weight;

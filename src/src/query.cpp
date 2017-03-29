@@ -48,6 +48,7 @@ Query::Query(const Query &other)
 Query &Query::operator=(const Query &other)
 {
     *d = *other.d;
+    return *this;
 }
 
 Query::~Query()

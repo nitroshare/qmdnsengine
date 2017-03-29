@@ -50,6 +50,7 @@ Message::Message(const Message &other)
 Message &Message::operator=(const Message &other)
 {
     *d = *other.d;
+    return *this;
 }
 
 Message::~Message()

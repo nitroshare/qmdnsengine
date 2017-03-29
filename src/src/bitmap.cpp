@@ -47,6 +47,7 @@ Bitmap::Bitmap(const Bitmap &other)
 Bitmap &Bitmap::operator=(const Bitmap &other)
 {
     *d = *other.d;
+    return *this;
 }
 
 Bitmap::~Bitmap()
