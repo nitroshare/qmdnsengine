@@ -27,7 +27,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(QHTTPENGINE_LIBRARY)
+#if defined(QMDNSENGINE_LIBRARY)
 #  define QMDNSENGINE_EXPORT Q_DECL_EXPORT
 #else
 #  define QMDNSENGINE_EXPORT Q_DECL_IMPORT
