@@ -6,7 +6,7 @@ set(HEADERS
 )
 
 set(SRC
-    mdns.cpp
+    src/mdns.cpp
 )
 
 add_library(qmdnsengine SHARED ${HEADERS} ${SRC})
