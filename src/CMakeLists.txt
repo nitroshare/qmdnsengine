@@ -6,6 +6,7 @@ set(HEADERS
     include/qmdnsengine/qmdnsengine_export.h
     include/qmdnsengine/query.h
     include/qmdnsengine/record.h
+    include/qmdnsengine/server.h
 )
 
 set(SRC
@@ -15,6 +16,7 @@ set(SRC
     src/message.cpp
     src/query.cpp
     src/record.cpp
+    src/server.cpp
 )
 
 if(WIN32)
