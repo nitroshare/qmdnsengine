@@ -45,6 +45,7 @@ install(TARGETS qmdnsengine
     EXPORT        qmdnsengine-export
     RUNTIME       DESTINATION bin
     LIBRARY       DESTINATION lib
+    ARCHIVE       DESTINATION lib
     PUBLIC_HEADER DESTINATION include/qmdnsengine
 )
 
