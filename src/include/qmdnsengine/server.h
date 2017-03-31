@@ -32,6 +32,8 @@
 namespace QMdnsEngine
 {
 
+class Message;
+
 class QMDNSENGINE_EXPORT ServerPrivate;
 
 /**
@@ -44,6 +46,28 @@ class QMDNSENGINE_EXPORT Server : public QObject
 public:
 
     explicit Server(QObject *parent = 0);
+
+    /**
+     * @brief Send a message
+     *
+     * The server will use the message's address to determine which protocol
+     * to use for sending it (IPv4 or IPv6).
+     */
+    void sendMessage(const Message &message);
+
+Q_SIGNALS:
+
+    /**
+     * @brief Indicate a new message was received
+     *
+     * This signal is only emitted after successfully confirming a hostname.
+     */
+    void messageReceived(const Message &message);
+
+    /**
+     * @brief Indicate an error has occurred
+     */
+    void error(const QString &message);
 
 private:
 

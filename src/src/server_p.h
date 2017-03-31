@@ -25,11 +25,15 @@
 #ifndef QMDNSENGINE_SERVER_P_H
 #define QMDNSENGINE_SERVER_P_H
 
+#include <QHostAddress>
 #include <QObject>
+#include <QTimer>
+#include <QUdpSocket>
 
 namespace QMdnsEngine
 {
 
+class Message;
 class Server;
 
 class ServerPrivate : public QObject
@@ -39,6 +43,17 @@ class ServerPrivate : public QObject
 public:
 
     explicit ServerPrivate(Server *server);
+
+    void bindSocket(QUdpSocket &socket, const QHostAddress &address);
+
+    QTimer timer;
+    QUdpSocket ipv4Socket;
+    QUdpSocket ipv6Socket;
+
+private Q_SLOTS:
+
+    void onTimeout();
+    void onReadyRead();
 
 private:
 
