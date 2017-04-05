@@ -34,6 +34,7 @@ namespace QMdnsEngine
 {
 
 class Message;
+class Record;
 
 QMDNSENGINE_EXPORT extern const quint16 A;
 QMDNSENGINE_EXPORT extern const quint16 AAAA;
@@ -66,6 +67,15 @@ QMDNSENGINE_EXPORT bool parseName(const QByteArray &packet, quint16 &offset, QBy
  * to future invocations of this function.
  */
 QMDNSENGINE_EXPORT void writeName(QByteArray &packet, quint16 &offset, const QByteArray &name, QMap<QByteArray, quint16> &nameMap);
+
+/**
+ * @brief Parse a record from a raw DNS packet
+ * @param packet raw DNS packet data
+ * @param offset offset into the packet where the record begins
+ * @param record reference to Record to populate
+ * @return true if no errors occurred
+ */
+QMDNSENGINE_EXPORT bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record);
 
 /**
  * @brief Populate a Message with data from a raw DNS packet

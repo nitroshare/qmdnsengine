@@ -26,6 +26,7 @@
 #include <QTest>
 
 #include <qmdnsengine/dns.h>
+#include <qmdnsengine/record.h>
 
 class TestDns : public QObject
 {
@@ -35,6 +36,8 @@ private Q_SLOTS:
 
     void testParseName_data();
     void testParseName();
+
+    void testParseRecordA();
 };
 
 void TestDns::testParseName_data()
@@ -89,6 +92,33 @@ void TestDns::testParseName()
         QCOMPARE(offset, correctOffset);
         QCOMPARE(name, correctName);
     }
+}
+
+void TestDns::testParseRecordA()
+{
+    const char packetData[] = {
+        '\x04', 't', 'e', 's', 't', '\0',
+        '\x00', '\x01',
+        '\x80', '\x00',
+        '\x00', '\x00', '\x0e', '\x10',
+        '\x00', '\x04',
+        '\x7f', '\x00', '\x00', '\x01'
+    };
+
+    quint16 offset = 0;
+    QMdnsEngine::Record record;
+    bool result = QMdnsEngine::parseRecord(
+        QByteArray(packetData, sizeof(packetData)),
+        offset,
+        record
+    );
+
+    QCOMPARE(result, true);
+    QCOMPARE(record.name(), QByteArray("test."));
+    QCOMPARE(record.type(), static_cast<quint16>(QMdnsEngine::A));
+    QCOMPARE(record.flushCache(), true);
+    QCOMPARE(record.ttl(), static_cast<quint32>(3600));
+    QCOMPARE(record.address(), QHostAddress("127.0.0.1"));
 }
 
 QTEST_MAIN(TestDns)

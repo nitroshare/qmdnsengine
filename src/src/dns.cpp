@@ -133,6 +133,112 @@ void writeName(QByteArray &packet, quint16 &offset, const QByteArray &name, QMap
     writeInteger<quint8>(packet, offset, 0);
 }
 
+bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
+{
+    QByteArray name;
+    quint16 type, class_, dataLen;
+    quint32 ttl;
+    if (!parseName(packet, offset, name) ||
+            !parseInteger<quint16>(packet, offset, type) ||
+            !parseInteger<quint16>(packet, offset, class_) ||
+            !parseInteger<quint32>(packet, offset, ttl) ||
+            !parseInteger<quint16>(packet, offset, dataLen)) {
+        return false;
+    }
+    record.setName(name);
+    record.setType(type);
+    record.setFlushCache(class_ & 0x8000);
+    record.setTtl(ttl);
+    switch (type) {
+    case A:
+    {
+        quint32 ipv4Addr;
+        if (!parseInteger<quint32>(packet, offset, ipv4Addr)) {
+            return false;
+        }
+        record.setAddress(QHostAddress(ipv4Addr));
+        break;
+    }
+    case AAAA:
+    {
+        if (offset + 16 > packet.length()) {
+            return false;
+        }
+        record.setAddress(QHostAddress(
+            reinterpret_cast<const quint8*>(packet.constData() + offset)
+        ));
+        offset += 16;
+        break;
+    }
+    case NSEC:
+    {
+        QByteArray nextDomainName;
+        quint8 number;
+        quint8 length;
+        if (!parseName(packet, offset, nextDomainName) ||
+                !parseInteger<quint8>(packet, offset, number) ||
+                !parseInteger<quint8>(packet, offset, length) ||
+                number != 0 ||
+                offset + length > packet.length()) {
+            return false;
+        }
+        Bitmap bitmap;
+        bitmap.setData(length, reinterpret_cast<const quint8*>(packet.constData() + offset));
+        record.setNextDomainName(nextDomainName);
+        record.setBitmap(bitmap);
+        break;
+    }
+    case PTR:
+    {
+        QByteArray target;
+        if (!parseName(packet, offset, target)) {
+            return false;
+        }
+        record.setTarget(target);
+        break;
+    }
+    case SRV:
+    {
+        quint16 priority, weight, port;
+        QByteArray target;
+        if (!parseInteger<quint16>(packet, offset, priority) ||
+                !parseInteger<quint16>(packet, offset, weight) ||
+                !parseInteger<quint16>(packet, offset, port) ||
+                !parseName(packet, offset, target)) {
+            return false;
+        }
+        record.setPriority(priority);
+        record.setWeight(weight);
+        record.setPort(port);
+        record.setTarget(target);
+        break;
+    }
+    case TXT:
+    {
+        quint16 start = offset;
+        while (offset < start + dataLen) {
+            quint8 nBytes;
+            if (!parseInteger<quint8>(packet, offset, nBytes) ||
+                    offset + nBytes > packet.length()) {
+                return false;
+            }
+            QByteArray attr(packet.constData() + offset, nBytes);
+            offset += nBytes;
+            int splitIndex = attr.indexOf('=');
+            if (splitIndex == -1) {
+                return false;
+            }
+            record.addAttribute(attr.left(splitIndex), attr.mid(splitIndex + 1));
+        }
+        break;
+    }
+    default:
+        offset += dataLen;
+        break;
+    }
+    return true;
+}
+
 bool fromPacket(const QByteArray &packet, Message &message)
 {
     quint16 offset = 0;
@@ -163,107 +269,9 @@ bool fromPacket(const QByteArray &packet, Message &message)
     }
     quint16 nRecord = nAnswer + nAuthority + nAdditional;
     for (int i = 0; i < nRecord; ++i) {
-        QByteArray name;
-        quint16 type, class_, dataLen;
-        quint32 ttl;
-        if (!parseName(packet, offset, name) ||
-                !parseInteger<quint16>(packet, offset, type) ||
-                !parseInteger<quint16>(packet, offset, class_) ||
-                !parseInteger<quint32>(packet, offset, ttl) ||
-                !parseInteger<quint16>(packet, offset, dataLen)) {
-            return false;
-        }
         Record record;
-        record.setName(name);
-        record.setType(type);
-        record.setFlushCache(class_ & 0x8000);
-        record.setTtl(ttl);
-        switch (type) {
-        case A:
-        {
-            quint32 ipv4Addr;
-            if (!parseInteger<quint32>(packet, offset, ipv4Addr)) {
-                return false;
-            }
-            record.setAddress(QHostAddress(ipv4Addr));
-            break;
-        }
-        case AAAA:
-        {
-            if (offset + 16 > packet.length()) {
-                return false;
-            }
-            record.setAddress(QHostAddress(
-                reinterpret_cast<const quint8*>(packet.constData() + offset)
-            ));
-            offset += 16;
-            break;
-        }
-        case NSEC:
-        {
-            QByteArray nextDomainName;
-            quint8 number;
-            quint8 length;
-            if (!parseName(packet, offset, nextDomainName) ||
-                    !parseInteger<quint8>(packet, offset, number) ||
-                    !parseInteger<quint8>(packet, offset, length) ||
-                    number != 0 ||
-                    offset + length > packet.length()) {
-                return false;
-            }
-            Bitmap bitmap;
-            bitmap.setData(length, reinterpret_cast<const quint8*>(packet.constData() + offset));
-            record.setNextDomainName(nextDomainName);
-            record.setBitmap(bitmap);
-            break;
-        }
-        case PTR:
-        {
-            QByteArray target;
-            if (!parseName(packet, offset, target)) {
-                return false;
-            }
-            record.setTarget(target);
-            break;
-        }
-        case SRV:
-        {
-            quint16 priority, weight, port;
-            QByteArray target;
-            if (!parseInteger<quint16>(packet, offset, priority) ||
-                    !parseInteger<quint16>(packet, offset, weight) ||
-                    !parseInteger<quint16>(packet, offset, port) ||
-                    !parseName(packet, offset, target)) {
-                return false;
-            }
-            record.setPriority(priority);
-            record.setWeight(weight);
-            record.setPort(port);
-            record.setTarget(target);
-            break;
-        }
-        case TXT:
-        {
-            quint16 start = offset;
-            while (offset < start + dataLen) {
-                quint8 nBytes;
-                if (!parseInteger<quint8>(packet, offset, nBytes) ||
-                        offset + nBytes > packet.length()) {
-                    return false;
-                }
-                QByteArray attr(packet.constData() + offset, nBytes);
-                offset += nBytes;
-                int splitIndex = attr.indexOf('=');
-                if (splitIndex == -1) {
-                    return false;
-                }
-                record.addAttribute(attr.left(splitIndex), attr.mid(splitIndex + 1));
-            }
-            break;
-        }
-        default:
-            offset += dataLen;
-            break;
+        if (!parseRecord(packet, offset, record)) {
+            return false;
         }
         message.addRecord(record);
     }
