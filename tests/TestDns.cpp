@@ -39,6 +39,26 @@
         record \
     )
 
+typedef QMap<QByteArray, quint16> NameMap;
+
+const char NameSimple[] = {
+    '\x04', '_', 't', 'c', 'p',
+    '\x05', 'l', 'o', 'c', 'a', 'l',
+    '\0'
+};
+
+const char NamePointer[] = {
+    '\x04', '_', 't', 'c', 'p',
+    '\x05', 'l', 'o', 'c', 'a', 'l',
+    '\0',
+    '\x04', 't', 'e', 's', 't',
+    '\xc0', '\0'
+};
+
+const char NameCorrupt[] = {
+    '\x03', '1', '2'
+};
+
 const char RecordA[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x01',
@@ -109,6 +129,9 @@ private Q_SLOTS:
     void testParseName_data();
     void testParseName();
 
+    void testWriteName_data();
+    void testWriteName();
+
     void testParseRecordA();
     void testParseRecordAAAA();
     void testParseRecordPTR();
@@ -124,37 +147,22 @@ void TestDns::testParseName_data()
     QTest::addColumn<QByteArray>("correctName");
     QTest::addColumn<bool>("correctResult");
 
-    const char simpleData[] = {
-        '\x04', '_', 't', 'c', 'p',
-        '\x05', 'l', 'o', 'c', 'a', 'l',
-        '\0'
-    };
     QTest::newRow("simple")
-            << QByteArray(simpleData, sizeof(simpleData))
+            << QByteArray(NameSimple, sizeof(NameSimple))
             << static_cast<quint16>(0)
             << static_cast<quint16>(12)
             << QByteArray("_tcp.local.")
             << true;
 
-    const char pointerData[] = {
-        '\x04', '_', 't', 'c', 'p',
-        '\x05', 'l', 'o', 'c', 'a', 'l',
-        '\0',
-        '\x04', 't', 'e', 's', 't',
-        '\xc0', '\0'
-    };
     QTest::newRow("pointer")
-            << QByteArray(pointerData, sizeof(pointerData))
+            << QByteArray(NamePointer, sizeof(NamePointer))
             << static_cast<quint16>(12)
             << static_cast<quint16>(19)
             << QByteArray("test._tcp.local.")
             << true;
 
-    const char corruptData[] = {
-        '\x03', '1', '2'
-    };
     QTest::newRow("corrupt data")
-            << QByteArray(corruptData, sizeof(corruptData))
+            << QByteArray(NameCorrupt, sizeof(NameCorrupt))
             << static_cast<quint16>(0)
             << static_cast<quint16>(0)
             << QByteArray()
@@ -178,6 +186,48 @@ void TestDns::testParseName()
         QCOMPARE(offset, correctOffset);
         QCOMPARE(name, correctName);
     }
+}
+
+void TestDns::testWriteName_data()
+{
+    QTest::addColumn<QByteArray>("initialPacket");
+    QTest::addColumn<quint16>("initialOffset");
+    QTest::addColumn<quint16>("correctOffset");
+    QTest::addColumn<QByteArray>("name");
+    QTest::addColumn<NameMap>("nameMap");
+    QTest::addColumn<QByteArray>("correctPacket");
+
+    QTest::newRow("simple")
+            << QByteArray()
+            << static_cast<quint16>(0)
+            << static_cast<quint16>(12)
+            << QByteArray("_tcp.local.")
+            << NameMap()
+            << QByteArray(NameSimple, sizeof(NameSimple));
+
+    QTest::newRow("pointer")
+            << QByteArray(NameSimple, sizeof(NameSimple))
+            << static_cast<quint16>(sizeof(NameSimple))
+            << static_cast<quint16>(19)
+            << QByteArray("test._tcp.local.")
+            << NameMap{{"_tcp.local", 0}}
+            << QByteArray(NamePointer, sizeof(NamePointer));
+}
+
+void TestDns::testWriteName()
+{
+    QFETCH(QByteArray, initialPacket);
+    QFETCH(quint16, initialOffset);
+    QFETCH(quint16, correctOffset);
+    QFETCH(QByteArray, name);
+    QFETCH(NameMap, nameMap);
+    QFETCH(QByteArray, correctPacket);
+
+    QByteArray packet = initialPacket;
+    quint16 offset = initialOffset;
+    QMdnsEngine::writeName(packet, offset, name, nameMap);
+
+    QCOMPARE(packet, correctPacket);
 }
 
 void TestDns::testParseRecordA()
