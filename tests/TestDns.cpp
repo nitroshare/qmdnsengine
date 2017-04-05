@@ -51,7 +51,7 @@ void TestDns::testParseName_data()
     };
     QTest::newRow("simple")
             << QByteArray(simpleData, sizeof(simpleData))
-            << 0
+            << static_cast<quint16>(0)
             << QByteArray("_tcp.local.")
             << true;
 }
@@ -69,7 +69,7 @@ void TestDns::testParseName()
 
     QCOMPARE(result, correctResult);
     if (result) {
-        QCOMPARE(offset - initialOffset, static_cast<quint16>(packet.length()));
+        QCOMPARE(offset - initialOffset, packet.length());
         QCOMPARE(name, correctName);
     }
 }
