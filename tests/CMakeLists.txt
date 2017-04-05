@@ -13,3 +13,12 @@ foreach(_test ${TESTS})
         COMMAND ${_test}
     )
 endforeach()
+
+# On Windows, the tests will not run without the DLL located in the current
+# directory - a target must be used to copy it here once built
+if(WIN32)
+    add_custom_target(qmdnsengine-copy ALL
+        "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:qmdnsengine>" "${CMAKE_CURRENT_BINARY_DIR}"
+        DEPENDS qmdnsengine
+    )
+endif()
