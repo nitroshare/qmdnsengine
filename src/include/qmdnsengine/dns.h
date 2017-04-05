@@ -78,6 +78,15 @@ QMDNSENGINE_EXPORT void writeName(QByteArray &packet, quint16 &offset, const QBy
 QMDNSENGINE_EXPORT bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record);
 
 /**
+ * @brief Write a record to a raw DNS packet
+ * @param packet raw DNS packet to write to
+ * @param offset offset to update with the number of bytes written
+ * @param record record to write to the packet
+ * @param nameMap map of names already written to their offsets
+ */
+QMDNSENGINE_EXPORT void writeRecord(QByteArray &packet, quint16 &offset, Record &record, QMap<QByteArray, quint16> &nameMap);
+
+/**
  * @brief Populate a Message with data from a raw DNS packet
  * @param packet raw DNS packet data
  * @param message reference to Message to populate

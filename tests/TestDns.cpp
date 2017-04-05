@@ -39,6 +39,12 @@
         record \
     )
 
+#define WRITE_RECORD() \
+    QByteArray packet; \
+    quint16 offset; \
+    NameMap nameMap; \
+    QMdnsEngine::writeRecord(packet, offset, record, nameMap)
+
 typedef QMap<QByteArray, quint16> NameMap;
 
 const char NameSimple[] = {
@@ -62,7 +68,7 @@ const char NameCorrupt[] = {
 const char RecordA[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x01',
-    '\x80', '\x00',
+    '\x80', '\x01',
     '\x00', '\x00', '\x0e', '\x10',
     '\x00', '\x04',
     '\x7f', '\x00', '\x00', '\x01'
@@ -71,7 +77,7 @@ const char RecordA[] = {
 const char RecordAAAA[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x1c',
-    '\x00', '\x00',
+    '\x00', '\x01',
     '\x00', '\x00', '\x00', '\x00',
     '\x00', '\x10',
     '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
@@ -81,7 +87,7 @@ const char RecordAAAA[] = {
 const char RecordPTR[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x0c',
-    '\x00', '\x00',
+    '\x00', '\x01',
     '\x00', '\x00', '\x00', '\x00',
     '\x00', '\x07',
     '\x05', 't', 'e', 's', 't', '2', '\0',
@@ -90,7 +96,7 @@ const char RecordPTR[] = {
 const char RecordSRV[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x21',
-    '\x00', '\x00',
+    '\x00', '\x01',
     '\x00', '\x00', '\x00', '\x00',
     '\x00', '\x0d',
     '\x00', '\x01', '\x00', '\x02', '\x00', '\x03',
@@ -100,7 +106,7 @@ const char RecordSRV[] = {
 const char RecordTXT[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x10',
-    '\x00', '\x00',
+    '\x00', '\x01',
     '\x00', '\x00', '\x00', '\x00',
     '\x00', '\x08',
     '\x03', 'a', '=', 'a',
@@ -137,6 +143,11 @@ private Q_SLOTS:
     void testParseRecordPTR();
     void testParseRecordSRV();
     void testParseRecordTXT();
+
+    void testWriteRecordA();
+    void testWriteRecordAAAA();
+    void testWriteRecordPTR();
+    void testWriteRecordSRV();
 };
 
 void TestDns::testParseName_data()
@@ -279,6 +290,59 @@ void TestDns::testParseRecordTXT()
     QCOMPARE(result, true);
     QCOMPARE(record.type(), static_cast<quint16>(QMdnsEngine::TXT));
     QCOMPARE(record.attributes(), Attributes);
+}
+
+void TestDns::testWriteRecordA()
+{
+    QMdnsEngine::Record record;
+    record.setName(Name);
+    record.setType(QMdnsEngine::A);
+    record.setFlushCache(true);
+    record.setTtl(Ttl);
+    record.setAddress(Ipv4Address);
+
+    WRITE_RECORD();
+
+    QCOMPARE(packet, QByteArray(RecordA, sizeof(RecordA)));
+}
+
+void TestDns::testWriteRecordAAAA()
+{
+    QMdnsEngine::Record record;
+    record.setName(Name);
+    record.setType(QMdnsEngine::AAAA);
+    record.setAddress(Ipv6Address);
+
+    WRITE_RECORD();
+
+    QCOMPARE(packet, QByteArray(RecordAAAA, sizeof(RecordAAAA)));
+}
+
+void TestDns::testWriteRecordPTR()
+{
+    QMdnsEngine::Record record;
+    record.setName(Name);
+    record.setType(QMdnsEngine::PTR);
+    record.setTarget(Target);
+
+    WRITE_RECORD();
+
+    QCOMPARE(packet, QByteArray(RecordPTR, sizeof(RecordPTR)));
+}
+
+void TestDns::testWriteRecordSRV()
+{
+    QMdnsEngine::Record record;
+    record.setName(Name);
+    record.setType(QMdnsEngine::SRV);
+    record.setPriority(Priority);
+    record.setWeight(Weight);
+    record.setPort(Port);
+    record.setTarget(Target);
+
+    WRITE_RECORD();
+
+    QCOMPARE(packet, QByteArray(RecordSRV, sizeof(RecordSRV)));
 }
 
 QTEST_MAIN(TestDns)
