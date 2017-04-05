@@ -73,6 +73,16 @@ void TestDns::testParseName_data()
             << static_cast<quint16>(19)
             << QByteArray("test._tcp.local.")
             << true;
+
+    const char corruptData[] = {
+        '\x03', '1', '2'
+    };
+    QTest::newRow("corrupt data")
+            << QByteArray(corruptData, sizeof(corruptData))
+            << static_cast<quint16>(0)
+            << static_cast<quint16>(0)
+            << QByteArray()
+            << false;
 }
 
 void TestDns::testParseName()
