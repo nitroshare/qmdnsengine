@@ -17,6 +17,13 @@ set(CMAKE_AUTOMOC ON)
 
 add_subdirectory(src)
 
+option(BUILD_TESTS "Build test suite" OFF)
+if(BUILD_TESTS)
+    find_package(Qt5Test 5.4 REQUIRED)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
 include(CPack)
 
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
