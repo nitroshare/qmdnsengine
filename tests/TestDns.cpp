@@ -41,6 +41,7 @@ void TestDns::testParseName_data()
 {
     QTest::addColumn<QByteArray>("packet");
     QTest::addColumn<quint16>("initialOffset");
+    QTest::addColumn<quint16>("correctOffset");
     QTest::addColumn<QByteArray>("correctName");
     QTest::addColumn<bool>("correctResult");
 
@@ -52,7 +53,22 @@ void TestDns::testParseName_data()
     QTest::newRow("simple")
             << QByteArray(simpleData, sizeof(simpleData))
             << static_cast<quint16>(0)
+            << static_cast<quint16>(12)
             << QByteArray("_tcp.local.")
+            << true;
+
+    const char pointerData[] = {
+        '\x04', '_', 't', 'c', 'p',
+        '\x05', 'l', 'o', 'c', 'a', 'l',
+        '\0',
+        '\x04', 't', 'e', 's', 't',
+        '\xc0', '\0'
+    };
+    QTest::newRow("pointer")
+            << QByteArray(pointerData, sizeof(pointerData))
+            << static_cast<quint16>(12)
+            << static_cast<quint16>(19)
+            << QByteArray("test._tcp.local.")
             << true;
 }
 
@@ -60,6 +76,7 @@ void TestDns::testParseName()
 {
     QFETCH(QByteArray, packet);
     QFETCH(quint16, initialOffset);
+    QFETCH(quint16, correctOffset);
     QFETCH(QByteArray, correctName);
     QFETCH(bool, correctResult);
 
@@ -69,7 +86,7 @@ void TestDns::testParseName()
 
     QCOMPARE(result, correctResult);
     if (result) {
-        QCOMPARE(offset - initialOffset, packet.length());
+        QCOMPARE(offset, correctOffset);
         QCOMPARE(name, correctName);
     }
 }
