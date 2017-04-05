@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <QHostAddress>
 #include <QMap>
 #include <QObject>
 #include <QTest>
@@ -29,14 +30,75 @@
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/record.h>
 
-#define PARSE_RECORD() \
+#define PARSE_RECORD(r) \
     quint16 offset = 0; \
     QMdnsEngine::Record record; \
     bool result = QMdnsEngine::parseRecord( \
-        QByteArray(packetData, sizeof(packetData)), \
+        QByteArray(r, sizeof(r)), \
         offset, \
         record \
     )
+
+const char RecordA[] = {
+    '\x04', 't', 'e', 's', 't', '\0',
+    '\x00', '\x01',
+    '\x80', '\x00',
+    '\x00', '\x00', '\x0e', '\x10',
+    '\x00', '\x04',
+    '\x7f', '\x00', '\x00', '\x01'
+};
+
+const char RecordAAAA[] = {
+    '\x04', 't', 'e', 's', 't', '\0',
+    '\x00', '\x1c',
+    '\x00', '\x00',
+    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x10',
+    '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x01'
+};
+
+const char RecordPTR[] = {
+    '\x04', 't', 'e', 's', 't', '\0',
+    '\x00', '\x0c',
+    '\x00', '\x00',
+    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x07',
+    '\x05', 't', 'e', 's', 't', '2', '\0',
+};
+
+const char RecordSRV[] = {
+    '\x04', 't', 'e', 's', 't', '\0',
+    '\x00', '\x21',
+    '\x00', '\x00',
+    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x0d',
+    '\x00', '\x01', '\x00', '\x02', '\x00', '\x03',
+    '\x05', 't', 'e', 's', 't', '2', '\0',
+};
+
+const char RecordTXT[] = {
+    '\x04', 't', 'e', 's', 't', '\0',
+    '\x00', '\x10',
+    '\x00', '\x00',
+    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x08',
+    '\x03', 'a', '=', 'a',
+    '\x03', 'b', '=', 'b'
+};
+
+const QByteArray Name("test.");
+const quint32 Ttl = 3600;
+const QHostAddress Ipv4Address("127.0.0.1");
+const QHostAddress Ipv6Address("::1");
+const QByteArray Target("test2.");
+const quint16 Priority = 1;
+const quint16 Weight = 2;
+const quint16 Port = 3;
+const QMap<QByteArray, QByteArray> Attributes{
+    {"a", "a"},
+    {"b", "b"}
+};
 
 class TestDns : public QObject
 {
@@ -120,56 +182,28 @@ void TestDns::testParseName()
 
 void TestDns::testParseRecordA()
 {
-    const char packetData[] = {
-        '\x04', 't', 'e', 's', 't', '\0',
-        '\x00', '\x01',
-        '\x80', '\x00',
-        '\x00', '\x00', '\x0e', '\x10',
-        '\x00', '\x04',
-        '\x7f', '\x00', '\x00', '\x01'
-    };
-
-    PARSE_RECORD();
+    PARSE_RECORD(RecordA);
 
     QCOMPARE(result, true);
-    QCOMPARE(record.name(), QByteArray("test."));
+    QCOMPARE(record.name(), Name);
     QCOMPARE(record.type(), static_cast<quint16>(QMdnsEngine::A));
     QCOMPARE(record.flushCache(), true);
-    QCOMPARE(record.ttl(), static_cast<quint32>(3600));
-    QCOMPARE(record.address(), QHostAddress("127.0.0.1"));
+    QCOMPARE(record.ttl(), Ttl);
+    QCOMPARE(record.address(), Ipv4Address);
 }
 
 void TestDns::testParseRecordAAAA()
 {
-    const char packetData[] = {
-        '\x04', 't', 'e', 's', 't', '\0',
-        '\x00', '\x1c',
-        '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x10',
-        '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x01'
-    };
-
-    PARSE_RECORD();
+    PARSE_RECORD(RecordAAAA);
 
     QCOMPARE(result, true);
     QCOMPARE(record.type(), static_cast<quint16>(QMdnsEngine::AAAA));
-    QCOMPARE(record.address(), QHostAddress("::1"));
+    QCOMPARE(record.address(), Ipv6Address);
 }
 
 void TestDns::testParseRecordPTR()
 {
-    const char packetData[] = {
-        '\x04', 't', 'e', 's', 't', '\0',
-        '\x00', '\x0c',
-        '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x07',
-        '\x05', 't', 'e', 's', 't', '2', '\0',
-    };
-
-    PARSE_RECORD();
+    PARSE_RECORD(RecordPTR);
 
     QCOMPARE(result, true);
     QCOMPARE(record.type(), static_cast<quint16>(QMdnsEngine::PTR));
@@ -178,48 +212,23 @@ void TestDns::testParseRecordPTR()
 
 void TestDns::testParseRecordSRV()
 {
-    const char packetData[] = {
-        '\x04', 't', 'e', 's', 't', '\0',
-        '\x00', '\x21',
-        '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x0d',
-        '\x00', '\x01', '\x00', '\x02', '\x00', '\x03',
-        '\x05', 't', 'e', 's', 't', '2', '\0',
-    };
-
-    PARSE_RECORD();
+    PARSE_RECORD(RecordSRV);
 
     QCOMPARE(result, true);
     QCOMPARE(record.type(), static_cast<quint16>(QMdnsEngine::SRV));
-    QCOMPARE(record.priority(), static_cast<quint16>(1));
-    QCOMPARE(record.weight(), static_cast<quint16>(2));
-    QCOMPARE(record.port(), static_cast<quint16>(3));
-    QCOMPARE(record.target(), QByteArray("test2."));
+    QCOMPARE(record.priority(), Priority);
+    QCOMPARE(record.weight(), Weight);
+    QCOMPARE(record.port(), Port);
+    QCOMPARE(record.target(), Target);
 }
 
 void TestDns::testParseRecordTXT()
 {
-    const char packetData[] = {
-        '\x04', 't', 'e', 's', 't', '\0',
-        '\x00', '\x10',
-        '\x00', '\x00',
-        '\x00', '\x00', '\x00', '\x00',
-        '\x00', '\x08',
-        '\x03', 'a', '=', 'a',
-        '\x03', 'b', '=', 'b'
-    };
-
-    PARSE_RECORD();
-
-    QMap<QByteArray, QByteArray> attributes{
-        {"a", "a"},
-        {"b", "b"}
-    };
+    PARSE_RECORD(RecordTXT);
 
     QCOMPARE(result, true);
     QCOMPARE(record.type(), static_cast<quint16>(QMdnsEngine::TXT));
-    QCOMPARE(record.attributes(), attributes);
+    QCOMPARE(record.attributes(), Attributes);
 }
 
 QTEST_MAIN(TestDns)
