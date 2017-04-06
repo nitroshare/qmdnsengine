@@ -148,6 +148,7 @@ private Q_SLOTS:
     void testWriteRecordAAAA();
     void testWriteRecordPTR();
     void testWriteRecordSRV();
+    void testWriteRecordTXT();
 };
 
 void TestDns::testParseName_data()
@@ -343,6 +344,20 @@ void TestDns::testWriteRecordSRV()
     WRITE_RECORD();
 
     QCOMPARE(packet, QByteArray(RecordSRV, sizeof(RecordSRV)));
+}
+
+void TestDns::testWriteRecordTXT()
+{
+    QMdnsEngine::Record record;
+    record.setName(Name);
+    record.setType(QMdnsEngine::TXT);
+    for (auto i = Attributes.constBegin(); i != Attributes.constEnd(); ++i) {
+        record.addAttribute(i.key(), i.value());
+    }
+
+    WRITE_RECORD();
+
+    QCOMPARE(packet, QByteArray(RecordTXT, sizeof(RecordTXT)));
 }
 
 QTEST_MAIN(TestDns)
