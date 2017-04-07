@@ -28,13 +28,68 @@
 
 using namespace QMdnsEngine;
 
+bool QMdnsEngine::operator<(const CacheKey &key1, const CacheKey &key2)
+{
+    return key1.type == key2.type ?
+        key1.name < key2.name :
+        key1.type < key2.type;
+}
+
 CachePrivate::CachePrivate(QObject *parent)
     : QObject(parent)
 {
+    connect(&mTimer, &QTimer::timeout, this, &CachePrivate::onTimeout);
+
+    mTimer.setSingleShot(true);
+}
+
+void CachePrivate::onTimeout()
+{
+    // Filter out expired entries and find the next earliest expiry
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime nextExpiry;
+    for (auto i = mRecords.begin(); i != mRecords.end(); ++i) {
+        if (i.value().expiry <= now) {
+            i = mRecords.erase(i);
+        } else {
+            nextExpiry = qMin(i.value().expiry, nextExpiry);
+        }
+    }
+
+    // Set the timer for the point when the next record expires
+    mNextExpiry = nextExpiry;
+    if (mNextExpiry.isValid()) {
+        mTimer.start(now.msecsTo(nextExpiry));
+    }
 }
 
 Cache::Cache(QObject *parent)
     : QObject(parent),
       d(new CachePrivate(this))
 {
+}
+
+void Cache::addRecord(const Record &record, const QDateTime &now)
+{
+    QDateTime expiry = now.addSecs(record.ttl());
+    d->mRecords.insert(
+        {record.name(), record.type()},
+        {expiry, record}
+    );
+
+    // Determine if the record expires sooner than the next one
+    if (expiry < d->mNextExpiry) {
+        d->mTimer.stop();
+        d->mTimer.start(now.msecsTo(expiry));
+    }
+}
+
+bool Cache::lookup(const QByteArray &name, quint16 type, Record &record)
+{
+    CacheValue value = d->mRecords.value({name, type});
+    if (value.expiry.isValid()) {
+        record = value.record;
+        return true;
+    }
+    return false;
 }

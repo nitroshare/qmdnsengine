@@ -25,11 +25,15 @@
 #ifndef QMDNSENGINE_CACHE_H
 #define QMDNSENGINE_CACHE_H
 
+#include <QDateTime>
 #include <QObject>
 
 #include "qmdnsengine_export.h"
 
-namespace QMdnsEngine {
+namespace QMdnsEngine
+{
+
+class Record;
 
 class QMDNSENGINE_EXPORT CachePrivate;
 
@@ -46,6 +50,25 @@ class QMDNSENGINE_EXPORT Cache : public QObject
 public:
 
     explicit Cache(QObject *parent = 0);
+
+    /**
+     * @brief Add a record to the cache
+     * @param record add this record to the cache
+     * @param now time to calculate TTL relative to
+     *
+     * The TTL for the record will be added to the provided time to calculate
+     * when the record expires.
+     */
+    void addRecord(const Record &record, const QDateTime &now = QDateTime::currentDateTime());
+
+    /**
+     * @brief Retrieve a record from the cache
+     * @param name name of record to retrieve
+     * @param type type of record to retrieve
+     * @param record storage for the record retrieved
+     * @return true if the record was retrieved
+     */
+    bool lookup(const QByteArray &name, quint16 type, Record &record);
 
 private:
 
