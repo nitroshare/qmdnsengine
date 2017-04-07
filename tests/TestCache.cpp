@@ -22,7 +22,6 @@
  * IN THE SOFTWARE.
  */
 
-#include <QDateTime>
 #include <QObject>
 #include <QTest>
 
@@ -41,21 +40,21 @@ private Q_SLOTS:
 
 void TestCache::testExpiry()
 {
-    QDateTime now = QDateTime::currentDateTime();
-
     QMdnsEngine::Record record;
     record.setName("Test");
     record.setType(QMdnsEngine::A);
     record.setTtl(0);
 
     QMdnsEngine::Cache cache;
-    cache.addRecord(record, now);
+    cache.addRecord(record);
 
     // The record should be in the cache
     QVERIFY(cache.lookup(record.name(), record.type(), record));
 
+    QTest::qWait(0);
+
     // After entering the event loop, the record should not be purged
-    QTRY_VERIFY(!cache.lookup(record.name(), record.type(), record));
+    QVERIFY(!cache.lookup(record.name(), record.type(), record));
 }
 
 QTEST_MAIN(TestCache)
