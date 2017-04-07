@@ -108,9 +108,9 @@ const char RecordTXT[] = {
     '\x00', '\x10',
     '\x00', '\x01',
     '\x00', '\x00', '\x00', '\x00',
-    '\x00', '\x08',
+    '\x00', '\x06',
     '\x03', 'a', '=', 'a',
-    '\x03', 'b', '=', 'b'
+    '\x01', 'b'
 };
 
 const QByteArray Name("test.");
@@ -123,7 +123,7 @@ const quint16 Weight = 2;
 const quint16 Port = 3;
 const QMap<QByteArray, QByteArray> Attributes{
     {"a", "a"},
-    {"b", "b"}
+    {"b", QByteArray()}
 };
 
 class TestDns : public QObject
