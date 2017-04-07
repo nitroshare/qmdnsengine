@@ -53,3 +53,33 @@ Service::~Service()
 {
     delete d;
 }
+
+QByteArray Service::type() const
+{
+    return d->type;
+}
+
+void Service::setType(const QByteArray &type)
+{
+    d->type = type;
+}
+
+QByteArray Service::name() const
+{
+    return d->name;
+}
+
+void Service::setName(const QByteArray &name)
+{
+    d->name = name;
+}
+
+quint16 Service::port() const
+{
+    return d->port;
+}
+
+void Service::setPort(quint16 port)
+{
+    d->port = port;
+}

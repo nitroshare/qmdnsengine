@@ -25,6 +25,8 @@
 #ifndef QMDNSENGINE_SERVICE_H
 #define QMDNSENGINE_SERVICE_H
 
+#include <QByteArray>
+
 #include "qmdnsengine_export.h"
 
 namespace QMdnsEngine
@@ -43,6 +45,41 @@ public:
     Service(const Service &other);
     Service &operator=(const Service &other);
     virtual ~Service();
+
+    /**
+     * @brief Retrieve the service type
+     */
+    QByteArray type() const;
+
+    /**
+     * @brief Set the service type
+     *
+     * For example, an HTTP service might use "_http._tcp".
+     */
+    void setType(const QByteArray &type);
+
+    /**
+     * @brief Retrieve the service name
+     */
+    QByteArray name() const;
+
+    /**
+     * @brief Set the service name
+     *
+     * This is combined with the service type and domain to form the FQDN for
+     * the service.
+     */
+    void setName(const QByteArray &name);
+
+    /**
+     * @brief Retrieve the service port
+     */
+    quint16 port() const;
+
+    /**
+     * @brief Set the service port
+     */
+    void setPort(quint16 port);
 
 private:
 

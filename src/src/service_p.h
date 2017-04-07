@@ -25,6 +25,8 @@
 #ifndef QMDNSENGINE_SERVICE_P_H
 #define QMDNSENGINE_SERVICE_P_H
 
+#include <QByteArray>
+
 namespace QMdnsEngine
 {
 
@@ -33,6 +35,10 @@ class ServicePrivate
 public:
 
     ServicePrivate();
+
+    QByteArray type;
+    QByteArray name;
+    quint16 port;
 };
 
 }
