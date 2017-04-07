@@ -96,7 +96,7 @@ void ServerPrivate::onTimeout()
                     ipv4Address = ipv4Address || address.protocol() == QAbstractSocket::IPv4Protocol;
                     ipv6Address = ipv6Address || address.protocol() == QAbstractSocket::IPv6Protocol;
                 }
-                if (ipv4Bound && ipv6Address) {
+                if (ipv4Bound && ipv4Address) {
                     ipv4Socket.joinMulticastGroup(MdnsIpv4Address, interface);
                 }
                 if (ipv6Bound && ipv6Address) {

@@ -33,7 +33,6 @@
 namespace QMdnsEngine
 {
 
-class Message;
 class Server;
 
 class ServerPrivate : public QObject
