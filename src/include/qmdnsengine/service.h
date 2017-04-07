@@ -26,6 +26,7 @@
 #define QMDNSENGINE_SERVICE_H
 
 #include <QByteArray>
+#include <QMap>
 
 #include "qmdnsengine_export.h"
 
@@ -80,6 +81,19 @@ public:
      * @brief Set the service port
      */
     void setPort(quint16 port);
+
+    /**
+     * @brief Retrieve the attributes for the service
+     *
+     * Boolean attributes will have null values (invoking QByteArray::isNull()
+     * on the value will return true).
+     */
+    QMap<QByteArray, QByteArray> attributes() const;
+
+    /**
+     * @brief Set the attributes for the service
+     */
+    void setAttributes(const QMap<QByteArray, QByteArray> &attributes);
 
 private:
 

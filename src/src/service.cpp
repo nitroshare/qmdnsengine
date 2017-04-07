@@ -83,3 +83,13 @@ void Service::setPort(quint16 port)
 {
     d->port = port;
 }
+
+QMap<QByteArray, QByteArray> Service::attributes() const
+{
+    return d->attributes;
+}
+
+void Service::setAttributes(const QMap<QByteArray, QByteArray> &attributes)
+{
+    d->attributes = attributes;
+}
