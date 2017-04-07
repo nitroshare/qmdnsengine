@@ -48,11 +48,12 @@ void CachePrivate::onTimeout()
     // Filter out expired entries and find the next earliest expiry
     QDateTime now = QDateTime::currentDateTime();
     QDateTime nextExpiry;
-    for (auto i = mRecords.begin(); i != mRecords.end(); ++i) {
+    for (auto i = mRecords.begin(); i != mRecords.end();) {
         if (i.value().expiry <= now) {
             i = mRecords.erase(i);
         } else {
             nextExpiry = qMin(i.value().expiry, nextExpiry);
+            ++i;
         }
     }
 
@@ -78,7 +79,7 @@ void Cache::addRecord(const Record &record, const QDateTime &now)
     );
 
     // Determine if the record expires sooner than the next one
-    if (expiry < d->mNextExpiry) {
+    if (d->mNextExpiry.isNull() || expiry < d->mNextExpiry) {
         d->mTimer.stop();
         d->mTimer.start(now.msecsTo(expiry));
     }

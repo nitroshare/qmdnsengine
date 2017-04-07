@@ -1,4 +1,5 @@
 set(TESTS
+    TestCache
     TestDns
 )
 
