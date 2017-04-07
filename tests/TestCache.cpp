@@ -41,12 +41,12 @@ private Q_SLOTS:
 
 void TestCache::testExpiry()
 {
-    QDateTime now = QDateTime::currentDateTime().addSecs(-1);
+    QDateTime now = QDateTime::currentDateTime();
 
     QMdnsEngine::Record record;
     record.setName("Test");
     record.setType(QMdnsEngine::A);
-    record.setTtl(1);
+    record.setTtl(0);
 
     QMdnsEngine::Cache cache;
     cache.addRecord(record, now);
