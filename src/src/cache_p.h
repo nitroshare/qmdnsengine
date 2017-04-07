@@ -57,9 +57,9 @@ public:
 
     CachePrivate(QObject *parent);
 
-    QTimer mTimer;
-    QDateTime mNextExpiry;
-    QMap<CacheKey, CacheValue> mRecords;
+    QTimer timer;
+    QDateTime nextExpiry;
+    QMap<CacheKey, CacheValue> records;
 
 private Q_SLOTS:
 

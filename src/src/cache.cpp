@@ -38,29 +38,29 @@ bool QMdnsEngine::operator<(const CacheKey &key1, const CacheKey &key2)
 CachePrivate::CachePrivate(QObject *parent)
     : QObject(parent)
 {
-    connect(&mTimer, &QTimer::timeout, this, &CachePrivate::onTimeout);
+    connect(&timer, &QTimer::timeout, this, &CachePrivate::onTimeout);
 
-    mTimer.setSingleShot(true);
+    timer.setSingleShot(true);
 }
 
 void CachePrivate::onTimeout()
 {
     // Filter out expired entries and find the next earliest expiry
     QDateTime now = QDateTime::currentDateTime();
-    QDateTime nextExpiry;
-    for (auto i = mRecords.begin(); i != mRecords.end();) {
+    QDateTime newNextExpiry;
+    for (auto i = records.begin(); i != records.end();) {
         if (i.value().expiry <= now) {
-            i = mRecords.erase(i);
+            i = records.erase(i);
         } else {
-            nextExpiry = qMin(i.value().expiry, nextExpiry);
+            newNextExpiry = qMin(i.value().expiry, newNextExpiry);
             ++i;
         }
     }
 
     // Set the timer for the point when the next record expires
-    mNextExpiry = nextExpiry;
-    if (mNextExpiry.isValid()) {
-        mTimer.start(now.msecsTo(nextExpiry));
+    nextExpiry = newNextExpiry;
+    if (nextExpiry.isValid()) {
+        timer.start(now.msecsTo(nextExpiry));
     }
 }
 
@@ -73,21 +73,21 @@ Cache::Cache(QObject *parent)
 void Cache::addRecord(const Record &record, const QDateTime &now)
 {
     QDateTime expiry = now.addSecs(record.ttl());
-    d->mRecords.insert(
+    d->records.insert(
         {record.name(), record.type()},
         {expiry, record}
     );
 
     // Determine if the record expires sooner than the next one
-    if (d->mNextExpiry.isNull() || expiry < d->mNextExpiry) {
-        d->mTimer.stop();
-        d->mTimer.start(now.msecsTo(expiry));
+    if (d->nextExpiry.isNull() || expiry < d->nextExpiry) {
+        d->timer.stop();
+        d->timer.start(now.msecsTo(expiry));
     }
 }
 
 bool Cache::lookup(const QByteArray &name, quint16 type, Record &record)
 {
-    CacheValue value = d->mRecords.value({name, type});
+    CacheValue value = d->records.value({name, type});
     if (value.expiry.isValid()) {
         record = value.record;
         return true;
