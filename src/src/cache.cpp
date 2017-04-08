@@ -28,6 +28,13 @@
 
 using namespace QMdnsEngine;
 
+bool QMdnsEngine::operator<(const CacheKey &key1, const CacheKey &key2)
+{
+    return key1.type == key2.type ?
+        key1.name < key2.name :
+        key1.type < key2.type;
+}
+
 CachePrivate::CachePrivate(Cache *cache)
     : QObject(cache),
       q(cache)
@@ -39,20 +46,20 @@ CachePrivate::CachePrivate(Cache *cache)
 
 void CachePrivate::onTimeout()
 {
-    // Filter out expired items and find the next earliest expiry
+    // Filter out expired entries and find the next earliest expiry
     QDateTime now = QDateTime::currentDateTime();
     QDateTime newNextExpiry;
-    for (auto i = items.begin(); i != items.end();) {
+    for (auto i = records.begin(); i != records.end();) {
         if (i.value().expiry <= now) {
-            emit q->itemExpired(i.key(), i.value().item);
-            i = items.erase(i);
+            emit q->recordExpired(i.value().record);
+            i = records.erase(i);
         } else {
             newNextExpiry = qMin(i.value().expiry, newNextExpiry);
             ++i;
         }
     }
 
-    // Set the timer for the point when the next item expires
+    // Set the timer for the point when the next record expires
     nextExpiry = newNextExpiry;
     if (nextExpiry.isValid()) {
         timer.start(now.msecsTo(nextExpiry));
@@ -65,20 +72,27 @@ Cache::Cache(QObject *parent)
 {
 }
 
-void Cache::addItem(const QVariant &name, const QVariant &item, quint16 ttl)
+void Cache::addRecord(const Record &record, const QDateTime &now)
 {
-    QDateTime now = QDateTime::currentDateTime();
-    QDateTime expiry = now.addSecs(ttl);
-    d->items.insert(name, {expiry, item});
+    QDateTime expiry = now.addSecs(record.ttl());
+    d->records.insert(
+        {record.name(), record.type()},
+        {expiry, record}
+    );
 
-    // Determine if the item expires sooner than the next one
+    // Determine if the record expires sooner than the next one
     if (d->nextExpiry.isNull() || expiry < d->nextExpiry) {
         d->timer.stop();
         d->timer.start(now.msecsTo(expiry));
     }
 }
 
-QVariant Cache::lookup(const QVariant &name)
+bool Cache::lookup(const QByteArray &name, quint16 type, Record &record)
 {
-    return d->items.value(name).item;
+    CacheValue value = d->records.value({name, type});
+    if (value.expiry.isValid()) {
+        record = value.record;
+        return true;
+    }
+    return false;
 }
