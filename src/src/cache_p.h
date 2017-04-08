@@ -26,7 +26,7 @@
 #define QMDNSENGINE_CACHE_P_H
 
 #include <QDateTime>
-#include <QMap>
+#include <QList>
 #include <QObject>
 #include <QTimer>
 
@@ -36,32 +36,23 @@ namespace QMdnsEngine {
 
 class Cache;
 
-// The record name and type make it unique
-struct CacheKey {
-    QByteArray name;
-    quint16 type;
-};
-
-// Store the time of expiry with the record
-struct CacheValue
-{
-    QDateTime expiry;
-    Record record;
-};
-
-bool operator<(const CacheKey &key1, const CacheKey &key2);
-
 class CachePrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
+    struct Entry
+    {
+        Record record;
+        QList<QDateTime> triggers;
+    };
+
     CachePrivate(Cache *cache);
 
     QTimer timer;
-    QDateTime nextExpiry;
-    QMap<CacheKey, CacheValue> records;
+    QList<Entry> entries;
+    QDateTime nextTrigger;
 
 private Q_SLOTS:
 

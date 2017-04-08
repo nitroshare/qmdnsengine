@@ -41,7 +41,8 @@ class QMDNSENGINE_EXPORT CachePrivate;
  * @brief Cache for DNS records
  *
  * Records are stored in the cache until they are considered to have expired,
- * at which point they are purged.
+ * at which point they are purged. The shouldQuery() signal is used to
+ * indicate when a record is approaching expiry.
  */
 class QMDNSENGINE_EXPORT Cache : public QObject
 {
@@ -57,7 +58,8 @@ public:
      * @param now time to calculate TTL relative to
      *
      * The TTL for the record will be added to the provided time to calculate
-     * when the record expires.
+     * when the record expires. Existing records of the same name and type
+     * will be replaced, resetting their expiration.
      */
     void addRecord(const Record &record, const QDateTime &now = QDateTime::currentDateTime());
 
@@ -71,6 +73,14 @@ public:
     bool lookup(const QByteArray &name, quint16 type, Record &record);
 
 Q_SIGNALS:
+
+    /**
+     * @brief Indicate that a record will expire soon and a new query should be issued
+     *
+     * This is done when a record reaches approximately 50%, 85%, 90%, and 95%
+     * of its lifetime.
+     */
+    void shouldQuery(const Record &record);
 
     /**
      * @brief Indicate that the specified record expired
