@@ -25,6 +25,7 @@
 #ifndef QMDNSENGINE_MDNS_H
 #define QMDNSENGINE_MDNS_H
 
+#include <QByteArray>
 #include <QHostAddress>
 
 #include "qmdnsengine_export.h"
@@ -35,6 +36,7 @@ namespace QMdnsEngine
 QMDNSENGINE_EXPORT extern const quint16 MdnsPort;
 QMDNSENGINE_EXPORT extern const QHostAddress MdnsIpv4Address;
 QMDNSENGINE_EXPORT extern const QHostAddress MdnsIpv6Address;
+QMDNSENGINE_EXPORT extern const QByteArray MdnsBrowseType;
 
 }
 
