@@ -1,5 +1,6 @@
 set(HEADERS
     include/qmdnsengine/bitmap.h
+    include/qmdnsengine/browser.h
     include/qmdnsengine/cache.h
     include/qmdnsengine/dns.h
     include/qmdnsengine/mdns.h
@@ -13,6 +14,7 @@ set(HEADERS
 
 set(SRC
     src/bitmap.cpp
+    src/browser.cpp
     src/cache.cpp
     src/dns.cpp
     src/mdns.cpp
