@@ -70,6 +70,13 @@ public:
      */
     bool lookup(const QByteArray &name, quint16 type, Record &record);
 
+Q_SIGNALS:
+
+    /**
+     * @brief Indicate that the specified record expired
+     */
+    void recordExpired(const Record &record);
+
 private:
 
     CachePrivate *const d;

@@ -23,11 +23,14 @@
  */
 
 #include <QObject>
+#include <QSignalSpy>
 #include <QTest>
 
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/cache.h>
 #include <qmdnsengine/record.h>
+
+Q_DECLARE_METATYPE(QMdnsEngine::Record)
 
 class TestCache : public QObject
 {
@@ -35,8 +38,14 @@ class TestCache : public QObject
 
 private Q_SLOTS:
 
+    void initTestCase();
     void testExpiry();
 };
+
+void TestCache::initTestCase()
+{
+    qRegisterMetaType<QMdnsEngine::Record>("Record");
+}
 
 void TestCache::testExpiry()
 {
@@ -48,13 +57,17 @@ void TestCache::testExpiry()
     QMdnsEngine::Cache cache;
     cache.addRecord(record);
 
+    QSignalSpy recordExpiredSpy(&cache, SIGNAL(recordExpired(Record)));
+
     // The record should be in the cache
     QVERIFY(cache.lookup(record.name(), record.type(), record));
 
     QTest::qWait(0);
 
-    // After entering the event loop, the record should not be purged
+    // After entering the event loop, the record should have been purged and
+    // the recordExpired() signal emitted
     QVERIFY(!cache.lookup(record.name(), record.type(), record));
+    QCOMPARE(recordExpiredSpy.count(), 1);
 }
 
 QTEST_MAIN(TestCache)

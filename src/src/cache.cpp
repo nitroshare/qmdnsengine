@@ -35,8 +35,9 @@ bool QMdnsEngine::operator<(const CacheKey &key1, const CacheKey &key2)
         key1.type < key2.type;
 }
 
-CachePrivate::CachePrivate(QObject *parent)
-    : QObject(parent)
+CachePrivate::CachePrivate(Cache *cache)
+    : QObject(cache),
+      q(cache)
 {
     connect(&timer, &QTimer::timeout, this, &CachePrivate::onTimeout);
 
@@ -50,6 +51,7 @@ void CachePrivate::onTimeout()
     QDateTime newNextExpiry;
     for (auto i = records.begin(); i != records.end();) {
         if (i.value().expiry <= now) {
+            emit q->recordExpired(i.value().record);
             i = records.erase(i);
         } else {
             newNextExpiry = qMin(i.value().expiry, newNextExpiry);

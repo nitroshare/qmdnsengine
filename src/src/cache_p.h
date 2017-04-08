@@ -34,6 +34,8 @@
 
 namespace QMdnsEngine {
 
+class Cache;
+
 // The record name and type make it unique
 struct CacheKey {
     QByteArray name;
@@ -55,7 +57,7 @@ class CachePrivate : public QObject
 
 public:
 
-    CachePrivate(QObject *parent);
+    CachePrivate(Cache *cache);
 
     QTimer timer;
     QDateTime nextExpiry;
@@ -64,6 +66,10 @@ public:
 private Q_SLOTS:
 
     void onTimeout();
+
+private:
+
+    Cache *const q;
 };
 
 }
