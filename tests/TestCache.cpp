@@ -26,11 +26,33 @@
 #include <QSignalSpy>
 #include <QTest>
 
-#include <qmdnsengine/dns.h>
 #include <qmdnsengine/cache.h>
-#include <qmdnsengine/record.h>
 
-Q_DECLARE_METATYPE(QMdnsEngine::Record)
+const QByteArray Name("name");
+const QByteArray NameInvalid("name2");
+
+// Test item used for storage in QVariant
+class TestItem
+{
+public:
+    QByteArray value1;
+    quint16 value2;
+};
+
+Q_DECLARE_METATYPE(TestItem)
+
+bool operator==(const TestItem &item1, const TestItem &item2)
+{
+    return item1.value1 == item2.value1 && item1.value2 == item2.value2;
+}
+
+bool operator<(const TestItem &item1, const TestItem &item2)
+{
+    return item1.value2 == item2.value2 ?
+        item1.value1 < item1.value1 : item1.value2 < item2.value2;
+}
+
+const TestItem Item{"item", 42};
 
 class TestCache : public QObject
 {
@@ -44,30 +66,25 @@ private Q_SLOTS:
 
 void TestCache::initTestCase()
 {
-    qRegisterMetaType<QMdnsEngine::Record>("Record");
+    QMetaType::registerComparators<TestItem>();
 }
 
 void TestCache::testExpiry()
 {
-    QMdnsEngine::Record record;
-    record.setName("Test");
-    record.setType(QMdnsEngine::A);
-    record.setTtl(0);
-
     QMdnsEngine::Cache cache;
-    cache.addRecord(record);
+    cache.addItem(Name, QVariant::fromValue(Item), 0);
 
-    QSignalSpy recordExpiredSpy(&cache, SIGNAL(recordExpired(Record)));
+    // The item should be in the cache and invalid names should fail
+    QCOMPARE(cache.lookup(Name), QVariant::fromValue(Item));
+    QCOMPARE(cache.lookup(NameInvalid), QVariant());
 
-    // The record should be in the cache
-    QVERIFY(cache.lookup(record.name(), record.type(), record));
-
+    QSignalSpy itemExpiredSpy(&cache, SIGNAL(itemExpired(QVariant,QVariant)));
     QTest::qWait(0);
 
-    // After entering the event loop, the record should have been purged and
-    // the recordExpired() signal emitted
-    QVERIFY(!cache.lookup(record.name(), record.type(), record));
-    QCOMPARE(recordExpiredSpy.count(), 1);
+    // After entering the event loop, the item should have been purged and
+    // the itemExpired() signal emitted
+    QCOMPARE(cache.lookup(Name), QVariant());
+    QCOMPARE(itemExpiredSpy.count(), 1);
 }
 
 QTEST_MAIN(TestCache)

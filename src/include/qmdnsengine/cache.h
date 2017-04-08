@@ -27,21 +27,21 @@
 
 #include <QDateTime>
 #include <QObject>
+#include <QVariant>
 
 #include "qmdnsengine_export.h"
 
 namespace QMdnsEngine
 {
 
-class Record;
-
 class QMDNSENGINE_EXPORT CachePrivate;
 
 /**
- * @brief Cache for DNS records
+ * @brief Cache for storing items
  *
- * Records are stored in the cache until they are considered to have expired,
- * at which point they are purged.
+ * When an item is added to the cache, a TTL is provided for calculating when
+ * the item expires. Once an item expires, the itemExpired() signal is emitted
+ * and the item is removed.
  */
 class QMDNSENGINE_EXPORT Cache : public QObject
 {
@@ -52,30 +52,26 @@ public:
     explicit Cache(QObject *parent = 0);
 
     /**
-     * @brief Add a record to the cache
-     * @param record add this record to the cache
-     * @param now time to calculate TTL relative to
-     *
-     * The TTL for the record will be added to the provided time to calculate
-     * when the record expires.
+     * @brief Add an item to the cache
+     * @param name unique identifier for the item
+     * @param item add this item to the cache
+     * @param ttl number of seconds before the item expires
      */
-    void addRecord(const Record &record, const QDateTime &now = QDateTime::currentDateTime());
+    void addItem(const QVariant &name, const QVariant &item, quint16 ttl);
 
     /**
-     * @brief Retrieve a record from the cache
-     * @param name name of record to retrieve
-     * @param type type of record to retrieve
-     * @param record storage for the record retrieved
-     * @return true if the record was retrieved
+     * @brief Retrieve an item from the cache
+     * @param name unique identifier of item to retrieve
+     * @return item if it exists or a null QVariant
      */
-    bool lookup(const QByteArray &name, quint16 type, Record &record);
+    QVariant lookup(const QVariant &name);
 
 Q_SIGNALS:
 
     /**
-     * @brief Indicate that the specified record expired
+     * @brief Indicate that the specified item expired
      */
-    void recordExpired(const Record &record);
+    void itemExpired(const QVariant &name, const QVariant &item);
 
 private:
 
