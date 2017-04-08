@@ -17,6 +17,12 @@ set(CMAKE_AUTOMOC ON)
 
 add_subdirectory(src)
 
+option(BUILD_EXAMPLES "Build example applications" OFF)
+if(BUILD_EXAMPLES)
+    find_package(Qt5Widgets 5.4)
+    add_subdirectory(examples)
+endif()
+
 option(BUILD_TESTS "Build test suite" OFF)
 if(BUILD_TESTS)
     find_package(Qt5Test 5.4 REQUIRED)

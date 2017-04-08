@@ -16,6 +16,6 @@ before_script:
   - export PATH=$PATH:/opt/qt58/bin
 
 script:
-  - cmake -DBUILD_TESTS=on .
+  - cmake -DBUILD_EXAMPLES=on -DBUILD_TESTS=on .
   - make
   - ctest
