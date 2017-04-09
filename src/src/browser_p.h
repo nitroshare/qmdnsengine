@@ -25,12 +25,15 @@
 #ifndef QMDNSENGINE_BROWSER_P_H
 #define QMDNSENGINE_BROWSER_P_H
 
+#include <QByteArray>
 #include <QObject>
 
 namespace QMdnsEngine
 {
 
 class Browser;
+class Message;
+class Server;
 
 class BrowserPrivate : public QObject
 {
@@ -38,7 +41,14 @@ class BrowserPrivate : public QObject
 
 public:
 
-    explicit BrowserPrivate(Browser *browser);
+    explicit BrowserPrivate(Browser *browser, Server *server, const QByteArray &type);
+
+    Server *server;
+    QByteArray type;
+
+private Q_SLOTS:
+
+    void onMessageReceived(const Message &message);
 
 private:
 

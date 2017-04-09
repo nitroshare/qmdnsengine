@@ -23,19 +23,29 @@
  */
 
 #include <qmdnsengine/browser.h>
+#include <qmdnsengine/message.h>
+#include <qmdnsengine/server.h>
 
 #include "browser_p.h"
 
 using namespace QMdnsEngine;
 
-BrowserPrivate::BrowserPrivate(Browser *browser)
+BrowserPrivate::BrowserPrivate(Browser *browser, Server *server, const QByteArray &type)
     : QObject(browser),
-      q(browser)
+      q(browser),
+      server(server),
+      type(type)
 {
+    connect(server, &Server::messageReceived, this, &BrowserPrivate::onMessageReceived);
 }
 
-Browser::Browser(QObject *parent)
+void BrowserPrivate::onMessageReceived(const Message &message)
+{
+    //...
+}
+
+Browser::Browser(Server *server, const QByteArray &type, QObject *parent)
     : QObject(parent),
-      d(new BrowserPrivate(this))
+      d(new BrowserPrivate(this, server, type))
 {
 }

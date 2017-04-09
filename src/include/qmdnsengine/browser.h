@@ -25,12 +25,16 @@
 #ifndef QMDNSENGINE_BROWSER_H
 #define QMDNSENGINE_BROWSER_H
 
+#include <QByteArray>
 #include <QObject>
 
 #include "qmdnsengine_export.h"
 
 namespace QMdnsEngine
 {
+
+class Server;
+class Service;
 
 class QMDNSENGINE_EXPORT BrowserPrivate;
 
@@ -43,7 +47,27 @@ class QMDNSENGINE_EXPORT Browser : public QObject
 
 public:
 
-    explicit Browser(QObject *parent = 0);
+    explicit Browser(Server *server, const QByteArray &type, QObject *parent = 0);
+
+Q_SIGNALS:
+
+    /**
+     * @brief Indicate that a new service has been added
+     */
+    void serviceAdded(const Service &service);
+
+    /**
+     * @brief Indicate that the specified service was updated
+     *
+     * This signal is emitted when the SRV record for a service (identified by
+     * its name and type) has changed.
+     */
+    void serviceUpdated(const Service &service);
+
+    /**
+     * @brief Indicate that the specified service was removed
+     */
+    void serviceRemoved(const Service &service);
 
 private:
 
