@@ -40,6 +40,7 @@ private Q_SLOTS:
 
     void initTestCase();
     void testExpiry();
+    void testRemoval();
 };
 
 void TestCache::initTestCase()
@@ -67,6 +68,27 @@ void TestCache::testExpiry()
 
     // After entering the event loop, the record should have been purged and
     // the recordExpired() signal emitted
+    QVERIFY(!cache.lookup(record.name(), record.type(), record));
+    QCOMPARE(recordExpiredSpy.count(), 1);
+}
+
+void TestCache::testRemoval()
+{
+    QMdnsEngine::Record record;
+    record.setName("Test");
+    record.setType(QMdnsEngine::A);
+    record.setTtl(10);
+
+    QMdnsEngine::Cache cache;
+    cache.addRecord(record);
+
+    QSignalSpy recordExpiredSpy(&cache, SIGNAL(recordExpired(Record)));
+
+    // Purge the record from the cache by setting its TTL to 0
+    record.setTtl(0);
+    cache.addRecord(record);
+
+    // Verify that the record is gone
     QVERIFY(!cache.lookup(record.name(), record.type(), record));
     QCOMPARE(recordExpiredSpy.count(), 1);
 }

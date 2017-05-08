@@ -91,6 +91,17 @@ Cache::Cache(QObject *parent)
 
 void Cache::addRecord(const Record &record)
 {
+    // If the record has a TTL of zero, it should be removed from the cache
+    if (record.ttl() == 0) {
+        for (auto i = d->entries.begin(); i != d->entries.end();) {
+            if ((*i).record.name() == record.name() || (*i).record.type() == record.type()) {
+                emit recordExpired((*i).record);
+                i = d->entries.erase(i);
+            }
+        }
+        return;
+    }
+
     QDateTime now = QDateTime::currentDateTime();
 
     // Create triggers for the record
