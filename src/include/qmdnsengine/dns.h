@@ -36,12 +36,14 @@ namespace QMdnsEngine
 class Message;
 class Record;
 
-QMDNSENGINE_EXPORT extern const quint16 A;
-QMDNSENGINE_EXPORT extern const quint16 AAAA;
-QMDNSENGINE_EXPORT extern const quint16 NSEC;
-QMDNSENGINE_EXPORT extern const quint16 PTR;
-QMDNSENGINE_EXPORT extern const quint16 SRV;
-QMDNSENGINE_EXPORT extern const quint16 TXT;
+enum {
+    A = 1,
+    AAAA = 28,
+    NSEC = 47,
+    PTR = 12,
+    SRV = 33,
+    TXT = 16
+};
 
 /**
  * @brief Parse a name from a raw DNS packet

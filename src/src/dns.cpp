@@ -34,13 +34,6 @@
 namespace QMdnsEngine
 {
 
-const quint16 A = 1;
-const quint16 AAAA = 28;
-const quint16 NSEC = 47;
-const quint16 PTR = 12;
-const quint16 SRV = 33;
-const quint16 TXT = 16;
-
 template<class T>
 bool parseInteger(const QByteArray &packet, quint16 &offset, T &value)
 {
