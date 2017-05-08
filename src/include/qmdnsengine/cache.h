@@ -25,7 +25,6 @@
 #ifndef QMDNSENGINE_CACHE_H
 #define QMDNSENGINE_CACHE_H
 
-#include <QDateTime>
 #include <QObject>
 
 #include "qmdnsengine_export.h"
@@ -55,13 +54,12 @@ public:
     /**
      * @brief Add a record to the cache
      * @param record add this record to the cache
-     * @param now time to calculate TTL relative to
      *
-     * The TTL for the record will be added to the provided time to calculate
+     * The TTL for the record will be added to the current time to calculate
      * when the record expires. Existing records of the same name and type
      * will be replaced, resetting their expiration.
      */
-    void addRecord(const Record &record, const QDateTime &now = QDateTime::currentDateTime());
+    void addRecord(const Record &record);
 
     /**
      * @brief Retrieve a record from the cache

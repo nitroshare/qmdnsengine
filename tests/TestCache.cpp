@@ -52,7 +52,7 @@ void TestCache::testExpiry()
     QMdnsEngine::Record record;
     record.setName("Test");
     record.setType(QMdnsEngine::A);
-    record.setTtl(0);
+    record.setTtl(1);
 
     QMdnsEngine::Cache cache;
     cache.addRecord(record);
@@ -62,7 +62,8 @@ void TestCache::testExpiry()
     // The record should be in the cache
     QVERIFY(cache.lookup(record.name(), record.type(), record));
 
-    QTest::qWait(0);
+    // This unfortunately delays the test but 1s is the smallest TTL
+    QTest::qWait(1100);
 
     // After entering the event loop, the record should have been purged and
     // the recordExpired() signal emitted

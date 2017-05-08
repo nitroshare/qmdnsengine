@@ -62,7 +62,9 @@ void CachePrivate::onTimeout()
         // If any triggers remain, determine if they are the next earliest; if
         // not, remove the entry and indicate the record expired
         if (triggers.length()) {
-            newNextTrigger = qMin(triggers.at(0), newNextTrigger);
+            if (newNextTrigger.isNull() || triggers.at(0) < newNextTrigger) {
+                newNextTrigger = triggers.at(0);
+            }
             if (shouldQuery) {
                 emit q->shouldQuery((*i).record);
             }
@@ -87,8 +89,10 @@ Cache::Cache(QObject *parent)
 {
 }
 
-void Cache::addRecord(const Record &record, const QDateTime &now)
+void Cache::addRecord(const Record &record)
 {
+    QDateTime now = QDateTime::currentDateTime();
+
     // Create triggers for the record
     QList<QDateTime> triggers{
         now.addMSecs(record.ttl() * 500),  // 50%
