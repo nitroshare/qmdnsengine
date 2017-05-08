@@ -25,6 +25,7 @@
 #ifndef QMDNSENGINE_CACHE_H
 #define QMDNSENGINE_CACHE_H
 
+#include <QList>
 #include <QObject>
 
 #include "qmdnsengine_export.h"
@@ -62,13 +63,26 @@ public:
     void addRecord(const Record &record);
 
     /**
-     * @brief Retrieve a record from the cache
+     * @brief Retrieve a single record from the cache
      * @param name name of record to retrieve
      * @param type type of record to retrieve
      * @param record storage for the record retrieved
-     * @return true if the record was retrieved
+     * @return true if a record was retrieved
+     *
+     * Some record types allow multiple records to be stored with identical
+     * names and types. This method will only retrieve the first matching
+     * record. Use lookupRecords() to obtain all of the records.
      */
-    bool lookup(const QByteArray &name, quint16 type, Record &record);
+    bool lookupRecord(const QByteArray &name, quint16 type, Record &record);
+
+    /**
+     * @brief Retrieve multiple records from the cache
+     * @param name name of records to retrieve
+     * @param type type of records to retrieve
+     * @param records storage for the records retrieved
+     * @return true if records were retrieved
+     */
+    bool lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records);
 
 Q_SIGNALS:
 

@@ -61,14 +61,14 @@ void TestCache::testExpiry()
     QSignalSpy recordExpiredSpy(&cache, SIGNAL(recordExpired(Record)));
 
     // The record should be in the cache
-    QVERIFY(cache.lookup(record.name(), record.type(), record));
+    QVERIFY(cache.lookupRecord(record.name(), record.type(), record));
 
     // This unfortunately delays the test but 1s is the smallest TTL
     QTest::qWait(1100);
 
     // After entering the event loop, the record should have been purged and
     // the recordExpired() signal emitted
-    QVERIFY(!cache.lookup(record.name(), record.type(), record));
+    QVERIFY(!cache.lookupRecord(record.name(), record.type(), record));
     QCOMPARE(recordExpiredSpy.count(), 1);
 }
 
@@ -89,7 +89,7 @@ void TestCache::testRemoval()
     cache.addRecord(record);
 
     // Verify that the record is gone
-    QVERIFY(!cache.lookup(record.name(), record.type(), record));
+    QVERIFY(!cache.lookupRecord(record.name(), record.type(), record));
     QCOMPARE(recordExpiredSpy.count(), 1);
 }
 

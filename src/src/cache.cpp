@@ -133,13 +133,22 @@ void Cache::addRecord(const Record &record)
     }
 }
 
-bool Cache::lookup(const QByteArray &name, quint16 type, Record &record)
+bool Cache::lookupRecord(const QByteArray &name, quint16 type, Record &record)
+{
+    QList<Record> records;
+    if (lookupRecords(name, type, records)) {
+        record = records.at(0);
+        return true;
+    }
+    return false;
+}
+
+bool Cache::lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records)
 {
     foreach (CachePrivate::Entry entry, d->entries) {
         if (entry.record.name() == name && entry.record.type() == type) {
-            record = entry.record;
-            return true;
+            records.append(entry.record);
         }
     }
-    return false;
+    return records.length();
 }
