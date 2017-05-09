@@ -94,7 +94,7 @@ void Cache::addRecord(const Record &record)
     // If the record has a TTL of zero, it should be removed from the cache
     if (record.ttl() == 0) {
         for (auto i = d->entries.begin(); i != d->entries.end();) {
-            if ((*i).record.name() == record.name() || (*i).record.type() == record.type()) {
+            if ((*i).record == record) {
                 emit recordExpired((*i).record);
                 i = d->entries.erase(i);
             }
@@ -116,7 +116,7 @@ void Cache::addRecord(const Record &record)
     // Loop through the existing entries, looking for a matching entry
     auto before = d->entries.end();
     for (auto i = d->entries.begin(); i != d->entries.end(); ++i) {
-        if ((*i).record.name() == record.name() && (*i).record.type() == record.type()) {
+        if ((*i).record == record) {
             before = d->entries.erase(i);
             break;
         }
@@ -146,7 +146,7 @@ bool Cache::lookupRecord(const QByteArray &name, quint16 type, Record &record)
 bool Cache::lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records)
 {
     foreach (CachePrivate::Entry entry, d->entries) {
-        if (entry.record.name() == name && entry.record.type() == type) {
+        if ((name.isNull() || entry.record.name() == name) && entry.record.type() == type) {
             records.append(entry.record);
         }
     }

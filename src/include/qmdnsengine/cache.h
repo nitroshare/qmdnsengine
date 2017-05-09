@@ -64,7 +64,7 @@ public:
 
     /**
      * @brief Retrieve a single record from the cache
-     * @param name name of record to retrieve
+     * @param name name of record to retrieve or null for any
      * @param type type of record to retrieve
      * @param record storage for the record retrieved
      * @return true if a record was retrieved
@@ -77,7 +77,7 @@ public:
 
     /**
      * @brief Retrieve multiple records from the cache
-     * @param name name of records to retrieve
+     * @param name name of records to retrieve or null for any
      * @param type type of records to retrieve
      * @param records storage for the records retrieved
      * @return true if records were retrieved
