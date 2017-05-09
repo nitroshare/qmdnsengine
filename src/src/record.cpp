@@ -55,6 +55,20 @@ Record &Record::operator=(const Record &other)
     return *this;
 }
 
+bool Record::operator==(const Record &other) const
+{
+    return d->name == other.d->name &&
+        d->type == other.d->type &&
+        d->address == other.d->address &&
+        d->target == other.d->target &&
+        d->nextDomainName == other.d->nextDomainName &&
+        d->priority == other.d->priority &&
+        d->weight == other.d->weight &&
+        d->port == other.d->port &&
+        d->attributes == other.d->attributes &&
+        d->bitmap == other.d->bitmap;
+}
+
 Record::~Record()
 {
     delete d;

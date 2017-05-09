@@ -50,6 +50,11 @@ Bitmap &Bitmap::operator=(const Bitmap &other)
     return *this;
 }
 
+bool Bitmap::operator==(const Bitmap &other)
+{
+    return d->length == other.d->length && d->data == other.d->data;
+}
+
 Bitmap::~Bitmap()
 {
     delete d;

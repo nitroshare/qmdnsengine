@@ -45,6 +45,7 @@ public:
     Bitmap();
     Bitmap(const Bitmap &other);
     Bitmap &operator=(const Bitmap &other);
+    bool operator==(const Bitmap &other);
     virtual ~Bitmap();
 
     /**
