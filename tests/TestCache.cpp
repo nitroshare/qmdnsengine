@@ -58,6 +58,7 @@ void TestCache::testExpiry()
     QMdnsEngine::Cache cache;
     cache.addRecord(record);
 
+    QSignalSpy shouldQuerySpy(&cache, SIGNAL(shouldQuery(Record)));
     QSignalSpy recordExpiredSpy(&cache, SIGNAL(recordExpired(Record)));
 
     // The record should be in the cache
@@ -69,6 +70,7 @@ void TestCache::testExpiry()
     // After entering the event loop, the record should have been purged and
     // the recordExpired() signal emitted
     QVERIFY(!cache.lookupRecord(record.name(), record.type(), record));
+    QVERIFY(shouldQuerySpy.count() > 0);
     QCOMPARE(recordExpiredSpy.count(), 1);
 }
 
