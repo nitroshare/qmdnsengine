@@ -97,6 +97,8 @@ void Cache::addRecord(const Record &record)
             if ((*i).record == record) {
                 emit recordExpired((*i).record);
                 i = d->entries.erase(i);
+            } else {
+                ++i;
             }
         }
         return;
