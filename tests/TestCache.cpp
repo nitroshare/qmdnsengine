@@ -32,15 +32,29 @@
 
 Q_DECLARE_METATYPE(QMdnsEngine::Record)
 
+const QByteArray Name = "Test";
+const quint16 Type = QMdnsEngine::TXT;
+
 class TestCache : public QObject
 {
     Q_OBJECT
+
+public:
+
+    TestCache() : mCounter(0) {}
 
 private Q_SLOTS:
 
     void initTestCase();
     void testExpiry();
     void testRemoval();
+    void testCacheFlush();
+
+private:
+
+    QMdnsEngine::Record createRecord();
+
+    int mCounter;
 };
 
 void TestCache::initTestCase()
@@ -50,38 +64,30 @@ void TestCache::initTestCase()
 
 void TestCache::testExpiry()
 {
-    QMdnsEngine::Record record;
-    record.setName("Test");
-    record.setType(QMdnsEngine::A);
-    record.setTtl(1);
-
     QMdnsEngine::Cache cache;
-    cache.addRecord(record);
+    cache.addRecord(createRecord());
 
     QSignalSpy shouldQuerySpy(&cache, SIGNAL(shouldQuery(Record)));
     QSignalSpy recordExpiredSpy(&cache, SIGNAL(recordExpired(Record)));
 
     // The record should be in the cache
-    QVERIFY(cache.lookupRecord(record.name(), record.type(), record));
+    QMdnsEngine::Record record;
+    QVERIFY(cache.lookupRecord(Name, Type, record));
 
     // This unfortunately delays the test but 1s is the smallest TTL
     QTest::qWait(1100);
 
     // After entering the event loop, the record should have been purged and
     // the recordExpired() signal emitted
-    QVERIFY(!cache.lookupRecord(record.name(), record.type(), record));
+    QVERIFY(!cache.lookupRecord(Name, Type, record));
     QVERIFY(shouldQuerySpy.count() > 0);
     QCOMPARE(recordExpiredSpy.count(), 1);
 }
 
 void TestCache::testRemoval()
 {
-    QMdnsEngine::Record record;
-    record.setName("Test");
-    record.setType(QMdnsEngine::A);
-    record.setTtl(10);
-
     QMdnsEngine::Cache cache;
+    QMdnsEngine::Record record = createRecord();
     cache.addRecord(record);
 
     QSignalSpy recordExpiredSpy(&cache, SIGNAL(recordExpired(Record)));
@@ -91,8 +97,40 @@ void TestCache::testRemoval()
     cache.addRecord(record);
 
     // Verify that the record is gone
-    QVERIFY(!cache.lookupRecord(record.name(), record.type(), record));
+    QVERIFY(!cache.lookupRecord(Name, Type, record));
     QCOMPARE(recordExpiredSpy.count(), 1);
+}
+
+void TestCache::testCacheFlush()
+{
+    QMdnsEngine::Cache cache;
+    for (int i = 0; i < 2; ++i) {
+        cache.addRecord(createRecord());
+    }
+
+    QList<QMdnsEngine::Record> records;
+    QVERIFY(cache.lookupRecords(Name, Type, records));
+    QCOMPARE(records.length(), 2);
+
+    // Insert a new record with the cache clear bit set
+    QMdnsEngine::Record record = createRecord();
+    record.setFlushCache(true);
+    cache.addRecord(record);
+
+    // Confirm that only a single record exists
+    records.clear();
+    QVERIFY(cache.lookupRecords(Name, Type, records));
+    QCOMPARE(records.length(), 1);
+}
+
+QMdnsEngine::Record TestCache::createRecord()
+{
+    QMdnsEngine::Record record;
+    record.setName(Name);
+    record.setType(Type);
+    record.setTtl(1);
+    record.addAttribute("key", QByteArray::number(mCounter++));
+    return record;
 }
 
 QTEST_MAIN(TestCache)
