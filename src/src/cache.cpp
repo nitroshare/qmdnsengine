@@ -91,20 +91,29 @@ Cache::Cache(QObject *parent)
 
 void Cache::addRecord(const Record &record)
 {
-    // If the record has a TTL of zero, it should be removed from the cache
-    if (record.ttl() == 0) {
+    // Any record with the flush cache bit set should cause all other records
+    // with the same name and type to be removed; any record with a TTL of
+    // zero should be immediately removed
+    if (record.flushCache() || record.ttl() == 0) {
         for (auto i = d->entries.begin(); i != d->entries.end();) {
-            if ((*i).record == record) {
+            if (record.flushCache() &&
+                    (*i).record.name() == record.name() &&
+                    (*i).record.type() == record.type() ||
+                    !record.flushCache() && (*i).record == record) {
                 emit recordExpired((*i).record);
                 i = d->entries.erase(i);
             } else {
                 ++i;
             }
         }
-        return;
+        if (!record.flushCache()) {
+            return;
+        }
     }
 
     QDateTime now = QDateTime::currentDateTime();
+
+    // TODO: add some random variation to these values
 
     // Create triggers for the record
     QList<QDateTime> triggers{
