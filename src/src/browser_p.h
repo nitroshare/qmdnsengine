@@ -26,13 +26,19 @@
 #define QMDNSENGINE_BROWSER_P_H
 
 #include <QByteArray>
+#include <QMap>
 #include <QObject>
+#include <QTimer>
+
+#include <qmdnsengine/service.h>
 
 namespace QMdnsEngine
 {
 
 class Browser;
+class Cache;
 class Message;
+class Record;
 class Server;
 
 class BrowserPrivate : public QObject
@@ -41,14 +47,23 @@ class BrowserPrivate : public QObject
 
 public:
 
-    explicit BrowserPrivate(Browser *browser, Server *server, const QByteArray &type);
+    explicit BrowserPrivate(Browser *browser, Server *server, const QByteArray &type, Cache *existingCache);
+
+    void updateService(const QByteArray &name);
 
     Server *server;
     QByteArray type;
 
+    Cache *cache;
+    QTimer timer;
+    QMap<QByteArray, Service> services;
+
 private Q_SLOTS:
 
     void onMessageReceived(const Message &message);
+    void onShouldQuery(const Record &record);
+    void onRecordExpired(const Record &record);
+    void onTimeout();
 
 private:
 

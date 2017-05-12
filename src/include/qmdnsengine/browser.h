@@ -33,6 +33,7 @@
 namespace QMdnsEngine
 {
 
+class Cache;
 class Server;
 class Service;
 
@@ -47,7 +48,14 @@ class QMDNSENGINE_EXPORT Browser : public QObject
 
 public:
 
-    explicit Browser(Server *server, const QByteArray &type, QObject *parent = 0);
+    /**
+     * @brief Create a new browser instance
+     * @param server server to use for receiving and sending mDNS messages
+     * @param type service type to browse for
+     * @param cache DNS cache to use or null to create one
+     * @param parent QObject
+     */
+    Browser(Server *server, const QByteArray &type, Cache *cache = 0, QObject *parent = 0);
 
 Q_SIGNALS:
 

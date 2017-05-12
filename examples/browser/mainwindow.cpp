@@ -64,7 +64,7 @@ void MainWindow::onClicked()
     }
 
     mServer = new QMdnsEngine::Server(this);
-    mBrowser = new QMdnsEngine::Browser(mServer, mServiceType->text().toUtf8(), mServer);
+    mBrowser = new QMdnsEngine::Browser(mServer, mServiceType->text().toUtf8(), nullptr, mServer);
 
     mServices->clear();
 
