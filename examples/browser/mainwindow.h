@@ -22,16 +22,40 @@
  * IN THE SOFTWARE.
  */
 
-#include <QApplication>
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include "mainwindow.h"
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QListWidget>
 
-int main(int argc, char *argv[])
+#include <qmdnsengine/browser.h>
+#include <qmdnsengine/server.h>
+
+class MainWindow : public QMainWindow
 {
-    QApplication app(argc, argv);
+    Q_OBJECT
 
-    MainWindow mainWindow;
-    mainWindow.show();
+public:
 
-    return app.exec();
-}
+    MainWindow();
+
+private Q_SLOTS:
+
+    void onClicked();
+    void onServiceAdded(const QMdnsEngine::Service &service);
+    void onServiceUpdated(const QMdnsEngine::Service &service);
+    void onServiceRemoved(const QMdnsEngine::Service &service);
+
+private:
+
+    QMdnsEngine::Server *mServer;
+    QMdnsEngine::Browser *mBrowser;
+
+    QLineEdit *mServiceType;
+    QPushButton *mStartStop;
+    QListWidget *mServices;
+};
+
+#endif // MAINWINDOW_H
