@@ -23,22 +23,26 @@
  */
 
 #include <QHBoxLayout>
+#include <QLineEdit>
+#include <QListView>
+#include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
 
 #include <qmdnsengine/service.h>
 
 #include "mainwindow.h"
+#include "servicemodel.h"
 
 MainWindow::MainWindow()
-    : mServer(nullptr),
-      mBrowser(nullptr)
+    : mServiceModel(nullptr)
 {
     setWindowTitle(tr("mDNS Browser"));
+    resize(640, 480);
 
-    mServiceType = new QLineEdit(tr("_example_browser._tcp.local."));
+    mServiceType = new QLineEdit(tr("_http._tcp.local."));
     mStartStop = new QPushButton(tr("Browse"));
-    mServices = new QListWidget;
+    mServices = new QListView;
 
     QVBoxLayout *rootLayout = new QVBoxLayout;
     QWidget *widget = new QWidget;
@@ -59,31 +63,11 @@ MainWindow::MainWindow()
 
 void MainWindow::onClicked()
 {
-    if (mServer) {
-        delete mServer;
+    if (mServiceModel) {
+        mServices->setModel(nullptr);
+        delete mServiceModel;
     }
 
-    mServer = new QMdnsEngine::Server(this);
-    mBrowser = new QMdnsEngine::Browser(mServer, mServiceType->text().toUtf8(), nullptr, mServer);
-
-    mServices->clear();
-
-    connect(mBrowser, &QMdnsEngine::Browser::serviceAdded, this, &MainWindow::onServiceAdded);
-    connect(mBrowser, &QMdnsEngine::Browser::serviceUpdated, this, &MainWindow::onServiceUpdated);
-    connect(mBrowser, &QMdnsEngine::Browser::serviceRemoved, this, &MainWindow::onServiceRemoved);
-}
-
-void MainWindow::onServiceAdded(const QMdnsEngine::Service &service)
-{
-    mServices->addItem(service.name());
-}
-
-void MainWindow::onServiceUpdated(const QMdnsEngine::Service &service)
-{
-    //...
-}
-
-void MainWindow::onServiceRemoved(const QMdnsEngine::Service &service)
-{
-    //...
+    mServiceModel = new ServiceModel(&mServer, mServiceType->text().toUtf8());
+    mServices->setModel(mServiceModel);
 }

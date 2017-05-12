@@ -1,6 +1,7 @@
 set(SRC
     browser.cpp
     mainwindow.cpp
+    servicemodel.cpp
 )
 
 add_executable(browser WIN32 ${SRC})

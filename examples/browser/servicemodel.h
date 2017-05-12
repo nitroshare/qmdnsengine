@@ -22,39 +22,38 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef SERVICEMODEL_H
+#define SERVICEMODEL_H
 
-#include <QMainWindow>
+#include <QAbstractListModel>
+#include <QList>
 
-#include <qmdnsengine/server.h>
+#include <qmdnsengine/browser.h>
+#include <qmdnsengine/service.h>
 
-class QLineEdit;
-class QListView;
-class QPushButton;
-
-class ServiceModel;
-
-class MainWindow : public QMainWindow
+class ServiceModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
 
-    MainWindow();
+    ServiceModel(QMdnsEngine::Server *server, const QByteArray &type);
+
+    virtual int rowCount(const QModelIndex &parent) const;
+    virtual QVariant data(const QModelIndex &index, int role) const;
 
 private Q_SLOTS:
 
-    void onClicked();
+    void onServiceAdded(const QMdnsEngine::Service &service);
+    void onServiceUpdated(const QMdnsEngine::Service &service);
+    void onServiceRemoved(const QMdnsEngine::Service &service);
 
 private:
 
-    QMdnsEngine::Server mServer;
-    ServiceModel *mServiceModel;
+    int findService(const QByteArray &name);
 
-    QLineEdit *mServiceType;
-    QPushButton *mStartStop;
-    QListView *mServices;
+    QMdnsEngine::Browser mBrowser;
+    QList<QMdnsEngine::Service> mServices;
 };
 
-#endif // MAINWINDOW_H
+#endif // SERVICEMODEL_H
