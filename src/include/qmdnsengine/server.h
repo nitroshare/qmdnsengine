@@ -55,6 +55,13 @@ public:
      */
     void sendMessage(const Message &message);
 
+    /**
+     * @brief Broadcast a message
+     *
+     * Send a message to both the IPv4 and IPv6 addresses and port for mDNS.
+     */
+    void broadcastMessage(const Message &message);
+
 Q_SIGNALS:
 
     /**

@@ -145,3 +145,11 @@ void Server::sendMessage(const Message &message)
         d->ipv6Socket.writeDatagram(packet, message.address(), message.port());
     }
 }
+
+void Server::broadcastMessage(const Message &message)
+{
+    QByteArray packet;
+    toPacket(message, packet);
+    d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
+    d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
+}
