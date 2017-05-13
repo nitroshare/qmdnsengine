@@ -215,6 +215,9 @@ bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
                     offset + nBytes > packet.length()) {
                 return false;
             }
+            if (nBytes == 0) {
+                break;
+            }
             QByteArray attr(packet.constData() + offset, nBytes);
             offset += nBytes;
             int splitIndex = attr.indexOf('=');
@@ -272,6 +275,10 @@ void writeRecord(QByteArray &packet, quint16 &offset, Record &record, QMap<QByte
         writeName(data, offset, record.target(), nameMap);
         break;
     case TXT:
+        if (!record.attributes().count()) {
+            writeInteger<quint8>(data, offset, 0);
+            break;
+        }
         for (auto i = record.attributes().constBegin(); i != record.attributes().constEnd(); ++i) {
             QByteArray entry = i.value().isNull() ? i.key() : i.key() + "=" + i.value();
             writeInteger<quint8>(data, offset, entry.length());
