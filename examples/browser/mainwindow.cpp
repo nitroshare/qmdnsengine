@@ -23,9 +23,12 @@
  */
 
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QListView>
 #include <QPushButton>
+#include <QSplitter>
+#include <QTableWidget>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -33,6 +36,8 @@
 
 #include "mainwindow.h"
 #include "servicemodel.h"
+
+Q_DECLARE_METATYPE(QMdnsEngine::Service)
 
 MainWindow::MainWindow()
     : mServiceModel(nullptr)
@@ -43,6 +48,8 @@ MainWindow::MainWindow()
     mServiceType = new QLineEdit(tr("_http._tcp.local."));
     mStartStop = new QPushButton(tr("Browse"));
     mServices = new QListView;
+    mAttributes = new QTableWidget;
+    mAttributes->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QVBoxLayout *rootLayout = new QVBoxLayout;
     QWidget *widget = new QWidget;
@@ -54,8 +61,12 @@ MainWindow::MainWindow()
     typeLayout->addWidget(mStartStop);
     rootLayout->addLayout(typeLayout);
 
+    QSplitter *splitter = new QSplitter;
+    splitter->addWidget(mServices);
+    splitter->addWidget(mAttributes);
+
     QHBoxLayout *servicesLayout = new QHBoxLayout;
-    servicesLayout->addWidget(mServices);
+    servicesLayout->addWidget(splitter);
     rootLayout->addLayout(servicesLayout);
 
     connect(mStartStop, &QPushButton::clicked, this, &MainWindow::onClicked);
@@ -66,8 +77,30 @@ void MainWindow::onClicked()
     if (mServiceModel) {
         mServices->setModel(nullptr);
         delete mServiceModel;
+        mAttributes->clear();
     }
 
     mServiceModel = new ServiceModel(&mServer, mServiceType->text().toUtf8());
     mServices->setModel(mServiceModel);
+
+    connect(mServices->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::onSelectionChanged);
+}
+
+void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &)
+{
+    mAttributes->clear();
+    if (selected.count()) {
+        auto service = mServiceModel->data(selected.at(0).topLeft(), Qt::UserRole).value<QMdnsEngine::Service>();
+        auto attributes = service.attributes();
+        mAttributes->setRowCount(attributes.keys().count());
+        mAttributes->setColumnCount(2);
+        mAttributes->setHorizontalHeaderLabels({tr("Key"), tr("Value")});
+        mAttributes->horizontalHeader()->setStretchLastSection(true);
+        mAttributes->verticalHeader()->setVisible(false);
+        int row = 0;
+        for (auto i = attributes.constBegin(); i != attributes.constEnd(); ++i, ++row) {
+            mAttributes->setItem(row, 0, new QTableWidgetItem(QString(i.key())));
+            mAttributes->setItem(row, 1, new QTableWidgetItem(QString(i.value())));
+        }
+    }
 }

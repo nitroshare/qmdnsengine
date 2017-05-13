@@ -29,9 +29,11 @@
 
 #include <qmdnsengine/server.h>
 
+class QItemSelection;
 class QLineEdit;
 class QListView;
 class QPushButton;
+class QTableWidget;
 
 class ServiceModel;
 
@@ -46,6 +48,7 @@ public:
 private Q_SLOTS:
 
     void onClicked();
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
 
@@ -55,6 +58,7 @@ private:
     QLineEdit *mServiceType;
     QPushButton *mStartStop;
     QListView *mServices;
+    QTableWidget *mAttributes;
 };
 
 #endif // MAINWINDOW_H

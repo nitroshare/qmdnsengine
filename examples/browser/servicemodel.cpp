@@ -24,6 +24,8 @@
 
 #include "servicemodel.h"
 
+Q_DECLARE_METATYPE(QMdnsEngine::Service)
+
 ServiceModel::ServiceModel(QMdnsEngine::Server *server, const QByteArray &type)
     : mBrowser(server, type)
 {
@@ -49,6 +51,8 @@ QVariant ServiceModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case Qt::DisplayRole:
         return service.name();
+    case Qt::UserRole:
+        return QVariant::fromValue(service);
     }
 
     return QVariant();
