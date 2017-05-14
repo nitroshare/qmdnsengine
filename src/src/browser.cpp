@@ -22,11 +22,10 @@
  * IN THE SOFTWARE.
  */
 
-#include <QSet>
-
 #include <qmdnsengine/browser.h>
 #include <qmdnsengine/cache.h>
 #include <qmdnsengine/dns.h>
+#include <qmdnsengine/mdns.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
@@ -51,10 +50,13 @@ BrowserPrivate::BrowserPrivate(Browser *browser, Server *server, const QByteArra
 
     connect(cache, &Cache::shouldQuery, this, &BrowserPrivate::onShouldQuery);
     connect(cache, &Cache::recordExpired, this, &BrowserPrivate::onRecordExpired);
-    connect(&timer, &QTimer::timeout, this, &BrowserPrivate::onTimeout);
+    connect(&queryTimer, &QTimer::timeout, this, &BrowserPrivate::onQueryTimeout);
+    connect(&serviceTimer, &QTimer::timeout, this, &BrowserPrivate::onServiceTimeout);
 
-    timer.setSingleShot(true);
-    onTimeout();
+    queryTimer.setSingleShot(true);
+    serviceTimer.setSingleShot(true);
+
+    onQueryTimeout();
 }
 
 // TODO: multiple SRV records not supported
@@ -118,9 +120,15 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     // avoids extraneous signals being emitted if SRV and TXT are provided
     QSet<QByteArray> serviceNames;
     foreach (Record record, message.records()) {
-        if (record.type() == PTR && record.name() == type ||
-                record.type() == SRV && record.name().endsWith("." + type) ||
-                record.type() == TXT && record.name().endsWith("." + type)) {
+        bool any = type == MdnsBrowseType;
+        if (any && record.type() == PTR) {
+            cache->addRecord(record);
+            ptrTargets.insert(record.target());
+            serviceTimer.stop();
+            serviceTimer.start(100);
+        } else if (record.type() == PTR && record.name() == type ||
+                record.type() == SRV && (any || record.name().endsWith("." + type)) ||
+                record.type() == TXT && (any || record.name().endsWith("." + type))) {
             cache->addRecord(record);
             switch (record.type()) {
             case PTR:
@@ -164,7 +172,7 @@ void BrowserPrivate::onRecordExpired(const Record &record)
     }
 }
 
-void BrowserPrivate::onTimeout()
+void BrowserPrivate::onQueryTimeout()
 {
     Query query;
     query.setName(type);
@@ -183,7 +191,24 @@ void BrowserPrivate::onTimeout()
     }
 
     server->broadcastMessage(message);
-    timer.start(60 * 1000);
+    queryTimer.start(60 * 1000);
+}
+
+void BrowserPrivate::onServiceTimeout()
+{
+    Message message;
+    foreach (QByteArray target, ptrTargets) {
+        Query query;
+        query.setName(target);
+        query.setType(PTR);
+        message.addQuery(query);
+    }
+
+    // TODO: cached PTR records
+
+    server->broadcastMessage(message);
+
+    ptrTargets.clear();
 }
 
 Browser::Browser(Server *server, const QByteArray &type, Cache *cache, QObject *parent)

@@ -28,6 +28,7 @@
 #include <QByteArray>
 #include <QMap>
 #include <QObject>
+#include <QSet>
 #include <QTimer>
 
 #include <qmdnsengine/service.h>
@@ -55,15 +56,20 @@ public:
     QByteArray type;
 
     Cache *cache;
-    QTimer timer;
+    QSet<QByteArray> ptrTargets;
     QMap<QByteArray, Service> services;
+
+    QTimer queryTimer;
+    QTimer serviceTimer;
 
 private Q_SLOTS:
 
     void onMessageReceived(const Message &message);
     void onShouldQuery(const Record &record);
     void onRecordExpired(const Record &record);
-    void onTimeout();
+
+    void onQueryTimeout();
+    void onServiceTimeout();
 
 private:
 
