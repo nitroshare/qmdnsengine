@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLineEdit>
@@ -32,6 +33,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include <qmdnsengine/mdns.h>
 #include <qmdnsengine/service.h>
 
 #include "mainwindow.h"
@@ -56,8 +58,11 @@ MainWindow::MainWindow()
     widget->setLayout(rootLayout);
     setCentralWidget(widget);
 
+    QCheckBox *any = new QCheckBox(tr("Any"));
+
     QHBoxLayout *typeLayout = new QHBoxLayout;
     typeLayout->addWidget(mServiceType, 1);
+    typeLayout->addWidget(any);
     typeLayout->addWidget(mStartStop);
     rootLayout->addLayout(typeLayout);
 
@@ -69,7 +74,16 @@ MainWindow::MainWindow()
     servicesLayout->addWidget(splitter);
     rootLayout->addLayout(servicesLayout);
 
+    connect(any, &QCheckBox::toggled, this, &MainWindow::onToggled);
     connect(mStartStop, &QPushButton::clicked, this, &MainWindow::onClicked);
+}
+
+void MainWindow::onToggled(bool checked)
+{
+    if (checked) {
+        mServiceType->setText(QMdnsEngine::MdnsBrowseType);
+    }
+    mServiceType->setEnabled(!checked);
 }
 
 void MainWindow::onClicked()
@@ -78,6 +92,7 @@ void MainWindow::onClicked()
         mServices->setModel(nullptr);
         delete mServiceModel;
         mAttributes->clear();
+        mAttributes->setColumnCount(0);
     }
 
     mServiceModel = new ServiceModel(&mServer, mServiceType->text().toUtf8());
@@ -89,6 +104,7 @@ void MainWindow::onClicked()
 void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &)
 {
     mAttributes->clear();
+    mAttributes->setColumnCount(0);
     if (selected.count()) {
         auto service = mServiceModel->data(selected.at(0).topLeft(), Qt::UserRole).value<QMdnsEngine::Service>();
         auto attributes = service.attributes();

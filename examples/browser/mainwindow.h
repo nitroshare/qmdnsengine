@@ -47,6 +47,7 @@ public:
 
 private Q_SLOTS:
 
+    void onToggled(bool checked);
     void onClicked();
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
