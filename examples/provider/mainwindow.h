@@ -29,8 +29,10 @@
 
 #include <qmdnsengine/server.h>
 #include <qmdnsengine/hostname.h>
+#include <qmdnsengine/message.h>
 #include <qmdnsengine/provider.h>
 
+class QCheckBox;
 class QPushButton;
 class QLineEdit;
 class QTextEdit;
@@ -47,10 +49,12 @@ private Q_SLOTS:
 
     void onClicked();
     void onHostnameChanged(const QByteArray &hostname);
+    void onMessageReceived(const QMdnsEngine::Message &message);
 
 private:
 
     QString buttonCaption() const;
+    QString typeToString(quint16 type) const;
 
     QMdnsEngine::Server mServer;
     QMdnsEngine::Hostname mHostname;
@@ -61,6 +65,7 @@ private:
     QLineEdit *mServicePort;
 
     QPushButton *mButton;
+    QCheckBox *mShowQueries;
 
     QTextEdit *mLog;
 };
