@@ -179,6 +179,11 @@ QMap<QByteArray, QByteArray> Record::attributes() const
     return d->attributes;
 }
 
+void Record::setAttributes(const QMap<QByteArray, QByteArray> &attributes)
+{
+    d->attributes = attributes;
+}
+
 void Record::addAttribute(const QByteArray &key, const QByteArray &value)
 {
     d->attributes.insert(key, value);

@@ -186,6 +186,11 @@ public:
     QMap<QByteArray, QByteArray> attributes() const;
 
     /**
+     * @brief Set attributes for the record
+     */
+    void setAttributes(const QMap<QByteArray, QByteArray> &attributes);
+
+    /**
      * @brief Add an attribute to the record
      */
     void addAttribute(const QByteArray &key, const QByteArray &value);
