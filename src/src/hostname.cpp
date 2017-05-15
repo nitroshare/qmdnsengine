@@ -44,23 +44,24 @@ HostnamePrivate::HostnamePrivate(Hostname *hostname, Server *server)
       server(server)
 {
     connect(server, &Server::messageReceived, this, &HostnamePrivate::onMessageReceived);
-    connect(&timer, &QTimer::timeout, this, &HostnamePrivate::onTimeout);
+    connect(&registrationTimer, &QTimer::timeout, this, &HostnamePrivate::onRegistrationTimeout);
+    connect(&rebroadcastTimer, &QTimer::timeout, this, &HostnamePrivate::onRebroadcastTimeout);
 
-    timer.setSingleShot(true);
+    registrationTimer.setSingleShot(true);
+    rebroadcastTimer.setSingleShot(true);
 
-    // Immediately begin asserting the hostname
-    assertHostname();
+    // Immediately assert the hostname
+    onRebroadcastTimeout();
+}
+
+void HostnamePrivate::resetHostname()
+{
+    hostnamePrev = hostname;
+    hostnameRegistered = false;
+    hostnameSuffix = 1;
 }
 
 void HostnamePrivate::assertHostname()
-{
-    hostnameRegistered = false;
-    hostnameSuffix = 1;
-
-    broadcastHostname();
-}
-
-void HostnamePrivate::broadcastHostname()
 {
     QByteArray localHostname = QHostInfo::localHostName().toUtf8();
     hostname = hostnameSuffix == 1 ? localHostname:
@@ -79,8 +80,8 @@ void HostnamePrivate::broadcastHostname()
     server->broadcastMessage(message);
 
     // If no reply is received after two seconds, the hostname is available
-    timer.stop();
-    timer.start(2 * 1000);
+    registrationTimer.stop();
+    registrationTimer.start(2 * 1000);
 }
 
 bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record)
@@ -112,7 +113,7 @@ void HostnamePrivate::onMessageReceived(const Message &message)
         foreach (Record record, message.records()) {
             if ((record.type() == A || record.type() == AAAA) && record.name() == hostname) {
                 ++hostnameSuffix;
-                broadcastHostname();
+                assertHostname();
             }
         }
     } else {
@@ -133,10 +134,21 @@ void HostnamePrivate::onMessageReceived(const Message &message)
     }
 }
 
-void HostnamePrivate::onTimeout()
+void HostnamePrivate::onRegistrationTimeout()
 {
     hostnameRegistered = true;
-    emit q->hostnameChanged(hostname);
+    if (hostname != hostnamePrev) {
+        emit q->hostnameChanged(hostname);
+    }
+
+    // Re-assert the hostname in half an hour
+    rebroadcastTimer.start(1800);
+}
+
+void HostnamePrivate::onRebroadcastTimeout()
+{
+    resetHostname();
+    assertHostname();
 }
 
 Hostname::Hostname(Server *server, QObject *parent)

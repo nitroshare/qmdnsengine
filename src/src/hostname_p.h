@@ -46,22 +46,25 @@ public:
 
     HostnamePrivate(Hostname *hostname, Server *server);
 
+    void resetHostname();
     void assertHostname();
-    void broadcastHostname();
     bool generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record);
 
     Server *server;
 
+    QByteArray hostnamePrev;
     QByteArray hostname;
     bool hostnameRegistered;
     int hostnameSuffix;
 
-    QTimer timer;
+    QTimer registrationTimer;
+    QTimer rebroadcastTimer;
 
 private Q_SLOTS:
 
     void onMessageReceived(const Message &message);
-    void onTimeout();
+    void onRegistrationTimeout();
+    void onRebroadcastTimeout();
 
 private:
 
