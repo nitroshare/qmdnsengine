@@ -49,6 +49,7 @@ public:
 
     Server *server;
     Hostname *hostname;
+    bool initialized;
 
     Record browsePtrRecord;
     Record ptrRecord;

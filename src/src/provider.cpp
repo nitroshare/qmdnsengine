@@ -40,7 +40,8 @@ const quint32 DefaultTtl = 3600;
 ProviderPrivate::ProviderPrivate(QObject *parent, Server *server, Hostname *hostname)
     : QObject(parent),
       server(server),
-      hostname(hostname)
+      hostname(hostname),
+      initialized(false)
 {
     browsePtrRecord.setType(PTR);
     ptrRecord.setType(PTR);
@@ -53,22 +54,26 @@ ProviderPrivate::ProviderPrivate(QObject *parent, Server *server, Hostname *host
 
 void ProviderPrivate::updateRecords(const Service &service)
 {
+    QByteArray fqName = service.name() + "." + service.type();
+
     browsePtrRecord.setName(MdnsBrowseType);
     browsePtrRecord.setTarget(service.type());
 
     ptrRecord.setName(service.type());
-    ptrRecord.setTarget(service.name());
+    ptrRecord.setTarget(fqName);
 
-    srvRecord.setName(service.name());
+    srvRecord.setName(fqName);
     srvRecord.setPort(service.port());
 
-    txtRecord.setName(service.name());
+    txtRecord.setName(fqName);
     txtRecord.setAttributes(service.attributes());
+
+    initialized = true;
 }
 
 void ProviderPrivate::onMessageReceived(const Message &message)
 {
-    if (!hostname->isRegistered() || message.isResponse()) {
+    if (!initialized || !hostname->isRegistered() || message.isResponse()) {
         return;
     }
     Message reply;
@@ -84,8 +89,8 @@ void ProviderPrivate::onMessageReceived(const Message &message)
             reply.addRecord(txtRecord);
         }
     }
-    if (message.records().count()) {
-        server->sendMessage(message);
+    if (reply.records().count()) {
+        server->sendMessage(reply);
     }
 }
 
