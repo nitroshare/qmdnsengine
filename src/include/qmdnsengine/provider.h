@@ -32,6 +32,8 @@
 namespace QMdnsEngine
 {
 
+class Hostname;
+class Server;
 class Service;
 
 class QMDNSENGINE_EXPORT ProviderPrivate;
@@ -45,7 +47,12 @@ class QMDNSENGINE_EXPORT Provider : public QObject
 
 public:
 
-    Provider(QObject *parent = 0);
+    Provider(Server *server, Hostname *hostname, QObject *parent = 0);
+
+    /**
+     * @brief Update the service with the provided information
+     */
+    void update(const Service &service);
 
 private:
 

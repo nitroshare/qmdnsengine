@@ -27,8 +27,15 @@
 
 #include <QObject>
 
+#include <qmdnsengine/record.h>
+
 namespace QMdnsEngine
 {
+
+class Hostname;
+class Message;
+class Server;
+class Service;
 
 class ProviderPrivate : public QObject
 {
@@ -36,7 +43,22 @@ class ProviderPrivate : public QObject
 
 public:
 
-    ProviderPrivate(QObject *parent);
+    ProviderPrivate(QObject *parent, Server *server, Hostname *hostname);
+
+    void updateRecords(const Service &service);
+
+    Server *server;
+    Hostname *hostname;
+
+    Record browsePtrRecord;
+    Record ptrRecord;
+    Record srvRecord;
+    Record txtRecord;
+
+private Q_SLOTS:
+
+    void onMessageReceived(const Message &message);
+    void onHostnameChanged(const QByteArray &hostname);
 };
 
 }
