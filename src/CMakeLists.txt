@@ -5,6 +5,7 @@ set(HEADERS
     include/qmdnsengine/dns.h
     include/qmdnsengine/mdns.h
     include/qmdnsengine/message.h
+    include/qmdnsengine/provider.h
     include/qmdnsengine/qmdnsengine_export.h
     include/qmdnsengine/query.h
     include/qmdnsengine/record.h
@@ -20,6 +21,7 @@ set(SRC
     src/dns.cpp
     src/mdns.cpp
     src/message.cpp
+    src/provider.cpp
     src/query.cpp
     src/record.cpp
     src/resolver.cpp
