@@ -45,6 +45,7 @@ public:
     Service();
     Service(const Service &other);
     Service &operator=(const Service &other);
+    bool operator==(const Service &other) const;
     virtual ~Service();
 
     /**

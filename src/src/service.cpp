@@ -49,6 +49,14 @@ Service &Service::operator=(const Service &other)
     return *this;
 }
 
+bool Service::operator==(const Service &other) const
+{
+    return d->type == other.d->type &&
+        d->name == other.d->name &&
+        d->port == other.d->port &&
+        d->attributes == other.d->attributes;
+}
+
 Service::~Service()
 {
     delete d;
