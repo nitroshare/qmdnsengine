@@ -3,6 +3,7 @@ set(HEADERS
     include/qmdnsengine/browser.h
     include/qmdnsengine/cache.h
     include/qmdnsengine/dns.h
+    include/qmdnsengine/hostname.h
     include/qmdnsengine/mdns.h
     include/qmdnsengine/message.h
     include/qmdnsengine/provider.h
@@ -19,6 +20,7 @@ set(SRC
     src/browser.cpp
     src/cache.cpp
     src/dns.cpp
+    src/hostname.cpp
     src/mdns.cpp
     src/message.cpp
     src/provider.cpp
