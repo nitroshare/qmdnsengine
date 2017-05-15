@@ -64,8 +64,8 @@ void HostnamePrivate::resetHostname()
 void HostnamePrivate::assertHostname()
 {
     QByteArray localHostname = QHostInfo::localHostName().toUtf8();
-    hostname = hostnameSuffix == 1 ? localHostname:
-        localHostname + "-" + QByteArray::number(hostnameSuffix);
+    hostname = (hostnameSuffix == 1 ? localHostname:
+        localHostname + "-" + QByteArray::number(hostnameSuffix)) + ".local.";
 
     Query ipv4Query;
     ipv4Query.setName(hostname);
@@ -117,11 +117,13 @@ void HostnamePrivate::onMessageReceived(const Message &message)
             }
         }
     } else {
+        if (!hostnameRegistered) {
+            return;
+        }
         Message reply;
         reply.reply(message);
         foreach (Query query, message.queries()) {
-            if (hostnameRegistered && (query.type() == A || query.type() == AAAA) &&
-                    query.name() == hostname) {
+            if ((query.type() == A || query.type() == AAAA) && query.name() == hostname) {
                 Record record;
                 if (generateRecord(message.address(), query.type(), record)) {
                     reply.addRecord(record);
@@ -129,7 +131,7 @@ void HostnamePrivate::onMessageReceived(const Message &message)
             }
         }
         if (reply.records().count()) {
-            server->sendMessage(message);
+            server->sendMessage(reply);
         }
     }
 }
@@ -142,7 +144,7 @@ void HostnamePrivate::onRegistrationTimeout()
     }
 
     // Re-assert the hostname in half an hour
-    rebroadcastTimer.start(1800);
+    rebroadcastTimer.start(30 * 60 * 1000);
 }
 
 void HostnamePrivate::onRebroadcastTimeout()
