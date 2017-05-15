@@ -53,7 +53,7 @@ public:
     Server *server;
 
     QByteArray hostname;
-    bool hostnameConfirmed;
+    bool hostnameRegistered;
     int hostnameSuffix;
 
     QTimer timer;

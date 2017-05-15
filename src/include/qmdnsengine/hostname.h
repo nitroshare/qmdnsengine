@@ -37,7 +37,7 @@ class Server;
 class QMDNSENGINE_EXPORT HostnamePrivate;
 
 /**
- * @brief Reserve and utilize a unique hostname
+ * @brief Register and utilize a unique hostname
  *
  * In order to use SRV records, a unique hostname must be used. This class
  * asserts a hostname (by first confirming that it is not in use) and then
@@ -52,9 +52,14 @@ public:
     Hostname(Server *server, QObject *parent = 0);
 
     /**
+     * @brief Determines if a hostname has been registered
+     */
+    bool isRegistered() const;
+
+    /**
      * @brief Retrieve the current hostname
      *
-     * A null string is returned if a hostname has not been reserved.
+     * This value is only valid when isRegistered() returns true.
      */
     QByteArray hostname() const;
 

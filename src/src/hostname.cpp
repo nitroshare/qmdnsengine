@@ -54,7 +54,7 @@ HostnamePrivate::HostnamePrivate(Hostname *hostname, Server *server)
 
 void HostnamePrivate::assertHostname()
 {
-    hostnameConfirmed = false;
+    hostnameRegistered = false;
     hostnameSuffix = 1;
 
     broadcastHostname();
@@ -119,7 +119,7 @@ void HostnamePrivate::onMessageReceived(const Message &message)
         Message reply;
         reply.reply(message);
         foreach (Query query, message.queries()) {
-            if (hostnameConfirmed && (query.type() == A || query.type() == AAAA) &&
+            if (hostnameRegistered && (query.type() == A || query.type() == AAAA) &&
                     query.name() == hostname) {
                 Record record;
                 if (generateRecord(message.address(), query.type(), record)) {
@@ -135,7 +135,7 @@ void HostnamePrivate::onMessageReceived(const Message &message)
 
 void HostnamePrivate::onTimeout()
 {
-    hostnameConfirmed = true;
+    hostnameRegistered = true;
     emit q->hostnameChanged(hostname);
 }
 
@@ -145,7 +145,12 @@ Hostname::Hostname(Server *server, QObject *parent)
 {
 }
 
+bool Hostname::isRegistered() const
+{
+    return d->hostnameRegistered;
+}
+
 QByteArray Hostname::hostname() const
 {
-    return d->hostnameConfirmed ? d->hostname : QByteArray();
+    return d->hostname;
 }
