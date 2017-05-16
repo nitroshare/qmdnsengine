@@ -54,6 +54,25 @@ ProviderPrivate::ProviderPrivate(QObject *parent, Server *server, Hostname *host
     onHostnameChanged(hostname->hostname());
 }
 
+ProviderPrivate::~ProviderPrivate()
+{
+    // If the provider is being destroyed, purge the records from caches
+
+    if (initialized) {
+        browsePtrRecord.setTtl(0);
+        ptrRecord.setTtl(0);
+        srvRecord.setTtl(0);
+        txtRecord.setTtl(0);
+        Message message;
+        message.setResponse(true);
+        message.addRecord(browsePtrRecord);
+        message.addRecord(ptrRecord);
+        message.addRecord(srvRecord);
+        message.addRecord(txtRecord);
+        server->broadcastMessage(message);
+    }
+}
+
 void ProviderPrivate::updateRecords(const Service &service)
 {
     QByteArray fqName = service.name() + "." + service.type();

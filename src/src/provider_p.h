@@ -44,6 +44,7 @@ class ProviderPrivate : public QObject
 public:
 
     ProviderPrivate(QObject *parent, Server *server, Hostname *hostname);
+    virtual ~ProviderPrivate();
 
     void updateRecords(const Service &service);
 
