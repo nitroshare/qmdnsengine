@@ -50,7 +50,7 @@ public:
 
     explicit BrowserPrivate(Browser *browser, Server *server, const QByteArray &type, Cache *existingCache);
 
-    void updateService(const QByteArray &name);
+    bool updateService(const QByteArray &fqName);
 
     Server *server;
     QByteArray type;
