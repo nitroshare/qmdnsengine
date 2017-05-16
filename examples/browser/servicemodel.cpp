@@ -50,7 +50,9 @@ QVariant ServiceModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
     case Qt::DisplayRole:
-        return service.name();
+        return QString("%1 (%2)")
+            .arg(QString(service.name()))
+            .arg(QString(service.type()));
     case Qt::UserRole:
         return QVariant::fromValue(service);
     }
