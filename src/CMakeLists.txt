@@ -57,12 +57,12 @@ target_link_libraries(qmdnsengine Qt5::Network)
 
 install(TARGETS qmdnsengine
     EXPORT        qmdnsengine-export
-    RUNTIME       DESTINATION bin
-    LIBRARY       DESTINATION lib
-    ARCHIVE       DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/qmdnsengine
+    RUNTIME       DESTINATION "${BIN_INSTALL_DIR}"
+    LIBRARY       DESTINATION "${LIB_INSTALL_DIR}"
+    ARCHIVE       DESTINATION "${LIB_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}/qmdnsengine"
 )
 
 install(EXPORT qmdnsengine-export
-    DESTINATION lib/cmake/qmdnsengine
+    DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
 )

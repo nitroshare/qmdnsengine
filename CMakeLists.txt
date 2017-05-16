@@ -11,6 +11,10 @@ set(PROJECT_VERSION_MINOR 1)
 set(PROJECT_VERSION_PATCH 0)
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
+set(BIN_INSTALL_DIR bin CACHE STRING "Binary installation directory relative to the install prefix")
+set(LIB_INSTALL_DIR lib CACHE STRING "Library installation directory relative to the install prefix")
+set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory relative to the install prefix")
+
 find_package(Qt5Network 5.4 REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
