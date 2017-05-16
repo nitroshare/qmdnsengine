@@ -110,6 +110,9 @@ bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 typ
 void HostnamePrivate::onMessageReceived(const Message &message)
 {
     if (message.isResponse()) {
+        if (hostnameRegistered) {
+            return;
+        }
         foreach (Record record, message.records()) {
             if ((record.type() == A || record.type() == AAAA) && record.name() == hostname) {
                 ++hostnameSuffix;

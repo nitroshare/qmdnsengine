@@ -50,6 +50,8 @@ ProviderPrivate::ProviderPrivate(QObject *parent, Server *server, Hostname *host
 
     connect(server, &Server::messageReceived, this, &ProviderPrivate::onMessageReceived);
     connect(hostname, &Hostname::hostnameChanged, this, &ProviderPrivate::onHostnameChanged);
+
+    onHostnameChanged(hostname->hostname());
 }
 
 void ProviderPrivate::updateRecords(const Service &service)
