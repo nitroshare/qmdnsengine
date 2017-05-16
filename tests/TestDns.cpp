@@ -78,7 +78,7 @@ const char RecordAAAA[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x1c',
     '\x00', '\x01',
-    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x00', '\x0e', '\x10',
     '\x00', '\x10',
     '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
     '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x01'
@@ -88,7 +88,7 @@ const char RecordPTR[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x0c',
     '\x00', '\x01',
-    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x00', '\x0e', '\x10',
     '\x00', '\x07',
     '\x05', 't', 'e', 's', 't', '2', '\0',
 };
@@ -97,7 +97,7 @@ const char RecordSRV[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x21',
     '\x00', '\x01',
-    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x00', '\x0e', '\x10',
     '\x00', '\x0d',
     '\x00', '\x01', '\x00', '\x02', '\x00', '\x03',
     '\x05', 't', 'e', 's', 't', '2', '\0',
@@ -107,7 +107,7 @@ const char RecordTXT[] = {
     '\x04', 't', 'e', 's', 't', '\0',
     '\x00', '\x10',
     '\x00', '\x01',
-    '\x00', '\x00', '\x00', '\x00',
+    '\x00', '\x00', '\x0e', '\x10',
     '\x00', '\x06',
     '\x03', 'a', '=', 'a',
     '\x01', 'b'
@@ -312,6 +312,7 @@ void TestDns::testWriteRecordAAAA()
     QMdnsEngine::Record record;
     record.setName(Name);
     record.setType(QMdnsEngine::AAAA);
+    record.setTtl(Ttl);
     record.setAddress(Ipv6Address);
 
     WRITE_RECORD();
@@ -324,6 +325,7 @@ void TestDns::testWriteRecordPTR()
     QMdnsEngine::Record record;
     record.setName(Name);
     record.setType(QMdnsEngine::PTR);
+    record.setTtl(Ttl);
     record.setTarget(Target);
 
     WRITE_RECORD();
@@ -336,6 +338,7 @@ void TestDns::testWriteRecordSRV()
     QMdnsEngine::Record record;
     record.setName(Name);
     record.setType(QMdnsEngine::SRV);
+    record.setTtl(Ttl);
     record.setPriority(Priority);
     record.setWeight(Weight);
     record.setPort(Port);
@@ -351,6 +354,7 @@ void TestDns::testWriteRecordTXT()
     QMdnsEngine::Record record;
     record.setName(Name);
     record.setType(QMdnsEngine::TXT);
+    record.setTtl(Ttl);
     for (auto i = Attributes.constBegin(); i != Attributes.constEnd(); ++i) {
         record.addAttribute(i.key(), i.value());
     }
