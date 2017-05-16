@@ -57,6 +57,11 @@ bool Service::operator==(const Service &other) const
         d->attributes == other.d->attributes;
 }
 
+bool Service::operator!=(const Service &other) const
+{
+    return !(*this == other);
+}
+
 Service::~Service()
 {
     delete d;

@@ -69,6 +69,11 @@ bool Record::operator==(const Record &other) const
         d->bitmap == other.d->bitmap;
 }
 
+bool Record::operator!=(const Record &other) const
+{
+    return !(*this == other);
+}
+
 Record::~Record()
 {
     delete d;

@@ -52,6 +52,7 @@ public:
     Record(const Record &other);
     Record &operator=(const Record &other);
     bool operator==(const Record &other) const;
+    bool operator!=(const Record &other) const;
     virtual ~Record();
 
     /**
