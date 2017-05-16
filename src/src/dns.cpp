@@ -179,6 +179,7 @@ bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
         bitmap.setData(length, reinterpret_cast<const quint8*>(packet.constData() + offset));
         record.setNextDomainName(nextDomainName);
         record.setBitmap(bitmap);
+        offset += length;
         break;
     }
     case PTR:
