@@ -64,6 +64,7 @@ install(TARGETS qmdnsengine
 )
 
 install(EXPORT qmdnsengine-export
+    FILE        qmdnsengineConfig.cmake
     DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
 )
 
