@@ -104,6 +104,8 @@ bool BrowserPrivate::updateService(const QByteArray &fqName)
     }
 
     services.insert(fqName, service);
+
+    return false;
 }
 
 void BrowserPrivate::onMessageReceived(const Message &message)
