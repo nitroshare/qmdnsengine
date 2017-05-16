@@ -93,8 +93,9 @@ bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 typ
         foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
             if (srcAddress.isInSubnet(entry.ip(), entry.prefixLength())) {
                 foreach (QHostAddress address, interface.allAddresses()) {
-                    if ((address.protocol() == QAbstractSocket::IPv4Protocol && type == A) ||
-                            (address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA)) {
+                    if (!address.isLoopback() &&
+                            ((address.protocol() == QAbstractSocket::IPv4Protocol && type == A) ||
+                            (address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA))) {
                         record.setName(hostname);
                         record.setType(type);
                         record.setAddress(address);
