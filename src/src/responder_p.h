@@ -25,11 +25,17 @@
 #ifndef QMDNSENGINE_RESPONDER_P_H
 #define QMDNSENGINE_RESPONDER_P_H
 
+#include <QList>
 #include <QObject>
+
+#include <qmdnsengine/record.h>
+
+class QTimer;
 
 namespace QMdnsEngine
 {
 
+class Message;
 class Server;
 
 class ResponderPrivate : public QObject
@@ -41,6 +47,12 @@ public:
     ResponderPrivate(QObject *parent, Server *server);
 
     Server *server;
+
+    QList<Record> records;
+
+public Q_SLOTS:
+
+    void onMessageReceived(const Message &message);
 };
 
 }

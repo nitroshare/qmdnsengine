@@ -22,7 +22,11 @@
  * IN THE SOFTWARE.
  */
 
+#include <qmdnsengine/dns.h>
+#include <qmdnsengine/message.h>
+#include <qmdnsengine/query.h>
 #include <qmdnsengine/responder.h>
+#include <qmdnsengine/server.h>
 
 #include "responder_p.h"
 
@@ -32,10 +36,38 @@ ResponderPrivate::ResponderPrivate(QObject *parent, Server *server)
     : QObject(parent),
       server(server)
 {
+    connect(server, &Server::messageReceived, this, &ResponderPrivate::onMessageReceived);
+}
+
+// TODO: this loop is terribly inefficient
+// TODO: in theory, this loop could cause a record to be returned multiple times
+
+void ResponderPrivate::onMessageReceived(const Message &message)
+{
+    if (message.isResponse()) {
+        return;
+    }
+    Message reply;
+    reply.reply(message);
+    foreach (Query query, message.queries()) {
+        for (auto i = records.constBegin(); i != records.constEnd(); ++i) {
+            if (query.name() == i->name() && (query.type() == ANY || query.type() == i->type())) {
+                reply.addRecord(*i);
+            }
+        }
+    }
+    if (reply.records().count()) {
+        server->sendMessage(message);
+    }
 }
 
 Responder::Responder(Server *server, QObject *parent)
     : QObject(parent),
       d(new ResponderPrivate(parent, server))
 {
+}
+
+void Responder::addRecord(const Record &record)
+{
+    d->records.append(record);
 }

@@ -32,12 +32,16 @@
 namespace QMdnsEngine
 {
 
+class Record;
 class Server;
 
 class QMDNSENGINE_EXPORT ResponderPrivate;
 
 /**
  * @brief Respond to queries for records
+ *
+ * The Prober class should be used to verify that a record is unique before
+ * attempting to use it.
  */
 class QMDNSENGINE_EXPORT Responder : public QObject
 {
@@ -46,6 +50,12 @@ class QMDNSENGINE_EXPORT Responder : public QObject
 public:
 
     Responder(Server *server, QObject *parent = 0);
+
+    /**
+     * @brief Add a record to the responder
+     * @param record DNS record to add
+     */
+    void addRecord(const Record &record);
 
 private:
 
