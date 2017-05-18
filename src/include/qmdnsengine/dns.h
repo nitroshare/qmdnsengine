@@ -39,6 +39,7 @@ class Record;
 enum {
     A = 1,
     AAAA = 28,
+    ANY = 255,
     NSEC = 47,
     PTR = 12,
     SRV = 33,
