@@ -22,51 +22,48 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_PROPOSER_P_H
-#define QMDNSENGINE_PROPOSER_P_H
+#ifndef QMDNSENGINE_PROBER_H
+#define QMDNSENGINE_PROBER_H
 
 #include <QObject>
-#include <QTimer>
 
-#include <qmdnsengine/record.h>
+#include "qmdnsengine_export.h"
 
 namespace QMdnsEngine
 {
 
-class Message;
-class Proposer;
+class Record;
 class Server;
 
-class ProposerPrivate : public QObject
+class QMDNSENGINE_EXPORT ProberPrivate;
+
+/**
+ * @brief Propose a record before using it to confirm its uniqueness
+ */
+class QMDNSENGINE_EXPORT Prober : public QObject
 {
     Q_OBJECT
 
 public:
 
-    ProposerPrivate(Proposer *proposer, Server *server, const Record &record);
+    Prober(Server *server, const Record &record, QObject *parent = 0);
 
-    void assertHostname();
+Q_SIGNALS:
 
-    Server *server;
-    QTimer timer;
-
-    bool confirmed;
-
-    Record proposedRecord;
-    QByteArray name;
-    QByteArray type;
-    int suffix;
-
-private Q_SLOTS:
-
-    void onMessageReceived(const Message &message);
-    void onTimeout();
+    /**
+     * @brief Indicate that the record has been confirmed unique
+     * @param record copy of the record that was confirmed
+     *
+     * Note that the record may not be identical to what was originally
+     * proposed since the name may have been changed.
+     */
+    void recordConfirmed(const Record &record);
 
 private:
 
-    Proposer *const q;
+    ProberPrivate *const d;
 };
 
 }
 
-#endif // QMDNSENGINE_PROPOSER_P_H
+#endif // QMDNSENGINE_PROBER_H

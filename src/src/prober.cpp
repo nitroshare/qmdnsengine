@@ -23,17 +23,17 @@
  */
 
 #include <qmdnsengine/message.h>
-#include <qmdnsengine/proposer.h>
+#include <qmdnsengine/prober.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/server.h>
 
-#include "proposer_p.h"
+#include "prober_p.h"
 
 using namespace QMdnsEngine;
 
-ProposerPrivate::ProposerPrivate(Proposer *proposer, Server *server, const Record &record)
-    : QObject(proposer),
-      q(proposer),
+ProberPrivate::ProberPrivate(Prober *prober, Server *server, const Record &record)
+    : QObject(prober),
+      q(prober),
       server(server),
       confirmed(false),
       proposedRecord(record),
@@ -44,13 +44,13 @@ ProposerPrivate::ProposerPrivate(Proposer *proposer, Server *server, const Recor
     name = record.name().left(index);
     type = record.name().mid(index);
 
-    connect(server, &Server::messageReceived, this, &ProposerPrivate::onMessageReceived);
-    connect(&timer, &QTimer::timeout, this, &ProposerPrivate::onTimeout);
+    connect(server, &Server::messageReceived, this, &ProberPrivate::onMessageReceived);
+    connect(&timer, &QTimer::timeout, this, &ProberPrivate::onTimeout);
 
     timer.setSingleShot(true);
 }
 
-void ProposerPrivate::assertHostname()
+void ProberPrivate::assertHostname()
 {
     // Use the current suffix to set the name of the proposed record
     if (suffix == 1) {
@@ -73,7 +73,7 @@ void ProposerPrivate::assertHostname()
     timer.start(2 * 1000);
 }
 
-void ProposerPrivate::onMessageReceived(const Message &message)
+void ProberPrivate::onMessageReceived(const Message &message)
 {
     // If the response matches the proposed record, increment the suffix and
     // try with the new name
@@ -89,14 +89,14 @@ void ProposerPrivate::onMessageReceived(const Message &message)
     }
 }
 
-void ProposerPrivate::onTimeout()
+void ProberPrivate::onTimeout()
 {
     confirmed = true;
     emit q->recordConfirmed(proposedRecord);
 }
 
-Proposer::Proposer(Server *server, const Record &record, QObject *parent)
+Prober::Prober(Server *server, const Record &record, QObject *parent)
     : QObject(parent),
-      d(new ProposerPrivate(this, server, record))
+      d(new ProberPrivate(this, server, record))
 {
 }
