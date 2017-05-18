@@ -11,6 +11,7 @@ set(HEADERS
     include/qmdnsengine/query.h
     include/qmdnsengine/record.h
     include/qmdnsengine/resolver.h
+    include/qmdnsengine/responder.h
     include/qmdnsengine/server.h
     include/qmdnsengine/service.h
 )
@@ -27,6 +28,7 @@ set(SRC
     src/query.cpp
     src/record.cpp
     src/resolver.cpp
+    src/responder.cpp
     src/server.cpp
     src/service.cpp
 )
