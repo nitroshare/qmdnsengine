@@ -73,7 +73,7 @@ public:
      * names and types. This method will only retrieve the first matching
      * record. Use lookupRecords() to obtain all of the records.
      */
-    bool lookupRecord(const QByteArray &name, quint16 type, Record &record);
+    bool lookupRecord(const QByteArray &name, quint16 type, Record &record) const;
 
     /**
      * @brief Retrieve multiple records from the cache
@@ -82,7 +82,7 @@ public:
      * @param records storage for the records retrieved
      * @return true if records were retrieved
      */
-    bool lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records);
+    bool lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records) const;
 
 Q_SIGNALS:
 
