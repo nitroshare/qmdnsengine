@@ -83,7 +83,6 @@ Responder::Responder(Server *server, QObject *parent)
 void Responder::addRecord(const Record &record)
 {
     QByteArray name = d->translate(record.name());
-
     if (d->records.count(name)) {
 
         // If a record with the same name exists in records, then it is safe to
@@ -105,4 +104,25 @@ void Responder::addRecord(const Record &record)
         }
         d->pendingRecords.insert(name, record);
     }
+}
+
+void Responder::removeRecord(const Record &record)
+{
+    // Remove all active records that match
+    QByteArray name = d->translate(record.name());
+    for (auto i = d->records.find(name); i != d->records.end() && i.key() == name;) {
+        if (i.value() == record) {
+            i = d->records.erase(i);
+        } else {
+            ++i;
+        }
+    }
+
+    // Remove the entry from the translation map if no records are using it
+    if (!d->records.count(name)) {
+        d->renames.remove(record.name());
+    }
+
+    // Remove pending records that match
+    d->pendingRecords.remove(record.name(), record);
 }

@@ -59,6 +59,12 @@ public:
      */
     void addRecord(const Record &record);
 
+    /**
+     * @brief Remove a record from the responder
+     * @param record DNS record to remove
+     */
+    void removeRecord(const Record &record);
+
 private:
 
     ResponderPrivate *const d;
