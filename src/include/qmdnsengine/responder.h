@@ -39,9 +39,6 @@ class QMDNSENGINE_EXPORT ResponderPrivate;
 
 /**
  * @brief Respond to queries for records
- *
- * The Prober class should be used to verify that a record is unique before
- * attempting to use it.
  */
 class QMDNSENGINE_EXPORT Responder : public QObject
 {
@@ -54,6 +51,10 @@ public:
     /**
      * @brief Add a record to the responder
      * @param record DNS record to add
+     *
+     * The responder keeps track of which names it has exclusive use of and if
+     * it does not have exclusive use of the name, it will send a DNS ANY
+     * to confirm that it is safe to use.
      */
     void addRecord(const Record &record);
 

@@ -24,6 +24,7 @@
 
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/message.h>
+#include <qmdnsengine/prober.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/responder.h>
 #include <qmdnsengine/server.h>
@@ -39,9 +40,6 @@ ResponderPrivate::ResponderPrivate(QObject *parent, Server *server)
     connect(server, &Server::messageReceived, this, &ResponderPrivate::onMessageReceived);
 }
 
-// TODO: this loop is terribly inefficient
-// TODO: in theory, this loop could cause a record to be returned multiple times
-
 void ResponderPrivate::onMessageReceived(const Message &message)
 {
     if (message.isResponse()) {
@@ -50,9 +48,9 @@ void ResponderPrivate::onMessageReceived(const Message &message)
     Message reply;
     reply.reply(message);
     foreach (Query query, message.queries()) {
-        for (auto i = records.constBegin(); i != records.constEnd(); ++i) {
-            if (query.name() == i->name() && (query.type() == ANY || query.type() == i->type())) {
-                reply.addRecord(*i);
+        foreach (Record record, records.values(query.name())) {
+            if (query.type() == record.type()) {
+                reply.addRecord(record);
             }
         }
     }
@@ -69,5 +67,16 @@ Responder::Responder(Server *server, QObject *parent)
 
 void Responder::addRecord(const Record &record)
 {
-    d->records.append(record);
+    // If there are already records with the same name, the record can be
+    // added directly to the map; otherwise, a probe must be issued
+
+    if (d->records.count(record.name())) {
+        d->records.insert(record.name(), record);
+    } else {
+        Prober *prober = new Prober(d->server, record, this);
+        connect(prober, &Prober::recordConfirmed, [this](const Record &newRecord) {
+            d->records.insert(newRecord.name(), newRecord);
+        });
+    }
+
 }

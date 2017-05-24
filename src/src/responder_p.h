@@ -25,7 +25,7 @@
 #ifndef QMDNSENGINE_RESPONDER_P_H
 #define QMDNSENGINE_RESPONDER_P_H
 
-#include <QList>
+#include <QMultiMap>
 #include <QObject>
 
 #include <qmdnsengine/record.h>
@@ -48,7 +48,7 @@ public:
 
     Server *server;
 
-    QList<Record> records;
+    QMultiMap<QByteArray, Record> records;
 
 public Q_SLOTS:
 

@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <qmdnsengine/dns.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/prober.h>
 #include <qmdnsengine/query.h>
@@ -59,10 +60,11 @@ void ProberPrivate::assertHostname()
         proposedRecord.setName(name + "-" + QByteArray::number(suffix) + type);
     }
 
-    // Broadcast a query containing the proposed record
+    // Broadcast a query for the proposed name (using an ANY query) and
+    // include the proposed record in the query
     Query query;
     query.setName(proposedRecord.name());
-    query.setType(proposedRecord.type());
+    query.setType(ANY);
     Message message;
     message.addQuery(query);
     message.addRecord(proposedRecord);
