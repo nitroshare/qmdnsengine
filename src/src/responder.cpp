@@ -59,6 +59,24 @@ void ResponderPrivate::onMessageReceived(const Message &message)
     }
 }
 
+void ResponderPrivate::translate(Record &record) const
+{
+    // Take the record and check to see if its name should be modified due to
+    // another (existing) record on the network
+
+    record.setName(renames.value(record.name(), record.name()));
+}
+
+void ResponderPrivate::insertRecords(const QByteArray &oldName, const QByteArray &newName)
+{
+    foreach (Record record, pendingRecords.values(oldName)) {
+        record.setName(newName);
+        records.insert(newName, record);
+    }
+    pendingRecords.remove(oldName);
+    renames.insert(oldName, newName);
+}
+
 Responder::Responder(Server *server, QObject *parent)
     : QObject(parent),
       d(new ResponderPrivate(parent, server))
@@ -67,16 +85,26 @@ Responder::Responder(Server *server, QObject *parent)
 
 void Responder::addRecord(const Record &record)
 {
-    // If there are already records with the same name, the record can be
-    // added directly to the map; otherwise, a probe must be issued
+    Record trRecord = record;
+    d->translate(trRecord);
 
-    if (d->records.count(record.name())) {
-        d->records.insert(record.name(), record);
+    if (d->records.count(trRecord.name())) {
+
+        // If a record with the same name exists in records, then it is safe to
+        // directly insert this new one
+        d->records.insert(trRecord.name(), trRecord);
+
     } else {
-        Prober *prober = new Prober(d->server, record, this);
-        connect(prober, &Prober::recordConfirmed, [this](const Record &newRecord) {
-            d->records.insert(newRecord.name(), newRecord);
-        });
-    }
 
+        // Either a pending probe exists (in which case, this record can be
+        // added to the pending list) or one does not (in which case, a new
+        // probe is started)
+        d->pendingRecords.insert(record.name(), record);
+        if (!d->pendingRecords.count(record.name())) {
+            Prober *prober = new Prober(d->server, record, this);
+            connect(prober, &Prober::recordConfirmed, [this, record](const Record &newRecord) {
+                d->insertRecords(record.name(), newRecord.name());
+            });
+        }
+    }
 }

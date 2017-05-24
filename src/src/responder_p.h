@@ -25,6 +25,7 @@
 #ifndef QMDNSENGINE_RESPONDER_P_H
 #define QMDNSENGINE_RESPONDER_P_H
 
+#include <QMap>
 #include <QMultiMap>
 #include <QObject>
 
@@ -46,11 +47,18 @@ public:
 
     ResponderPrivate(QObject *parent, Server *server);
 
+    void translate(Record &record) const;
+    void insertRecords(const QByteArray &oldName, const QByteArray &newName);
+
     Server *server;
 
     QMultiMap<QByteArray, Record> records;
+    QMultiMap<QByteArray, Record> pendingRecords;
 
-public Q_SLOTS:
+    // Keep track of record names after being probed
+    QMap<QByteArray, QByteArray> renames;
+
+private Q_SLOTS:
 
     void onMessageReceived(const Message &message);
 };

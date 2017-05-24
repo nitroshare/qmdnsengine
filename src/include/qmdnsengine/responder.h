@@ -54,7 +54,8 @@ public:
      *
      * The responder keeps track of which names it has exclusive use of and if
      * it does not have exclusive use of the name, it will send a DNS ANY
-     * to confirm that it is safe to use.
+     * to confirm that it is safe to use. If the name is in use, all records
+     * added via this method will be silently rewritten.
      */
     void addRecord(const Record &record);
 
