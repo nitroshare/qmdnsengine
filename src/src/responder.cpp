@@ -59,12 +59,9 @@ void ResponderPrivate::onMessageReceived(const Message &message)
     }
 }
 
-void ResponderPrivate::translate(Record &record) const
+QByteArray ResponderPrivate::translate(const QByteArray &name) const
 {
-    // Take the record and check to see if its name should be modified due to
-    // another (existing) record on the network
-
-    record.setName(renames.value(record.name(), record.name()));
+    return renames.value(name, name);
 }
 
 void ResponderPrivate::insertRecords(const QByteArray &oldName, const QByteArray &newName)
@@ -85,26 +82,27 @@ Responder::Responder(Server *server, QObject *parent)
 
 void Responder::addRecord(const Record &record)
 {
-    Record trRecord = record;
-    d->translate(trRecord);
+    QByteArray name = d->translate(record.name());
 
-    if (d->records.count(trRecord.name())) {
+    if (d->records.count(name)) {
 
         // If a record with the same name exists in records, then it is safe to
-        // directly insert this new one
-        d->records.insert(trRecord.name(), trRecord);
+        // insert the record (changing its name to match)
+        Record newRecord = record;
+        newRecord.setName(name);
+        d->records.insert(name, newRecord);
 
     } else {
 
         // Either a pending probe exists (in which case, this record can be
         // added to the pending list) or one does not (in which case, a new
         // probe is started)
-        d->pendingRecords.insert(record.name(), record);
-        if (!d->pendingRecords.count(record.name())) {
+        if (!d->pendingRecords.count(name)) {
             Prober *prober = new Prober(d->server, record, this);
-            connect(prober, &Prober::recordConfirmed, [this, record](const Record &newRecord) {
-                d->insertRecords(record.name(), newRecord.name());
+            connect(prober, &Prober::nameConfirmed, [this, name](const QByteArray &newName) {
+                d->insertRecords(name, newName);
             });
         }
+        d->pendingRecords.insert(name, record);
     }
 }

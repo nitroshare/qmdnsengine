@@ -51,13 +51,10 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Indicate that the record has been confirmed unique
-     * @param record copy of the record that was confirmed
-     *
-     * Note that the record may not be identical to what was originally
-     * proposed since the name may have been changed.
+     * @brief Indicate that the name has been confirmed unique
+     * @param name that was confirmed to be unique
      */
-    void recordConfirmed(const Record &record);
+    void nameConfirmed(const QByteArray &name);
 
 private:
 

@@ -94,7 +94,7 @@ void ProberPrivate::onMessageReceived(const Message &message)
 void ProberPrivate::onTimeout()
 {
     confirmed = true;
-    emit q->recordConfirmed(proposedRecord);
+    emit q->nameConfirmed(proposedRecord.name());
 }
 
 Prober::Prober(Server *server, const Record &record, QObject *parent)

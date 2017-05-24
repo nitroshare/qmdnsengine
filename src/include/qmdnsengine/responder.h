@@ -38,7 +38,7 @@ class Server;
 class QMDNSENGINE_EXPORT ResponderPrivate;
 
 /**
- * @brief Respond to queries for records
+ * @brief Respond to DNS queries for records
  */
 class QMDNSENGINE_EXPORT Responder : public QObject
 {
@@ -55,7 +55,7 @@ public:
      * The responder keeps track of which names it has exclusive use of and if
      * it does not have exclusive use of the name, it will send a DNS ANY
      * to confirm that it is safe to use. If the name is in use, all records
-     * added via this method will be silently rewritten.
+     * added via this method will have their names changed.
      */
     void addRecord(const Record &record);
 

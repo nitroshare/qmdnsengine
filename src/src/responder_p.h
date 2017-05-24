@@ -47,7 +47,7 @@ public:
 
     ResponderPrivate(QObject *parent, Server *server);
 
-    void translate(Record &record) const;
+    QByteArray translate(const QByteArray &name) const;
     void insertRecords(const QByteArray &oldName, const QByteArray &newName);
 
     Server *server;
