@@ -24,61 +24,45 @@
 
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/hostname.h>
-#include <qmdnsengine/mdns.h>
-#include <qmdnsengine/message.h>
 #include <qmdnsengine/provider.h>
-#include <qmdnsengine/query.h>
 #include <qmdnsengine/server.h>
-#include <qmdnsengine/service.h>
 
 #include "provider_p.h"
 
 using namespace QMdnsEngine;
 
-const quint32 DefaultTtl = 3600;
-
 ProviderPrivate::ProviderPrivate(QObject *parent, Server *server, Hostname *hostname)
     : QObject(parent),
       server(server),
       hostname(hostname),
+      responder(server),
       initialized(false)
 {
+    connect(hostname, &Hostname::hostnameChanged, this, &ProviderPrivate::onHostnameChanged);
+
     browsePtrRecord.setType(PTR);
     ptrRecord.setType(PTR);
     srvRecord.setType(SRV);
     txtRecord.setType(TXT);
-
-    connect(server, &Server::messageReceived, this, &ProviderPrivate::onMessageReceived);
-    connect(hostname, &Hostname::hostnameChanged, this, &ProviderPrivate::onHostnameChanged);
-
-    onHostnameChanged(hostname->hostname());
 }
 
-ProviderPrivate::~ProviderPrivate()
+void ProviderPrivate::updateRecords()
 {
-    // If the provider is being destroyed, purge the records from caches
+    if (!hostname->isRegistered()) {
+        return;
+    }
 
     if (initialized) {
-        browsePtrRecord.setTtl(0);
-        ptrRecord.setTtl(0);
-        srvRecord.setTtl(0);
-        txtRecord.setTtl(0);
-        Message message;
-        message.setResponse(true);
-        message.addRecord(browsePtrRecord);
-        message.addRecord(ptrRecord);
-        message.addRecord(srvRecord);
-        message.addRecord(txtRecord);
-        server->broadcastMessage(message);
+        responder.removeRecord(browsePtrRecord);
+        responder.removeRecord(ptrRecord);
+        responder.removeRecord(srvRecord);
+        responder.removeRecord(txtRecord);
     }
-}
 
-void ProviderPrivate::updateRecords(const Service &service)
-{
     QByteArray fqName = service.name() + "." + service.type();
 
-    browsePtrRecord.setName(MdnsBrowseType);
-    browsePtrRecord.setTarget(service.type());
+    browsePtrRecord.setName(service.type());
+    browsePtrRecord.setTarget(fqName);
 
     ptrRecord.setName(service.type());
     ptrRecord.setTarget(fqName);
@@ -89,35 +73,17 @@ void ProviderPrivate::updateRecords(const Service &service)
     txtRecord.setName(fqName);
     txtRecord.setAttributes(service.attributes());
 
-    initialized = true;
-}
+    responder.addRecord(browsePtrRecord);
+    responder.addRecord(ptrRecord);
+    responder.addRecord(srvRecord);
+    responder.addRecord(txtRecord);
 
-void ProviderPrivate::onMessageReceived(const Message &message)
-{
-    if (!initialized || !hostname->isRegistered() || message.isResponse()) {
-        return;
-    }
-    Message reply;
-    reply.reply(message);
-    foreach (Query query, message.queries()) {
-        if (query.type() == PTR && query.name() == browsePtrRecord.name()) {
-            reply.addRecord(browsePtrRecord);
-        } else if (query.type() == PTR && query.name() == ptrRecord.name()) {
-            reply.addRecord(ptrRecord);
-        } else if (query.type() == SRV && query.name() == srvRecord.name()) {
-            reply.addRecord(srvRecord);
-        } else if (query.type() == TXT && query.name() == txtRecord.name()) {
-            reply.addRecord(txtRecord);
-        }
-    }
-    if (reply.records().count()) {
-        server->sendMessage(reply);
-    }
+    initialized = true;
 }
 
 void ProviderPrivate::onHostnameChanged(const QByteArray &hostname)
 {
-    srvRecord.setTarget(hostname);
+    updateRecords();
 }
 
 Provider::Provider(Server *server, Hostname *hostname, QObject *parent)
@@ -128,5 +94,6 @@ Provider::Provider(Server *server, Hostname *hostname, QObject *parent)
 
 void Provider::update(const Service &service)
 {
-    d->updateRecords(service);
+    d->service = service;
+    d->updateRecords();
 }
