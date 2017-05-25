@@ -49,6 +49,8 @@ ProberPrivate::ProberPrivate(Prober *prober, Server *server, const Record &recor
     connect(&timer, &QTimer::timeout, this, &ProberPrivate::onTimeout);
 
     timer.setSingleShot(true);
+
+    assertHostname();
 }
 
 void ProberPrivate::assertHostname()
