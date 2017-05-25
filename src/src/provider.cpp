@@ -24,6 +24,7 @@
 
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/hostname.h>
+#include <qmdnsengine/mdns.h>
 #include <qmdnsengine/provider.h>
 #include <qmdnsengine/server.h>
 
@@ -61,22 +62,23 @@ void ProviderPrivate::updateRecords()
 
     QByteArray fqName = service.name() + "." + service.type();
 
-    browsePtrRecord.setName(service.type());
-    browsePtrRecord.setTarget(fqName);
+    browsePtrRecord.setName(MdnsBrowseType);
+    browsePtrRecord.setTarget(service.type());
 
     ptrRecord.setName(service.type());
     ptrRecord.setTarget(fqName);
 
     srvRecord.setName(fqName);
     srvRecord.setPort(service.port());
+    srvRecord.setTarget(hostname->hostname());
 
     txtRecord.setName(fqName);
     txtRecord.setAttributes(service.attributes());
 
-    responder.addRecord(browsePtrRecord);
-    responder.addRecord(ptrRecord);
-    responder.addRecord(srvRecord);
-    responder.addRecord(txtRecord);
+    responder.addRecord(browsePtrRecord, false);
+    responder.addRecord(ptrRecord, false);
+    responder.addRecord(srvRecord, true);
+    responder.addRecord(txtRecord, true);
 
     initialized = true;
 }
