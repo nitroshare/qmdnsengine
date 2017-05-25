@@ -80,10 +80,10 @@ Responder::Responder(Server *server, QObject *parent)
 {
 }
 
-void Responder::addRecord(const Record &record)
+void Responder::addRecord(const Record &record, bool probe)
 {
     QByteArray name = d->translate(record.name());
-    if (d->records.count(name)) {
+    if (!probe || d->records.count(name)) {
 
         // If a record with the same name exists in records, then it is safe to
         // insert the record (changing its name to match)

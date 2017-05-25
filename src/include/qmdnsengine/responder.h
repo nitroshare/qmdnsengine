@@ -51,13 +51,14 @@ public:
     /**
      * @brief Add a record to the responder
      * @param record DNS record to add
+     * @param probe true to probe for the record
      *
      * The responder keeps track of which names it has exclusive use of and if
      * it does not have exclusive use of the name, it will send a DNS ANY
      * to confirm that it is safe to use. If the name is in use, all records
      * added via this method will have their names changed.
      */
-    void addRecord(const Record &record);
+    void addRecord(const Record &record, bool probe);
 
     /**
      * @brief Remove a record from the responder
