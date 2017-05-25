@@ -55,7 +55,7 @@ void ResponderPrivate::onMessageReceived(const Message &message)
         }
     }
     if (reply.records().count()) {
-        server->sendMessage(message);
+        server->sendMessage(reply);
     }
 }
 
