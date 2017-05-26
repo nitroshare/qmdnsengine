@@ -141,7 +141,7 @@ void ProviderPrivate::onMessageReceived(const Message &message)
         if (query.type() == PTR && query.name() == MdnsBrowseType) {
             sendBrowsePtr = true;
         } else if (query.type() == PTR && query.name() == ptrRecord.name()) {
-            sendPtr = sendSrv = sendTxt = true;
+            sendPtr = true;
         } else if (query.type() == SRV && query.name() == srvRecord.name()) {
             sendSrv = true;
         } else if (query.type() == TXT && query.name() == txtRecord.name()) {
@@ -158,6 +158,11 @@ void ProviderPrivate::onMessageReceived(const Message &message)
         } else if (record == txtRecord) {
             sendTxt = false;
         }
+    }
+
+    // Include the SRV and TXT if the PTR is being sent
+    if (sendPtr) {
+        sendSrv = sendTxt = true;
     }
 
     // If any records should be sent, compose a message reply
