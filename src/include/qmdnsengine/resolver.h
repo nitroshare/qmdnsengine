@@ -33,6 +33,7 @@
 namespace QMdnsEngine
 {
 
+class Cache;
 class Server;
 
 class QMDNSENGINE_EXPORT ResolverPrivate;
@@ -46,7 +47,7 @@ class QMDNSENGINE_EXPORT Resolver : public QObject
 
 public:
 
-    Resolver(Server *server, const QByteArray &name, QObject *parent = 0);
+    Resolver(Server *server, const QByteArray &name, Cache *cache = 0, QObject *parent = 0);
 
 Q_SIGNALS:
 

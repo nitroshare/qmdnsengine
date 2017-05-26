@@ -22,7 +22,10 @@
  * IN THE SOFTWARE.
  */
 
+#include <QTimer>
+
 #include <qmdnsengine/dns.h>
+#include <qmdnsengine/cache.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
@@ -33,26 +36,52 @@
 
 using namespace QMdnsEngine;
 
-ResolverPrivate::ResolverPrivate(Resolver *resolver, Server *server, const QByteArray &name)
+ResolverPrivate::ResolverPrivate(Resolver *resolver, Server *server, const QByteArray &name, Cache *cache)
     : QObject(resolver),
       q(resolver),
       server(server),
-      name(name)
+      name(name),
+      cache(cache ? cache : new Cache)
 {
     connect(server, &Server::messageReceived, this, &ResolverPrivate::onMessageReceived);
 
+    // Emit a signal for each of the existing records in the cache
+    QTimer::singleShot(0, [this]() {
+        foreach (Record record, existing()) {
+            emit q->resolved(record.address());
+        }
+    });
+
+    // Query for new records
     query();
 }
 
-void ResolverPrivate::query()
+QList<Record> ResolverPrivate::existing() const
 {
+    QList<Record> records;
+    cache->lookupRecords(name, A, records);
+    cache->lookupRecords(name, AAAA, records);
+    return records;
+}
+
+void ResolverPrivate::query() const
+{
+    Message message;
+
+    // Add a query for A and AAAA records
     Query query;
     query.setName(name);
     query.setType(A);
-    Message message;
     message.addQuery(query);
     query.setType(AAAA);
     message.addQuery(query);
+
+    // Add existing (known) records to the query
+    foreach (Record record, existing()) {
+        message.addRecord(record);
+    }
+
+    // Send the query
     server->broadcastMessage(message);
 }
 
@@ -63,13 +92,14 @@ void ResolverPrivate::onMessageReceived(const Message &message)
     }
     foreach (Record record, message.records()) {
         if (record.name() == name && (record.type() == A || record.type() == AAAA)) {
+            cache->addRecord(record);
             emit q->resolved(record.address());
         }
     }
 }
 
-Resolver::Resolver(Server *server, const QByteArray &name, QObject *parent)
+Resolver::Resolver(Server *server, const QByteArray &name, Cache *cache, QObject *parent)
     : QObject(parent),
-      d(new ResolverPrivate(this, server, name))
+      d(new ResolverPrivate(this, server, name, cache))
 {
 }
