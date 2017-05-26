@@ -24,7 +24,7 @@
 
 #include <QtGlobal>
 
-#ifdef Q_OS_LINUX
+#ifdef Q_OS_UNIX
 #  include <cerrno>
 #  include <cstring>
 #  include <sys/socket.h>
