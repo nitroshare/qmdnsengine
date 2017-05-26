@@ -25,6 +25,7 @@
 #ifndef QMDNSENGINE_RESOLVER_H
 #define QMDNSENGINE_RESOLVER_H
 
+#include <QHostAddress>
 #include <QObject>
 
 #include "qmdnsengine_export.h"
@@ -32,15 +33,30 @@
 namespace QMdnsEngine
 {
 
+class Server;
+
 class QMDNSENGINE_EXPORT ResolverPrivate;
 
+/**
+ * @brief Resolve a service to an address
+ */
 class QMDNSENGINE_EXPORT Resolver : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit Resolver(QObject *parent = 0);
+    Resolver(Server *server, const QByteArray &name, QObject *parent = 0);
+
+Q_SIGNALS:
+
+    /**
+     * @brief Indicate that the host resolved to an address
+     * @param address service address
+     *
+     * This signal will be emitted once for each address.
+     */
+    void resolved(const QHostAddress &address);
 
 private:
 

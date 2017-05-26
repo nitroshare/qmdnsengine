@@ -22,20 +22,54 @@
  * IN THE SOFTWARE.
  */
 
+#include <qmdnsengine/dns.h>
+#include <qmdnsengine/message.h>
+#include <qmdnsengine/query.h>
+#include <qmdnsengine/record.h>
 #include <qmdnsengine/resolver.h>
+#include <qmdnsengine/server.h>
 
 #include "resolver_p.h"
 
 using namespace QMdnsEngine;
 
-ResolverPrivate::ResolverPrivate(Resolver *resolver)
+ResolverPrivate::ResolverPrivate(Resolver *resolver, Server *server, const QByteArray &name)
     : QObject(resolver),
-      q(resolver)
+      q(resolver),
+      server(server),
+      name(name)
 {
+    connect(server, &Server::messageReceived, this, &ResolverPrivate::onMessageReceived);
+
+    query();
 }
 
-Resolver::Resolver(QObject *parent)
+void ResolverPrivate::query()
+{
+    Query query;
+    query.setName(name);
+    query.setType(A);
+    Message message;
+    message.addQuery(query);
+    query.setType(AAAA);
+    message.addQuery(query);
+    server->broadcastMessage(message);
+}
+
+void ResolverPrivate::onMessageReceived(const Message &message)
+{
+    if (!message.isResponse()) {
+        return;
+    }
+    foreach (Record record, message.records()) {
+        if (record.name() == name && (record.type() == A || record.type() == AAAA)) {
+            emit q->resolved(record.address());
+        }
+    }
+}
+
+Resolver::Resolver(Server *server, const QByteArray &name, QObject *parent)
     : QObject(parent),
-      d(new ResolverPrivate(this))
+      d(new ResolverPrivate(this, server, name))
 {
 }

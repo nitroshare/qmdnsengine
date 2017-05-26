@@ -30,7 +30,9 @@
 namespace QMdnsEngine
 {
 
+class Message;
 class Resolver;
+class Server;
 
 class ResolverPrivate : public QObject
 {
@@ -38,7 +40,16 @@ class ResolverPrivate : public QObject
 
 public:
 
-    explicit ResolverPrivate(Resolver *resolver);
+    explicit ResolverPrivate(Resolver *resolver, Server *server, const QByteArray &name);
+
+    void query();
+
+    Server *server;
+    QByteArray name;
+
+private Q_SLOTS:
+
+    void onMessageReceived(const Message &message);
 
 private:
 
