@@ -96,8 +96,9 @@ void Cache::addRecord(const Record &record)
     // zero should be immediately removed
     if (record.flushCache() || record.ttl() == 0) {
         for (auto i = d->entries.begin(); i != d->entries.end();) {
-            if (record.flushCache() &&
-                    ((*i).record.name() == record.name() && (*i).record.type() == record.type()) ||
+            if ((record.flushCache() &&
+                    (*i).record.name() == record.name() &&
+                    (*i).record.type() == record.type()) ||
                     (!record.flushCache() && (*i).record == record)) {
                 emit recordExpired((*i).record);
                 i = d->entries.erase(i);
