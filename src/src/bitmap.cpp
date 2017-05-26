@@ -52,7 +52,7 @@ Bitmap &Bitmap::operator=(const Bitmap &other)
 
 bool Bitmap::operator==(const Bitmap &other)
 {
-    if (!d->length == other.d->length) {
+    if (d->length != other.d->length) {
         return false;
     }
     for (int i = 0; i < d->length; ++i) {

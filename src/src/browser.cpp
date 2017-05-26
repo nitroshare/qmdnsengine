@@ -124,9 +124,9 @@ void BrowserPrivate::onMessageReceived(const Message &message)
             ptrTargets.insert(record.target());
             serviceTimer.stop();
             serviceTimer.start(100);
-        } else if (record.type() == PTR && (any || record.name() == type) ||
-                record.type() == SRV && (any || record.name().endsWith("." + type)) ||
-                record.type() == TXT && (any || record.name().endsWith("." + type))) {
+        } else if ((record.type() == PTR && (any || record.name() == type)) ||
+                (record.type() == SRV && (any || record.name().endsWith("." + type))) ||
+                (record.type() == TXT && (any || record.name().endsWith("." + type)))) {
             cache->addRecord(record);
             switch (record.type()) {
             case PTR:
