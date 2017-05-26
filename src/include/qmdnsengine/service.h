@@ -26,6 +26,8 @@
 #define QMDNSENGINE_SERVICE_H
 
 #include <QByteArray>
+#include <QHostAddress>
+#include <QList>
 #include <QMap>
 
 #include "qmdnsengine_export.h"
@@ -73,6 +75,16 @@ public:
      * the service.
      */
     void setName(const QByteArray &name);
+
+    /**
+     * @brief Retrieve the addresses for the service
+     */
+    QList<QHostAddress> addresses() const;
+
+    /**
+     * @brief Add an address for the service
+     */
+    void addAddress(const QHostAddress &address);
 
     /**
      * @brief Retrieve the service port
