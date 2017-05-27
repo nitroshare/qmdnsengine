@@ -77,14 +77,14 @@ public:
     void setName(const QByteArray &name);
 
     /**
-     * @brief Retrieve the addresses for the service
+     * @brief Retrieve the hostname of the device providing the service
      */
-    QList<QHostAddress> addresses() const;
+    QByteArray hostname() const;
 
     /**
-     * @brief Add an address for the service
+     * @brief Set the hostname of the device providing the service
      */
-    void addAddress(const QHostAddress &address);
+    void setHostname(const QByteArray &hostname);
 
     /**
      * @brief Retrieve the service port

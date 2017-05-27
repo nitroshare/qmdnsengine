@@ -26,9 +26,7 @@
 #define QMDNSENGINE_SERVICE_P_H
 
 #include <QByteArray>
-#include <QHostAddress>
 #include <QMap>
-#include <QSet>
 
 namespace QMdnsEngine
 {
@@ -41,7 +39,7 @@ public:
 
     QByteArray type;
     QByteArray name;
-    QSet<QHostAddress> addresses;
+    QByteArray hostname;
     quint16 port;
     QMap<QByteArray, QByteArray> attributes;
 };

@@ -87,14 +87,14 @@ void Service::setName(const QByteArray &name)
     d->name = name;
 }
 
-QList<QHostAddress> Service::addresses() const
+QByteArray Service::hostname() const
 {
-    return d->addresses.toList();
+    return d->hostname;
 }
 
-void Service::addAddress(const QHostAddress &address)
+void Service::setHostname(const QByteArray &hostname)
 {
-    d->addresses.insert(address);
+    d->hostname = hostname;
 }
 
 quint16 Service::port() const

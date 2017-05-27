@@ -80,6 +80,7 @@ bool BrowserPrivate::updateService(const QByteArray &fqName)
     Service service;
     service.setName(serviceName);
     service.setType(serviceType);
+    service.setHostname(srvRecord.target());
     service.setPort(srvRecord.port());
 
     // If TXT records are available for the service, add their values
