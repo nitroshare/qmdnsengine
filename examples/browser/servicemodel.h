@@ -29,6 +29,7 @@
 #include <QList>
 
 #include <qmdnsengine/browser.h>
+#include <qmdnsengine/cache.h>
 #include <qmdnsengine/service.h>
 
 class ServiceModel : public QAbstractListModel
@@ -52,6 +53,7 @@ private:
 
     int findService(const QByteArray &name);
 
+    QMdnsEngine::Cache cache;
     QMdnsEngine::Browser mBrowser;
     QList<QMdnsEngine::Service> mServices;
 };

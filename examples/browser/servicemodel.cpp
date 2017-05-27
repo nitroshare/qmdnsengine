@@ -27,7 +27,7 @@
 Q_DECLARE_METATYPE(QMdnsEngine::Service)
 
 ServiceModel::ServiceModel(QMdnsEngine::Server *server, const QByteArray &type)
-    : mBrowser(server, type)
+    : mBrowser(server, type, &cache)
 {
     connect(&mBrowser, &QMdnsEngine::Browser::serviceAdded, this, &ServiceModel::onServiceAdded);
     connect(&mBrowser, &QMdnsEngine::Browser::serviceUpdated, this, &ServiceModel::onServiceUpdated);

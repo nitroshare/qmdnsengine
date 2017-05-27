@@ -28,10 +28,12 @@
 #include <QMainWindow>
 
 #include <qmdnsengine/server.h>
+#include <qmdnsengine/resolver.h>
 
 class QItemSelection;
 class QLineEdit;
 class QListView;
+class QListWidget;
 class QPushButton;
 class QTableWidget;
 
@@ -59,7 +61,10 @@ private:
     QLineEdit *mServiceType;
     QPushButton *mStartStop;
     QListView *mServices;
+    QListWidget *mAddresses;
     QTableWidget *mAttributes;
+
+    QMdnsEngine::Resolver *mResolver;
 };
 
 #endif // MAINWINDOW_H

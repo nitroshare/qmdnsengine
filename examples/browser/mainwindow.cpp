@@ -27,6 +27,7 @@
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QListView>
+#include <QListWidget>
 #include <QPushButton>
 #include <QSplitter>
 #include <QTableWidget>
@@ -42,7 +43,8 @@
 Q_DECLARE_METATYPE(QMdnsEngine::Service)
 
 MainWindow::MainWindow()
-    : mServiceModel(nullptr)
+    : mServiceModel(nullptr),
+      mResolver(nullptr)
 {
     setWindowTitle(tr("mDNS Browser"));
     resize(640, 480);
@@ -50,6 +52,7 @@ MainWindow::MainWindow()
     mServiceType = new QLineEdit(tr("_http._tcp.local."));
     mStartStop = new QPushButton(tr("Browse"));
     mServices = new QListView;
+    mAddresses = new QListWidget;
     mAttributes = new QTableWidget;
     mAttributes->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -66,12 +69,17 @@ MainWindow::MainWindow()
     typeLayout->addWidget(mStartStop);
     rootLayout->addLayout(typeLayout);
 
-    QSplitter *splitter = new QSplitter;
-    splitter->addWidget(mServices);
-    splitter->addWidget(mAttributes);
+    QSplitter *vSplitter = new QSplitter;
+    vSplitter->setOrientation(Qt::Vertical);
+    vSplitter->addWidget(mAddresses);
+    vSplitter->addWidget(mAttributes);
+
+    QSplitter *hSplitter = new QSplitter;
+    hSplitter->addWidget(mServices);
+    hSplitter->addWidget(vSplitter);
 
     QHBoxLayout *servicesLayout = new QHBoxLayout;
-    servicesLayout->addWidget(splitter);
+    servicesLayout->addWidget(hSplitter);
     rootLayout->addLayout(servicesLayout);
 
     connect(any, &QCheckBox::toggled, this, &MainWindow::onToggled);
@@ -103,10 +111,19 @@ void MainWindow::onClicked()
 
 void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &)
 {
+    mAddresses->clear();
     mAttributes->clear();
     mAttributes->setColumnCount(0);
+
+    if (mResolver) {
+        delete mResolver;
+        mResolver = nullptr;
+    }
+
     if (selected.count()) {
         auto service = mServiceModel->data(selected.at(0).topLeft(), Qt::UserRole).value<QMdnsEngine::Service>();
+
+        // Show TXT values
         auto attributes = service.attributes();
         mAttributes->setRowCount(attributes.keys().count());
         mAttributes->setColumnCount(2);
@@ -118,5 +135,11 @@ void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemS
             mAttributes->setItem(row, 0, new QTableWidgetItem(QString(i.key())));
             mAttributes->setItem(row, 1, new QTableWidgetItem(QString(i.value())));
         }
+
+        // Resolve the address
+        mResolver = new QMdnsEngine::Resolver(&mServer, service.hostname(), nullptr, this);
+        connect(mResolver, &QMdnsEngine::Resolver::resolved, [this](const QHostAddress &address) {
+            mAddresses->addItem(address.toString());
+        });
     }
 }
