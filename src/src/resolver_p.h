@@ -26,6 +26,7 @@
 #define QMDNSENGINE_RESOLVER_P_H
 
 #include <QObject>
+#include <QTimer>
 
 namespace QMdnsEngine
 {
@@ -51,9 +52,12 @@ public:
     QByteArray name;
     Cache *cache;
 
+    QTimer timer;
+
 private Q_SLOTS:
 
     void onMessageReceived(const Message &message);
+    void onTimeout();
 
 private:
 

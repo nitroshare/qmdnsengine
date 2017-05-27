@@ -44,16 +44,14 @@ ResolverPrivate::ResolverPrivate(Resolver *resolver, Server *server, const QByte
       cache(cache ? cache : new Cache(this))
 {
     connect(server, &Server::messageReceived, this, &ResolverPrivate::onMessageReceived);
-
-    // Emit a signal for each of the existing records in the cache
-    QTimer::singleShot(0, [this]() {
-        foreach (Record record, existing()) {
-            emit q->resolved(record.address());
-        }
-    });
+    connect(&timer, &QTimer::timeout, this, &ResolverPrivate::onTimeout);
 
     // Query for new records
     query();
+
+    // Pull the existing records from the cache
+    timer.setSingleShot(true);
+    timer.start(0);
 }
 
 QList<Record> ResolverPrivate::existing() const
@@ -95,6 +93,13 @@ void ResolverPrivate::onMessageReceived(const Message &message)
             cache->addRecord(record);
             emit q->resolved(record.address());
         }
+    }
+}
+
+void ResolverPrivate::onTimeout()
+{
+    foreach (Record record, existing()) {
+        emit q->resolved(record.address());
     }
 }
 
