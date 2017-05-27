@@ -41,7 +41,7 @@ ResolverPrivate::ResolverPrivate(Resolver *resolver, Server *server, const QByte
       q(resolver),
       server(server),
       name(name),
-      cache(cache ? cache : new Cache)
+      cache(cache ? cache : new Cache(this))
 {
     connect(server, &Server::messageReceived, this, &ResolverPrivate::onMessageReceived);
 

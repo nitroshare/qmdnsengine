@@ -40,12 +40,8 @@ BrowserPrivate::BrowserPrivate(Browser *browser, Server *server, const QByteArra
       q(browser),
       server(server),
       type(type),
-      cache(existingCache)
+      cache(existingCache ? existingCache : new Cache(this))
 {
-    if (!cache) {
-        cache = new Cache;
-    }
-
     connect(server, &Server::messageReceived, this, &BrowserPrivate::onMessageReceived);
 
     connect(cache, &Cache::shouldQuery, this, &BrowserPrivate::onShouldQuery);
