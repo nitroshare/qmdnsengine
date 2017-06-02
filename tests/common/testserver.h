@@ -45,6 +45,7 @@ public:
     void deliverMessage(const QMdnsEngine::Message &message);
 
     QList<QMdnsEngine::Message> receivedMessages() const;
+    void clearReceivedMessages();
 
 private:
 

@@ -52,3 +52,8 @@ QList<QMdnsEngine::Message> TestServer::receivedMessages() const
 {
     return mMessages;
 }
+
+void TestServer::clearReceivedMessages()
+{
+    mMessages.clear();
+}

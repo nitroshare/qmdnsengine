@@ -3,6 +3,7 @@ add_subdirectory(common)
 set(TESTS
     TestCache
     TestDns
+    TestHostname
 )
 
 foreach(_test ${TESTS})
