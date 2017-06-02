@@ -64,9 +64,7 @@ void HostnamePrivate::resetHostname()
 void HostnamePrivate::assertHostname()
 {
     QByteArray localHostname = QHostInfo::localHostName().toUtf8();
-    if (localHostname.endsWith(".local")) {
-        localHostname.resize(localHostname.length() - 6);
-    }
+    localHostname = localHostname.replace('.', '-');
     hostname = (hostnameSuffix == 1 ? localHostname:
         localHostname + "-" + QByteArray::number(hostnameSuffix)) + ".local.";
 
