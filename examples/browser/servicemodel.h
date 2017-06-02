@@ -31,6 +31,7 @@
 #include <qmdnsengine/browser.h>
 #include <qmdnsengine/cache.h>
 #include <qmdnsengine/service.h>
+#include <qmdnsengine/server.h>
 
 class ServiceModel : public QAbstractListModel
 {
