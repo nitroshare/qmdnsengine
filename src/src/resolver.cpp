@@ -24,26 +24,26 @@
 
 #include <QTimer>
 
+#include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/cache.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
 #include <qmdnsengine/resolver.h>
-#include <qmdnsengine/server.h>
 
 #include "resolver_p.h"
 
 using namespace QMdnsEngine;
 
-ResolverPrivate::ResolverPrivate(Resolver *resolver, Server *server, const QByteArray &name, Cache *cache)
+ResolverPrivate::ResolverPrivate(Resolver *resolver, AbstractServer *server, const QByteArray &name, Cache *cache)
     : QObject(resolver),
       q(resolver),
       server(server),
       name(name),
       cache(cache ? cache : new Cache(this))
 {
-    connect(server, &Server::messageReceived, this, &ResolverPrivate::onMessageReceived);
+    connect(server, &AbstractServer::messageReceived, this, &ResolverPrivate::onMessageReceived);
     connect(&timer, &QTimer::timeout, this, &ResolverPrivate::onTimeout);
 
     // Query for new records
@@ -103,7 +103,7 @@ void ResolverPrivate::onTimeout()
     }
 }
 
-Resolver::Resolver(Server *server, const QByteArray &name, Cache *cache, QObject *parent)
+Resolver::Resolver(AbstractServer *server, const QByteArray &name, Cache *cache, QObject *parent)
     : QObject(parent),
       d(new ResolverPrivate(this, server, name, cache))
 {

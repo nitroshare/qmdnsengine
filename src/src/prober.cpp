@@ -22,17 +22,17 @@
  * IN THE SOFTWARE.
  */
 
+#include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/prober.h>
 #include <qmdnsengine/query.h>
-#include <qmdnsengine/server.h>
 
 #include "prober_p.h"
 
 using namespace QMdnsEngine;
 
-ProberPrivate::ProberPrivate(Prober *prober, Server *server, const Record &record)
+ProberPrivate::ProberPrivate(Prober *prober, AbstractServer *server, const Record &record)
     : QObject(prober),
       q(prober),
       server(server),
@@ -45,7 +45,7 @@ ProberPrivate::ProberPrivate(Prober *prober, Server *server, const Record &recor
     name = record.name().left(index);
     type = record.name().mid(index);
 
-    connect(server, &Server::messageReceived, this, &ProberPrivate::onMessageReceived);
+    connect(server, &AbstractServer::messageReceived, this, &ProberPrivate::onMessageReceived);
     connect(&timer, &QTimer::timeout, this, &ProberPrivate::onTimeout);
 
     timer.setSingleShot(true);
@@ -99,7 +99,7 @@ void ProberPrivate::onTimeout()
     emit q->nameConfirmed(proposedRecord.name());
 }
 
-Prober::Prober(Server *server, const Record &record, QObject *parent)
+Prober::Prober(AbstractServer *server, const Record &record, QObject *parent)
     : QObject(parent),
       d(new ProberPrivate(this, server, record))
 {

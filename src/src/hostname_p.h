@@ -33,10 +33,10 @@ class QHostAddress;
 namespace QMdnsEngine
 {
 
+class AbstractServer;
 class Hostname;
 class Message;
 class Record;
-class Server;
 
 class HostnamePrivate : public QObject
 {
@@ -44,13 +44,13 @@ class HostnamePrivate : public QObject
 
 public:
 
-    HostnamePrivate(Hostname *hostname, Server *server);
+    HostnamePrivate(Hostname *hostname, AbstractServer *server);
 
     void resetHostname();
     void assertHostname();
     bool generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record);
 
-    Server *server;
+    AbstractServer *server;
 
     QByteArray hostnamePrev;
     QByteArray hostname;

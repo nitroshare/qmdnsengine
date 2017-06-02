@@ -33,9 +33,9 @@
 namespace QMdnsEngine
 {
 
+class AbstractServer;
 class Message;
 class Prober;
-class Server;
 
 class ProberPrivate : public QObject
 {
@@ -43,11 +43,11 @@ class ProberPrivate : public QObject
 
 public:
 
-    ProberPrivate(Prober *prober, Server *server, const Record &record);
+    ProberPrivate(Prober *prober, AbstractServer *server, const Record &record);
 
     void assertHostname();
 
-    Server *server;
+    AbstractServer *server;
     QTimer timer;
 
     bool confirmed;

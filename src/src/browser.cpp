@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/browser.h>
 #include <qmdnsengine/cache.h>
 #include <qmdnsengine/dns.h>
@@ -29,20 +30,19 @@
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
-#include <qmdnsengine/server.h>
 
 #include "browser_p.h"
 
 using namespace QMdnsEngine;
 
-BrowserPrivate::BrowserPrivate(Browser *browser, Server *server, const QByteArray &type, Cache *existingCache)
+BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const QByteArray &type, Cache *existingCache)
     : QObject(browser),
       q(browser),
       server(server),
       type(type),
       cache(existingCache ? existingCache : new Cache(this))
 {
-    connect(server, &Server::messageReceived, this, &BrowserPrivate::onMessageReceived);
+    connect(server, &AbstractServer::messageReceived, this, &BrowserPrivate::onMessageReceived);
 
     connect(cache, &Cache::shouldQuery, this, &BrowserPrivate::onShouldQuery);
     connect(cache, &Cache::recordExpired, this, &BrowserPrivate::onRecordExpired);
@@ -235,7 +235,7 @@ void BrowserPrivate::onServiceTimeout()
     ptrTargets.clear();
 }
 
-Browser::Browser(Server *server, const QByteArray &type, Cache *cache, QObject *parent)
+Browser::Browser(AbstractServer *server, const QByteArray &type, Cache *cache, QObject *parent)
     : QObject(parent),
       d(new BrowserPrivate(this, server, type, cache))
 {

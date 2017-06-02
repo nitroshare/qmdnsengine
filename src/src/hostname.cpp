@@ -27,23 +27,23 @@
 #include <QNetworkAddressEntry>
 #include <QNetworkInterface>
 
+#include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/hostname.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
-#include <qmdnsengine/server.h>
 
 #include "hostname_p.h"
 
 using namespace QMdnsEngine;
 
-HostnamePrivate::HostnamePrivate(Hostname *hostname, Server *server)
+HostnamePrivate::HostnamePrivate(Hostname *hostname, AbstractServer *server)
     : QObject(hostname),
       q(hostname),
       server(server)
 {
-    connect(server, &Server::messageReceived, this, &HostnamePrivate::onMessageReceived);
+    connect(server, &AbstractServer::messageReceived, this, &HostnamePrivate::onMessageReceived);
     connect(&registrationTimer, &QTimer::timeout, this, &HostnamePrivate::onRegistrationTimeout);
     connect(&rebroadcastTimer, &QTimer::timeout, this, &HostnamePrivate::onRebroadcastTimeout);
 
@@ -160,7 +160,7 @@ void HostnamePrivate::onRebroadcastTimeout()
     assertHostname();
 }
 
-Hostname::Hostname(Server *server, QObject *parent)
+Hostname::Hostname(AbstractServer *server, QObject *parent)
     : QObject(parent),
       d(new HostnamePrivate(this, server))
 {

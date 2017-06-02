@@ -32,7 +32,7 @@
 namespace QMdnsEngine
 {
 
-class Server;
+class AbstractServer;
 
 class QMDNSENGINE_EXPORT HostnamePrivate;
 
@@ -49,7 +49,7 @@ class QMDNSENGINE_EXPORT Hostname : public QObject
 
 public:
 
-    Hostname(Server *server, QObject *parent = 0);
+    Hostname(AbstractServer *server, QObject *parent = 0);
 
     /**
      * @brief Determines if a hostname has been registered

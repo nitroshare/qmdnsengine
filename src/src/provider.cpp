@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/hostname.h>
 #include <qmdnsengine/mdns.h>
@@ -29,13 +30,12 @@
 #include <qmdnsengine/prober.h>
 #include <qmdnsengine/provider.h>
 #include <qmdnsengine/query.h>
-#include <qmdnsengine/server.h>
 
 #include "provider_p.h"
 
 using namespace QMdnsEngine;
 
-ProviderPrivate::ProviderPrivate(QObject *parent, Server *server, Hostname *hostname)
+ProviderPrivate::ProviderPrivate(QObject *parent, AbstractServer *server, Hostname *hostname)
     : QObject(parent),
       server(server),
       hostname(hostname),
@@ -43,7 +43,7 @@ ProviderPrivate::ProviderPrivate(QObject *parent, Server *server, Hostname *host
       initialized(false),
       confirmed(false)
 {
-    connect(server, &Server::messageReceived, this, &ProviderPrivate::onMessageReceived);
+    connect(server, &AbstractServer::messageReceived, this, &ProviderPrivate::onMessageReceived);
     connect(hostname, &Hostname::hostnameChanged, this, &ProviderPrivate::onHostnameChanged);
 
     browsePtrProposed.setName(MdnsBrowseType);
@@ -196,7 +196,7 @@ void ProviderPrivate::onHostnameChanged(const QByteArray &hostname)
     }
 }
 
-Provider::Provider(Server *server, Hostname *hostname, QObject *parent)
+Provider::Provider(AbstractServer *server, Hostname *hostname, QObject *parent)
     : QObject(parent),
       d(new ProviderPrivate(this, server, hostname))
 {

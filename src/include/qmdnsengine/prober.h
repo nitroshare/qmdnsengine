@@ -32,8 +32,8 @@
 namespace QMdnsEngine
 {
 
+class AbstractServer;
 class Record;
-class Server;
 
 class QMDNSENGINE_EXPORT ProberPrivate;
 
@@ -46,7 +46,7 @@ class QMDNSENGINE_EXPORT Prober : public QObject
 
 public:
 
-    Prober(Server *server, const Record &record, QObject *parent = 0);
+    Prober(AbstractServer *server, const Record &record, QObject *parent = 0);
 
 Q_SIGNALS:
 

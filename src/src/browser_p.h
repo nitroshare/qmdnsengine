@@ -36,11 +36,11 @@
 namespace QMdnsEngine
 {
 
+class AbstractServer;
 class Browser;
 class Cache;
 class Message;
 class Record;
-class Server;
 
 class BrowserPrivate : public QObject
 {
@@ -48,11 +48,11 @@ class BrowserPrivate : public QObject
 
 public:
 
-    explicit BrowserPrivate(Browser *browser, Server *server, const QByteArray &type, Cache *existingCache);
+    explicit BrowserPrivate(Browser *browser, AbstractServer *server, const QByteArray &type, Cache *existingCache);
 
     bool updateService(const QByteArray &fqName);
 
-    Server *server;
+    AbstractServer *server;
     QByteArray type;
 
     Cache *cache;

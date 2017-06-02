@@ -33,10 +33,10 @@
 namespace QMdnsEngine
 {
 
+class AbstractServer;
 class Hostname;
 class Message;
 class Prober;
-class Server;
 
 class ProviderPrivate : public QObject
 {
@@ -44,7 +44,7 @@ class ProviderPrivate : public QObject
 
 public:
 
-    ProviderPrivate(QObject *parent, Server *server, Hostname *hostname);
+    ProviderPrivate(QObject *parent, AbstractServer *server, Hostname *hostname);
     virtual ~ProviderPrivate();
 
     void announce();
@@ -52,7 +52,7 @@ public:
     void farewell();
     void publish();
 
-    Server *server;
+    AbstractServer *server;
     Hostname *hostname;
     Prober *prober;
 

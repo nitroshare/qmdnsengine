@@ -33,8 +33,8 @@
 namespace QMdnsEngine
 {
 
+class AbstractServer;
 class Cache;
-class Server;
 class Service;
 
 class QMDNSENGINE_EXPORT BrowserPrivate;
@@ -55,7 +55,7 @@ public:
      * @param cache DNS cache to use or null to create one
      * @param parent QObject
      */
-    Browser(Server *server, const QByteArray &type, Cache *cache = 0, QObject *parent = 0);
+    Browser(AbstractServer *server, const QByteArray &type, Cache *cache = 0, QObject *parent = 0);
 
 Q_SIGNALS:
 
