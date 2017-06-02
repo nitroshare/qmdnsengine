@@ -22,46 +22,33 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_SERVER_H
-#define QMDNSENGINE_SERVER_H
+#include <qmdnsengine/mdns.h>
 
-#include <qmdnsengine/abstractserver.h>
+#include "testserver.h"
 
-#include "qmdnsengine_export.h"
-
-namespace QMdnsEngine
+void TestServer::sendMessage(const QMdnsEngine::Message &message)
 {
-
-class Message;
-
-class QMDNSENGINE_EXPORT ServerPrivate;
-
-/**
- * @brief mDNS server
- */
-class QMDNSENGINE_EXPORT Server : public AbstractServer
-{
-    Q_OBJECT
-
-public:
-
-    explicit Server(QObject *parent = 0);
-
-    /**
-     * @brief Implementation of AbstractServer::sendMessage()
-     */
-    virtual void sendMessage(const Message &message);
-
-    /**
-     * @brief Implementation of AbstractServer::sendMessageToAll()
-     */
-    virtual void sendMessageToAll(const Message &message);
-
-private:
-
-    ServerPrivate *const d;
-};
-
+    mMessages.append(message);
 }
 
-#endif // QMDNSENGINE_SERVER_H
+void TestServer::sendMessageToAll(const QMdnsEngine::Message &message)
+{
+    QMdnsEngine::Message ipv4Message = message;
+    ipv4Message.setAddress(QMdnsEngine::MdnsIpv4Address);
+    ipv4Message.setPort(QMdnsEngine::MdnsPort);
+    mMessages.append(ipv4Message);
+    QMdnsEngine::Message ipv6Message = message;
+    ipv4Message.setAddress(QMdnsEngine::MdnsIpv6Address);
+    ipv4Message.setPort(QMdnsEngine::MdnsPort);
+    mMessages.append(ipv6Message);
+}
+
+void TestServer::deliverMessage(const QMdnsEngine::Message &message)
+{
+    emit messageReceived(message);
+}
+
+QList<QMdnsEngine::Message> TestServer::receivedMessages() const
+{
+    return mMessages;
+}

@@ -22,46 +22,33 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_SERVER_H
-#define QMDNSENGINE_SERVER_H
+#ifndef COMMON_TESTSERVER_H
+#define COMMON_TESTSERVER_H
+
+#include <QList>
 
 #include <qmdnsengine/abstractserver.h>
-
-#include "qmdnsengine_export.h"
-
-namespace QMdnsEngine
-{
-
-class Message;
-
-class QMDNSENGINE_EXPORT ServerPrivate;
+#include <qmdnsengine/message.h>
 
 /**
- * @brief mDNS server
+ * @brief Test server that stores sent messages and enables manual message delivery
  */
-class QMDNSENGINE_EXPORT Server : public AbstractServer
+class TestServer : public QMdnsEngine::AbstractServer
 {
     Q_OBJECT
 
 public:
 
-    explicit Server(QObject *parent = 0);
+    virtual void sendMessage(const QMdnsEngine::Message &message);
+    virtual void sendMessageToAll(const QMdnsEngine::Message &message);
 
-    /**
-     * @brief Implementation of AbstractServer::sendMessage()
-     */
-    virtual void sendMessage(const Message &message);
+    void deliverMessage(const QMdnsEngine::Message &message);
 
-    /**
-     * @brief Implementation of AbstractServer::sendMessageToAll()
-     */
-    virtual void sendMessageToAll(const Message &message);
+    QList<QMdnsEngine::Message> receivedMessages() const;
 
 private:
 
-    ServerPrivate *const d;
+    QList<QMdnsEngine::Message> mMessages;
 };
 
-}
-
-#endif // QMDNSENGINE_SERVER_H
+#endif // COMMON_TESTSERVER_H
