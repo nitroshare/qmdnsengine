@@ -22,46 +22,11 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_SERVER_H
-#define QMDNSENGINE_SERVER_H
-
 #include <qmdnsengine/abstractserver.h>
 
-#include "qmdnsengine_export.h"
+using namespace QMdnsEngine;
 
-namespace QMdnsEngine
+AbstractServer::AbstractServer(QObject *parent)
+    : QObject(parent)
 {
-
-class Message;
-
-class QMDNSENGINE_EXPORT ServerPrivate;
-
-/**
- * @brief mDNS server
- */
-class QMDNSENGINE_EXPORT Server : public AbstractServer
-{
-    Q_OBJECT
-
-public:
-
-    explicit Server(QObject *parent = 0);
-
-    /**
-     * @brief Implementation of AbstractServer::sendMessage()
-     */
-    void sendMessage(const Message &message);
-
-    /**
-     * @brief Implementation of AbstractServer::sendMessageToAll()
-     */
-    void sendMessageToAll(const Message &message);
-
-private:
-
-    ServerPrivate *const d;
-};
-
 }
-
-#endif // QMDNSENGINE_SERVER_H

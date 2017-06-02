@@ -130,7 +130,7 @@ void ServerPrivate::onReadyRead()
 }
 
 Server::Server(QObject *parent)
-    : QObject(parent),
+    : AbstractServer(parent),
       d(new ServerPrivate(this))
 {
 }
@@ -146,7 +146,7 @@ void Server::sendMessage(const Message &message)
     }
 }
 
-void Server::broadcastMessage(const Message &message)
+void Server::sendMessageToAll(const Message &message)
 {
     QByteArray packet;
     toPacket(message, packet);

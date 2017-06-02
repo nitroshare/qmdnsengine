@@ -156,7 +156,7 @@ void BrowserPrivate::onMessageReceived(const Message &message)
         query.setType(TXT);
         queryMessage.addQuery(query);
     }
-    server->broadcastMessage(queryMessage);
+    server->sendMessageToAll(queryMessage);
 }
 
 void BrowserPrivate::onShouldQuery(const Record &record)
@@ -169,7 +169,7 @@ void BrowserPrivate::onShouldQuery(const Record &record)
     query.setType(record.type());
     Message message;
     message.addQuery(query);
-    server->broadcastMessage(message);
+    server->sendMessageToAll(message);
 }
 
 void BrowserPrivate::onRecordExpired(const Record &record)
@@ -214,7 +214,7 @@ void BrowserPrivate::onQueryTimeout()
         }
     }
 
-    server->broadcastMessage(message);
+    server->sendMessageToAll(message);
     queryTimer.start(60 * 1000);
 }
 
@@ -230,7 +230,7 @@ void BrowserPrivate::onServiceTimeout()
 
     // TODO: cached PTR records
 
-    server->broadcastMessage(message);
+    server->sendMessageToAll(message);
 
     ptrTargets.clear();
 }

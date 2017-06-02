@@ -22,10 +22,10 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QMDNSENGINE_SERVER_H
-#define QMDNSENGINE_SERVER_H
+#ifndef QMDNSENGINE_ABSTRACTSERVER_H
+#define QMDNSENGINE_ABSTRACTSERVER_H
 
-#include <qmdnsengine/abstractserver.h>
+#include <QObject>
 
 #include "qmdnsengine_export.h"
 
@@ -34,34 +34,49 @@ namespace QMdnsEngine
 
 class Message;
 
-class QMDNSENGINE_EXPORT ServerPrivate;
-
 /**
- * @brief mDNS server
+ * @brief Base class for server implementations
+ *
+ * Many of the other classes in this library require the ability to send and
+ * receive mDNS messages. By having them use this base class, they become far
+ * easier to test.
  */
-class QMDNSENGINE_EXPORT Server : public AbstractServer
+class QMDNSENGINE_EXPORT AbstractServer : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit Server(QObject *parent = 0);
+    explicit AbstractServer(QObject *parent = 0);
 
     /**
-     * @brief Implementation of AbstractServer::sendMessage()
+     * @brief Send a message to its provided destination
+     *
+     * The message will be sent over the IP protocol specified in the message
+     * and to the target address and port specified in the message.
      */
-    void sendMessage(const Message &message);
+    virtual void sendMessage(const Message &message) = 0;
 
     /**
-     * @brief Implementation of AbstractServer::sendMessageToAll()
+     * @brief Send a message to the multicast address on each interface
+     *
+     * The message will be sent over both IPv4 and IPv6 on all interfaces.
      */
-    void sendMessageToAll(const Message &message);
+    virtual void sendMessageToAll(const Message &message) = 0;
 
-private:
+Q_SIGNALS:
 
-    ServerPrivate *const d;
+    /**
+     * @brief Indicate that an mDNS message was received
+     */
+    void messageReceived(const Message &message);
+
+    /**
+     * @brief Indicate an error has occurred
+     */
+    void error(const QString &message);
 };
 
 }
 
-#endif // QMDNSENGINE_SERVER_H
+#endif // QMDNSENGINE_ABSTRACTSERVER_H

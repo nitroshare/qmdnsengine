@@ -70,7 +70,7 @@ void ProberPrivate::assertHostname()
     Message message;
     message.addQuery(query);
     message.addRecord(proposedRecord);
-    server->broadcastMessage(message);
+    server->sendMessageToAll(message);
 
     // Wait two seconds to confirm it is unique
     timer.stop();

@@ -80,7 +80,7 @@ void HostnamePrivate::assertHostname()
     message.addQuery(ipv4Query);
     message.addQuery(ipv6Query);
 
-    server->broadcastMessage(message);
+    server->sendMessageToAll(message);
 
     // If no reply is received after two seconds, the hostname is available
     registrationTimer.stop();

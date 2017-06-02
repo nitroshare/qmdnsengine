@@ -69,7 +69,7 @@ void ProviderPrivate::announce()
     message.addRecord(ptrRecord);
     message.addRecord(srvRecord);
     message.addRecord(txtRecord);
-    server->broadcastMessage(message);
+    server->sendMessageToAll(message);
 }
 
 void ProviderPrivate::confirm()

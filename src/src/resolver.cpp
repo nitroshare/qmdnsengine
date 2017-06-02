@@ -80,7 +80,7 @@ void ResolverPrivate::query() const
     }
 
     // Send the query
-    server->broadcastMessage(message);
+    server->sendMessageToAll(message);
 }
 
 void ResolverPrivate::onMessageReceived(const Message &message)

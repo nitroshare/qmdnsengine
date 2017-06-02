@@ -1,4 +1,5 @@
 set(HEADERS
+    include/qmdnsengine/abstractserver.h
     include/qmdnsengine/bitmap.h
     include/qmdnsengine/browser.h
     include/qmdnsengine/cache.h
@@ -17,6 +18,7 @@ set(HEADERS
 )
 
 set(SRC
+    src/abstractserver.cpp
     src/bitmap.cpp
     src/browser.cpp
     src/cache.cpp
