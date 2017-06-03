@@ -126,7 +126,7 @@ void Message::reply(const Message &other)
         if (other.address().protocol() == QAbstractSocket::IPv4Protocol) {
             setAddress(MdnsIpv4Address);
         } else {
-            setAddress(MdnsIpv4Address);
+            setAddress(MdnsIpv6Address);
         }
     } else {
         setAddress(other.address());
