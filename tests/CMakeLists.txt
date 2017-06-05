@@ -4,6 +4,7 @@ set(TESTS
     TestCache
     TestDns
     TestHostname
+    TestProber
 )
 
 foreach(_test ${TESTS})
