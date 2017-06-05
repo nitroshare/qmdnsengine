@@ -28,6 +28,7 @@
 #include <QList>
 
 #include <qmdnsengine/abstractserver.h>
+#include <qmdnsengine/cache.h>
 #include <qmdnsengine/message.h>
 
 /**
@@ -47,9 +48,14 @@ public:
     QList<QMdnsEngine::Message> receivedMessages() const;
     void clearReceivedMessages();
 
+    const QMdnsEngine::Cache *cache() const;
+
 private:
 
+    void saveMessage(const QMdnsEngine::Message &message);
+
     QList<QMdnsEngine::Message> mMessages;
+    QMdnsEngine::Cache mCache;
 };
 
 #endif // COMMON_TESTSERVER_H

@@ -23,12 +23,13 @@
  */
 
 #include <qmdnsengine/mdns.h>
+#include <qmdnsengine/record.h>
 
 #include "testserver.h"
 
 void TestServer::sendMessage(const QMdnsEngine::Message &message)
 {
-    mMessages.append(message);
+    saveMessage(message);
 }
 
 void TestServer::sendMessageToAll(const QMdnsEngine::Message &message)
@@ -36,11 +37,11 @@ void TestServer::sendMessageToAll(const QMdnsEngine::Message &message)
     QMdnsEngine::Message ipv4Message = message;
     ipv4Message.setAddress(QMdnsEngine::MdnsIpv4Address);
     ipv4Message.setPort(QMdnsEngine::MdnsPort);
-    mMessages.append(ipv4Message);
+    saveMessage(ipv4Message);
     QMdnsEngine::Message ipv6Message = message;
     ipv4Message.setAddress(QMdnsEngine::MdnsIpv6Address);
     ipv4Message.setPort(QMdnsEngine::MdnsPort);
-    mMessages.append(ipv6Message);
+    saveMessage(ipv6Message);
 }
 
 void TestServer::deliverMessage(const QMdnsEngine::Message &message)
@@ -56,4 +57,19 @@ QList<QMdnsEngine::Message> TestServer::receivedMessages() const
 void TestServer::clearReceivedMessages()
 {
     mMessages.clear();
+}
+
+const QMdnsEngine::Cache *TestServer::cache() const
+{
+    return &mCache;
+}
+
+void TestServer::saveMessage(const QMdnsEngine::Message &message)
+{
+    mMessages.append(message);
+    if (message.isResponse()) {
+        foreach (QMdnsEngine::Record record, message.records()) {
+            mCache.addRecord(record);
+        }
+    }
 }

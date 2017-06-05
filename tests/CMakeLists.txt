@@ -5,6 +5,7 @@ set(TESTS
     TestDns
     TestHostname
     TestProber
+    TestProvider
 )
 
 foreach(_test ${TESTS})
