@@ -50,10 +50,10 @@ ProberPrivate::ProberPrivate(Prober *prober, AbstractServer *server, const Recor
 
     timer.setSingleShot(true);
 
-    assertHostname();
+    assertRecord();
 }
 
-void ProberPrivate::assertHostname()
+void ProberPrivate::assertRecord()
 {
     // Use the current suffix to set the name of the proposed record
     if (suffix == 1) {
@@ -88,7 +88,7 @@ void ProberPrivate::onMessageReceived(const Message &message)
     foreach (Record record, message.records()) {
         if (record.name() == proposedRecord.name() && record.type() == proposedRecord.type()) {
             ++suffix;
-            assertHostname();
+            assertRecord();
         }
     }
 }

@@ -45,7 +45,7 @@ public:
 
     ProberPrivate(Prober *prober, AbstractServer *server, const Record &record);
 
-    void assertHostname();
+    void assertRecord();
 
     AbstractServer *server;
     QTimer timer;
