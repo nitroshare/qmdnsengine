@@ -1,5 +1,6 @@
 set(SRC
     testserver.cpp
+    util.cpp
 )
 
 add_library(common STATIC ${SRC})

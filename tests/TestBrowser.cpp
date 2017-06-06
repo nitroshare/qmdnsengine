@@ -33,6 +33,7 @@
 #include <qmdnsengine/service.h>
 
 #include "common/testserver.h"
+#include "common/util.h"
 
 Q_DECLARE_METATYPE(QMdnsEngine::Service)
 
@@ -52,10 +53,6 @@ private Q_SLOTS:
 
     void initTestCase();
     void testBrowser();
-
-private:
-
-    bool waitForQuery(TestServer *server, const QByteArray &name, quint16 type);
 };
 
 void TestBrowser::initTestCase()
@@ -73,7 +70,7 @@ void TestBrowser::testBrowser()
     QSignalSpy serviceRemovedSpy(&browser, SIGNAL(serviceRemoved(Service)));
 
     // Wait for the PTR query
-    QTRY_VERIFY(waitForQuery(&server, Type, QMdnsEngine::PTR));
+    QTRY_VERIFY(queryReceived(&server, Type, QMdnsEngine::PTR));
     server.clearReceivedMessages();
 
     // Transmit the PTR record
@@ -89,7 +86,7 @@ void TestBrowser::testBrowser()
     }
 
     // Wait for a SRV query
-    QTRY_VERIFY(waitForQuery(&server, Fqdn, QMdnsEngine::SRV));
+    QTRY_VERIFY(queryReceived(&server, Fqdn, QMdnsEngine::SRV));
     server.clearReceivedMessages();
 
     // Nothing should have been added yet
@@ -143,20 +140,6 @@ void TestBrowser::testBrowser()
 
     // The serviceRemoved signal should have been emitted
     QCOMPARE(serviceRemovedSpy.count(), 1);
-}
-
-bool TestBrowser::waitForQuery(TestServer *server, const QByteArray &name, quint16 type)
-{
-    foreach (QMdnsEngine::Message message, server->receivedMessages()) {
-        if (!message.isResponse()) {
-            foreach (QMdnsEngine::Query query, message.queries()) {
-                if (query.name() == name && query.type() == type) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 QTEST_MAIN(TestBrowser)
