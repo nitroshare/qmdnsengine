@@ -206,8 +206,12 @@ void Provider::update(const Service &service)
 {
     d->initialized = true;
 
+    // Clean the service name
+    QByteArray serviceName = service.name();
+    serviceName = serviceName.replace('.', '-');
+
     // Update the proposed records
-    QByteArray fqName = service.name() + "." + service.type();
+    QByteArray fqName = serviceName + "." + service.type();
     d->browsePtrProposed.setTarget(service.type());
     d->ptrProposed.setName(service.type());
     d->ptrProposed.setTarget(fqName);
