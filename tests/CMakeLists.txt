@@ -7,6 +7,7 @@ set(TESTS
     TestHostname
     TestProber
     TestProvider
+    TestResolver
 )
 
 foreach(_test ${TESTS})
