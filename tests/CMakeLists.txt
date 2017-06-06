@@ -1,6 +1,7 @@
 add_subdirectory(common)
 
 set(TESTS
+    TestBrowser
     TestCache
     TestDns
     TestHostname
