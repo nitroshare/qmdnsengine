@@ -27,6 +27,7 @@
 
 #include <qmdnsengine/browser.h>
 #include <qmdnsengine/dns.h>
+#include <qmdnsengine/mdns.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
@@ -53,6 +54,7 @@ private Q_SLOTS:
 
     void initTestCase();
     void testBrowser();
+    void testBrowsePtr();
 };
 
 void TestBrowser::initTestCase()
@@ -140,6 +142,29 @@ void TestBrowser::testBrowser()
 
     // The serviceRemoved signal should have been emitted
     QCOMPARE(serviceRemovedSpy.count(), 1);
+}
+
+void TestBrowser::testBrowsePtr()
+{
+    TestServer server;
+    QMdnsEngine::Browser browser(&server, QMdnsEngine::MdnsBrowseType);
+    Q_UNUSED(browser);
+
+    // Wait for a query for service types
+    QTRY_VERIFY(queryReceived(&server, QMdnsEngine::MdnsBrowseType, QMdnsEngine::PTR));
+
+    // Send a PTR and SRV record
+    QMdnsEngine::Record record;
+    record.setName(QMdnsEngine::MdnsBrowseType);
+    record.setType(QMdnsEngine::PTR);
+    record.setTarget(Type);
+    QMdnsEngine::Message message;
+    message.setResponse(true);
+    message.addRecord(record);
+    server.deliverMessage(message);
+
+    // Wait for the query for records of the specified type
+    QTRY_VERIFY(queryReceived(&server, Type, QMdnsEngine::PTR));
 }
 
 QTEST_MAIN(TestBrowser)
