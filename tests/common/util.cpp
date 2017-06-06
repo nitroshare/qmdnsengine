@@ -38,4 +38,5 @@ bool queryReceived(TestServer *server, const QByteArray &name, quint16 type)
             }
         }
     }
+    return false;
 }
