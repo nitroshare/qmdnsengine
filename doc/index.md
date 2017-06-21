@@ -1,0 +1,1 @@
+QMdnsEngine provides an implementation of multicast DNS as per RFC 6762.

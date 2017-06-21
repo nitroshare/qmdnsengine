@@ -21,6 +21,12 @@ set(CMAKE_AUTOMOC ON)
 
 add_subdirectory(src)
 
+option(BUILD_DOC "Build Doxygen documentation" OFF)
+if(BUILD_DOC)
+    find_package(Doxygen REQUIRED)
+    add_subdirectory(doc)
+endif()
+
 option(BUILD_EXAMPLES "Build example applications" OFF)
 if(BUILD_EXAMPLES)
     find_package(Qt5Widgets 5.4)
