@@ -7,20 +7,8 @@ This library provides an implementation of multicast DNS as per [RFC 6762](https
 
 > **Note:** the library is under active development and may change drastically before the first release.
 
-### Features
+### Documentation
 
-- Runs on Windows, macOS, Linux, and all other platforms supported by Qt
-- Includes extensive documentation describing how to use the library
-- Requires only QtCore and QtNetwork - no other dependencies
-- Ships with an exhaustive set of unit tests 
-- Released under the permissive MIT license
+To learn more about the building and using the library, please visit this page:
 
-### Build Requirements
-
-QMdnsEngine requires the following in order to build the library:
-
-- CMake 3.2+
-- Qt 5.4+
-- Visual Studio 2013+, GCC 4.7+, Clang 3.1+
-
-(Note that other toolchains may be able to build the library but they have not been tested.)
+https://ci.quickmediasolutions.com/job/qmdnsengine-documentation/doxygen/
