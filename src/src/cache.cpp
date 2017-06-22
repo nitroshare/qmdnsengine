@@ -130,9 +130,11 @@ void Cache::addRecord(const Record &record)
 
     // Check if half of this record's lifetime is earlier than the next
     // scheduled trigger; if so, restart the timer
+
     if (d->nextTrigger.isNull() || triggers.at(0) < d->nextTrigger) {
+        d->nextTrigger = triggers.at(0);
         d->timer.stop();
-        d->timer.start(now.msecsTo(triggers.at(0)));
+        d->timer.start(now.msecsTo(d->nextTrigger));
     }
 }
 
