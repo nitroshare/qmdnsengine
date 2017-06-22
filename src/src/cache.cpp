@@ -91,50 +91,42 @@ Cache::Cache(QObject *parent)
 
 void Cache::addRecord(const Record &record)
 {
-    // Any record with the flush cache bit set should cause all other records
-    // with the same name and type to be removed; any record with a TTL of
-    // zero should be immediately removed
-    if (record.flushCache() || record.ttl() == 0) {
-        for (auto i = d->entries.begin(); i != d->entries.end();) {
-            if ((record.flushCache() &&
-                    (*i).record.name() == record.name() &&
-                    (*i).record.type() == record.type()) ||
-                    (!record.flushCache() && (*i).record == record)) {
+    bool flushCache = record.flushCache();
+    bool ttlZero = record.ttl() == 0;
+    for (auto i = d->entries.begin(); i != d->entries.end();) {
+        if (flushCache && (*i).record.name() == record.name() && (*i).record.type() == record.type() ||
+                (*i).record == record) {
+
+            // If the TTL is set to 0, indicate that the record was removed
+            if (ttlZero) {
                 emit recordExpired((*i).record);
-                i = d->entries.erase(i);
-            } else {
-                ++i;
             }
-        }
-        if (!record.flushCache()) {
-            return;
+
+            i = d->entries.erase(i);
+
+            // No need to continue further if the TTL was set to 0
+            if (ttlZero) {
+                return;
+            }
+        } else {
+            ++i;
         }
     }
 
+    // Use the current time to calculate the triggers and add a random offset
     QDateTime now = QDateTime::currentDateTime();
+    qint64 random = qrand() % 20;
 
-    // TODO: add some random variation to these values
-
-    // Create triggers for the record
     QList<QDateTime> triggers{
-        now.addMSecs(record.ttl() * 500),  // 50%
-        now.addMSecs(record.ttl() * 850),  // 85%
-        now.addMSecs(record.ttl() * 900),  // 90%
-        now.addMSecs(record.ttl() * 950),  // 95%
+        now.addMSecs(record.ttl() * 500 + random),  // 50%
+        now.addMSecs(record.ttl() * 850 + random),  // 85%
+        now.addMSecs(record.ttl() * 900 + random),  // 90%
+        now.addMSecs(record.ttl() * 950 + random),  // 95%
         now.addSecs(record.ttl())
     };
 
-    // Loop through the existing entries, looking for a matching entry
-    auto before = d->entries.end();
-    for (auto i = d->entries.begin(); i != d->entries.end(); ++i) {
-        if ((*i).record == record) {
-            before = d->entries.erase(i);
-            break;
-        }
-    }
-
-    // Insert the record and its triggers
-    d->entries.insert(before, {record, triggers});
+    // Append the record and its triggers
+    d->entries.append({record, triggers});
 
     // Check if half of this record's lifetime is earlier than the next
     // scheduled trigger; if so, restart the timer
