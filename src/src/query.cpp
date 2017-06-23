@@ -22,6 +22,9 @@
  * IN THE SOFTWARE.
  */
 
+#include <QDebug>
+
+#include <qmdnsengine/dns.h>
 #include <qmdnsengine/query.h>
 
 #include "query_p.h"
@@ -84,4 +87,14 @@ bool Query::unicastResponse() const
 void Query::setUnicastResponse(bool unicastResponse)
 {
     d->unicastResponse = unicastResponse;
+}
+
+QDebug QMdnsEngine::operator<<(QDebug dbg, const Query &query)
+{
+    QDebugStateSaver saver(dbg);
+    Q_UNUSED(saver);
+
+    dbg.noquote().nospace() << "Query(" << typeName(query.type()) << " " << query.name() << ")";
+
+    return dbg;
 }

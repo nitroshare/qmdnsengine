@@ -83,6 +83,8 @@ private:
     QueryPrivate *const d;
 };
 
+QDebug operator<<(QDebug dbg, const Query &query);
+
 }
 
 #endif // QMDNSENGINE_QUERY_H

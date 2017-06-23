@@ -22,6 +22,8 @@
  * IN THE SOFTWARE.
  */
 
+#include <QDebug>
+
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/record.h>
 
