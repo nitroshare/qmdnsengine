@@ -54,7 +54,6 @@ private Q_SLOTS:
 private:
 
     QString buttonCaption() const;
-    QString typeToString(quint16 type) const;
 
     QMdnsEngine::Server mServer;
     QMdnsEngine::Hostname mHostname;

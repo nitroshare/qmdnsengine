@@ -120,7 +120,7 @@ void MainWindow::onMessageReceived(const QMdnsEngine::Message &message)
     foreach (QMdnsEngine::Query query, message.queries()) {
         mLog->append(
             tr("[%1] %2")
-                .arg(typeToString(query.type()))
+                .arg(QMdnsEngine::typeName(query.type()))
                 .arg(QString(query.name()))
         );
     }
@@ -129,16 +129,4 @@ void MainWindow::onMessageReceived(const QMdnsEngine::Message &message)
 QString MainWindow::buttonCaption() const
 {
     return mProvider ? tr("Stop") : tr("Start");
-}
-
-QString MainWindow::typeToString(quint16 type) const
-{
-    switch (type) {
-    case QMdnsEngine::A:    return "A";
-    case QMdnsEngine::AAAA: return "AAAA";
-    case QMdnsEngine::PTR:  return "PTR";
-    case QMdnsEngine::SRV:  return "SRV";
-    case QMdnsEngine::TXT:  return "TXT";
-    default:                return tr("unknown");
-    }
 }
