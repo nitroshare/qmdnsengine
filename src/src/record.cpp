@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <qmdnsengine/dns.h>
 #include <qmdnsengine/record.h>
 
 #include "record_p.h"
@@ -202,4 +203,14 @@ Bitmap Record::bitmap() const
 void Record::setBitmap(const Bitmap &bitmap)
 {
     d->bitmap = bitmap;
+}
+
+QDebug QMdnsEngine::operator<<(QDebug dbg, const Record &record)
+{
+    QDebugStateSaver saver(dbg);
+    Q_UNUSED(saver);
+
+    dbg.noquote().nospace() << "Record(" << typeName(record.type()) << " " << record.name() << ")";
+
+    return dbg;
 }

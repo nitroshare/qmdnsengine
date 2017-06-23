@@ -213,6 +213,8 @@ private:
     RecordPrivate *const d;
 };
 
+QDebug operator<<(QDebug dbg, const Record &record);
+
 }
 
 #endif // QMDNSENGINE_RECORD_H
