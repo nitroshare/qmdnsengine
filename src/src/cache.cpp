@@ -39,28 +39,30 @@ CachePrivate::CachePrivate(Cache *cache)
 
 void CachePrivate::onTimeout()
 {
-    QDateTime now = QDateTime::currentDateTime();
 
-    // Loop through each of the entries, processing the triggers and searching
-    // for the next earliest trigger
+    // Loop through all of the records in the cache, emitting the appropriate
+    // signal when a trigger has passed, determining when the next trigger
+    // will occur, and removing records that have expired
+    QDateTime now = QDateTime::currentDateTime();
     QDateTime newNextTrigger;
+
     for (auto i = entries.begin(); i != entries.end();) {
         auto &triggers = (*i).triggers;
 
-        // Loop through the triggers remaining in the entry, removing ones
-        // that have already passed
+        // Loop through the triggers and remove ones that have already
+        // passed
         bool shouldQuery = false;
         for (auto j = triggers.begin(); j != triggers.end();) {
             if ((*j) <= now) {
                 shouldQuery = true;
                 j = triggers.erase(j);
             } else {
-                ++j;
+                break;
             }
         }
 
-        // If any triggers remain, determine if they are the next earliest; if
-        // not, remove the entry and indicate the record expired
+        // If triggers remain, determine the next earliest one; if none
+        // remain, the record has expired and should be removed
         if (triggers.length()) {
             if (newNextTrigger.isNull() || triggers.at(0) < newNextTrigger) {
                 newNextTrigger = triggers.at(0);
@@ -130,7 +132,6 @@ void Cache::addRecord(const Record &record)
 
     // Check if half of this record's lifetime is earlier than the next
     // scheduled trigger; if so, restart the timer
-
     if (d->nextTrigger.isNull() || triggers.at(0) < d->nextTrigger) {
         d->nextTrigger = triggers.at(0);
         d->timer.stop();
