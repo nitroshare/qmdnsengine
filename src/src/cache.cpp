@@ -23,6 +23,7 @@
  */
 
 #include <qmdnsengine/cache.h>
+#include <qmdnsengine/dns.h>
 
 #include "cache_p.h"
 
@@ -152,7 +153,8 @@ bool Cache::lookupRecord(const QByteArray &name, quint16 type, Record &record) c
 bool Cache::lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records) const
 {
     foreach (CachePrivate::Entry entry, d->entries) {
-        if ((name.isNull() || entry.record.name() == name) && entry.record.type() == type) {
+        if ((name.isNull() || entry.record.name() == name) &&
+                (type == ANY || entry.record.type() == type)) {
             records.append(entry.record);
         }
     }
