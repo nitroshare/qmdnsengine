@@ -104,6 +104,13 @@ QMDNSENGINE_EXPORT bool fromPacket(const QByteArray &packet, Message &message);
  */
 QMDNSENGINE_EXPORT void toPacket(const Message &message, QByteArray &packet);
 
+/**
+ * @brief Retrieve the string representation of a DNS type
+ * @param type integer type
+ * @return human-readable name for the type
+ */
+QMDNSENGINE_EXPORT QString typeName(quint16 type);
+
 }
 
 #endif // QMDNSENGINE_DNS_H

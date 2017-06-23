@@ -354,4 +354,18 @@ void toPacket(const Message &message, QByteArray &packet)
     }
 }
 
+QString typeName(quint16 type)
+{
+    switch (type) {
+    case A:    return "A";
+    case AAAA: return "AAAA";
+    case ANY:  return "ANY";
+    case NSEC: return "NSEC";
+    case PTR:  return "PTR";
+    case SRV:  return "SRV";
+    case TXT:  return "TXT";
+    default:   return "?";
+    }
+}
+
 }
