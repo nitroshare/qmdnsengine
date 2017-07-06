@@ -15,11 +15,12 @@
     #titlearea {
         border-bottom: none;
     }
-    #main-nav {
+    #main-nav, #navrow1 {
         border-radius: 4px 4px 0 0;
         border-top: 1px solid #c4cfe5;
+        position: relative;
     }
-    #main-nav, .header, .nav-path, .contents {
+    #main-nav, #navrow1, .header, .nav-path, .contents {
         border-left: 1px solid #c4cfe5;
         border-right: 1px solid #c4cfe5;
         box-sizing: border-box;
