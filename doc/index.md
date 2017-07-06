@@ -29,7 +29,7 @@ QMdnsEngine uses CMake for building the library. The options shown below allow t
 
 ## Basic Provider Usage
 
-To provide a service on the local network, begin by creating a Server, a Hostname, and a Provider:
+To provide a service on the local network, begin by creating a [Server](@ref QMdnsEngine::Server), a [Hostname](@ref QMdnsEngine::Hostname), and a [Provider](@ref QMdnsEngine::Provider):
 
 @code
 QMdnsEngine::Server server;
@@ -53,7 +53,7 @@ That's it! As long as the provider remains in scope, the service will be availab
 
 ## Basic Browser Usage
 
-To find services on the local network, begin by creating a Server and a Browser:
+To find services on the local network, begin by creating a [Server](@ref QMdnsEngine::Server) and a [Browser](@ref QMdnsEngine::Browser):
 
 @code
 QMdnsEngine::Server server;
@@ -63,7 +63,7 @@ QMdnsEngine::Browser browser(&server, "_http._tcp.local.", &cache);
 
 The cache is optional but helps save time later when resolving services. The browser is provided with a service type which is used to filter services.
 
-To receive a notification when services are added, connect to the Browser::serviceAdded() signal:
+To receive a notification when services are added, connect to the [Browser::serviceAdded()](@ref QMdnsEngine::Browser::serviceAdded) signal:
 
 @code
 QObject::connect(&browser, &QMdnsEngine::Browser::serviceAdded,
@@ -73,7 +73,7 @@ QObject::connect(&browser, &QMdnsEngine::Browser::serviceAdded,
 );
 @endcode
 
-To resolve the service, use a Resolver:
+To resolve the service, use a [Resolver](@ref QMdnsEngine::Resolver):
 
 @code
 QMdnsEngine::Resolver resolver(&server, service.name(), &cache);
@@ -84,4 +84,4 @@ QObject::connect(&resolver, &QMdnsEngine::Resolver::resolved,
 );
 @endcode
 
-Note that Resolver::resolved() may be emitted once for each address provided by the service.
+Note that [Resolver::resolved()](@ref QMdnsEngine::Resolver::resolved) may be emitted once for each address provided by the service.
