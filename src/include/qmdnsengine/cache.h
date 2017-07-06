@@ -38,11 +38,29 @@ class Record;
 class QMDNSENGINE_EXPORT CachePrivate;
 
 /**
- * @brief Cache for DNS records
+ * @brief %Cache for DNS records
  *
- * Records are stored in the cache until they are considered to have expired,
- * at which point they are purged. The shouldQuery() signal is used to
- * indicate when a record is approaching expiry.
+ * Records are added to the cache using the addRecord() method which are then
+ * stored in the cache until they are considered to have expired, at which
+ * point they are purged. The shouldQuery() signal is used to indicate when a
+ * record is approaching expiry and the recordExpired() signal indicates when
+ * a record has expired (at which point it is removed).
+ *
+ * The cache can be queried to retrieve one or more records matching a given
+ * type. For example, to retrieve all TXT records that match a given name:
+ *
+ * @code
+ * Cache cache;
+ *
+ * QList<QMdnsEngine::Record> records;
+ * cache.lookupRecords("My Service._http._tcp.local.", QMdnsEngine::TXT, records);
+ *
+ * foreach (QMdnsEngine::Record record, records) {
+ *     qDebug() << "Record:" << record.name();
+ * }
+ * @endcode
+ *
+ * Alternatively, lookupRecord() can be used to find a single record.
  */
 class QMDNSENGINE_EXPORT Cache : public QObject
 {
@@ -50,6 +68,9 @@ class QMDNSENGINE_EXPORT Cache : public QObject
 
 public:
 
+    /**
+     * @brief Create an empty cache.
+     */
     explicit Cache(QObject *parent = 0);
 
     /**
@@ -88,14 +109,16 @@ Q_SIGNALS:
 
     /**
      * @brief Indicate that a record will expire soon and a new query should be issued
+     * @param record reference to the record that will soon expire
      *
-     * This is done when a record reaches approximately 50%, 85%, 90%, and 95%
-     * of its lifetime.
+     * This signal is emitted when a record reaches approximately 50%, 85%,
+     * 90%, and 95% of its lifetime.
      */
     void shouldQuery(const Record &record);
 
     /**
      * @brief Indicate that the specified record expired
+     * @param record reference to the record that has expired
      */
     void recordExpired(const Record &record);
 
