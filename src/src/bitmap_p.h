@@ -35,9 +35,13 @@ class BitmapPrivate
 public:
 
     BitmapPrivate();
+    virtual ~BitmapPrivate();
+
+    void free();
+    void fromData(quint8 newLength, const quint8 *newData);
 
     quint8 length;
-    quint8 data[32];
+    quint8 *data;
 };
 
 }

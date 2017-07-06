@@ -29,8 +29,29 @@
 using namespace QMdnsEngine;
 
 BitmapPrivate::BitmapPrivate()
-    : length(0)
+    : length(0),
+      data(nullptr)
 {
+}
+
+BitmapPrivate::~BitmapPrivate()
+{
+    free();
+}
+
+void BitmapPrivate::free()
+{
+    if (data) {
+        delete data;
+    }
+}
+
+void BitmapPrivate::fromData(quint8 newLength, const quint8 *newData)
+{
+    for (int i = 0; i < newLength; ++i) {
+        data[i] = newData[i];
+    }
+    length = newLength;
 }
 
 Bitmap::Bitmap()
@@ -41,12 +62,13 @@ Bitmap::Bitmap()
 Bitmap::Bitmap(const Bitmap &other)
     : d(new BitmapPrivate)
 {
-    *this = other;
+    d->fromData(other.d->length, other.d->data);
 }
 
 Bitmap &Bitmap::operator=(const Bitmap &other)
 {
-    *d = *other.d;
+    d->free();
+    d->fromData(other.d->length, other.d->data);
     return *this;
 }
 
@@ -80,8 +102,6 @@ const quint8 *Bitmap::data() const
 
 void Bitmap::setData(quint8 length, const quint8 *data)
 {
-    d->length = length;
-    for (int i = 0; i < d->length; ++i) {
-        d->data[i] = data[i];
-    }
+    d->free();
+    d->fromData(length, data);
 }

@@ -36,20 +36,42 @@ class QMDNSENGINE_EXPORT BitmapPrivate;
  * @brief 256-bit bitmap
  *
  * Bitmaps are used in QMdnsEngine::NSEC records to indicate which records are
- * available. mDNS only uses the first block (0).
+ * available. Bitmaps in mDNS records use only the first block (block 0).
  */
 class QMDNSENGINE_EXPORT Bitmap
 {
 public:
 
+    /**
+     * @brief Create an empty bitmap
+     */
     Bitmap();
+
+    /**
+     * @brief Create a copy of an existing bitmap
+     */
     Bitmap(const Bitmap &other);
+
+    /**
+     * @brief Assignment operator
+     */
     Bitmap &operator=(const Bitmap &other);
+
+    /**
+     * @brief Equality operator
+     */
     bool operator==(const Bitmap &other);
+
+    /**
+     * @brief Destroy the bitmap
+     */
     virtual ~Bitmap();
 
     /**
      * @brief Retrieve the length of the block in bytes
+     *
+     * This method indicates how many bytes are pointed to by the data()
+     * method.
      */
     quint8 length() const;
 
@@ -62,6 +84,9 @@ public:
 
     /**
      * @brief Set the data to be stored in the bitmap
+     *
+     * The length parameter indicates how many bytes of data are valid. The
+     * actual bytes are copied to the bitmap.
      */
     void setData(quint8 length, const quint8 *data);
 
