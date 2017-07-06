@@ -43,7 +43,6 @@ BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const Q
       cache(existingCache ? existingCache : new Cache(this))
 {
     connect(server, &AbstractServer::messageReceived, this, &BrowserPrivate::onMessageReceived);
-
     connect(cache, &Cache::shouldQuery, this, &BrowserPrivate::onShouldQuery);
     connect(cache, &Cache::recordExpired, this, &BrowserPrivate::onRecordExpired);
     connect(&queryTimer, &QTimer::timeout, this, &BrowserPrivate::onQueryTimeout);
@@ -52,6 +51,7 @@ BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const Q
     queryTimer.setSingleShot(true);
     serviceTimer.setSingleShot(true);
 
+    // Immediately begin browsing for services
     onQueryTimeout();
 }
 
@@ -59,16 +59,19 @@ BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const Q
 
 bool BrowserPrivate::updateService(const QByteArray &fqName)
 {
-    QByteArray serviceName = fqName.left(fqName.indexOf('.'));
-    QByteArray serviceType = fqName.mid(fqName.indexOf('.') + 1);
+    // Split the FQDN into service name and type
+    int index = fqName.indexOf('.');
+    QByteArray serviceName = fqName.left(index);
+    QByteArray serviceType = fqName.mid(index + 1);
 
     // Immediately return if a PTR record does not exist
-    Record ptrRecord, srvRecord;
+    Record ptrRecord;
     if (!cache->lookupRecord(serviceType, PTR, ptrRecord)) {
         return false;
     }
 
-    // If a SRV record is missing, query for it
+    // If a SRV record is missing, query for it (by returning true)
+    Record srvRecord;
     if (!cache->lookupRecord(fqName, SRV, srvRecord)) {
         return true;
     }
