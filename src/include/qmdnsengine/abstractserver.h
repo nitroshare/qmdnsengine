@@ -35,11 +35,12 @@ namespace QMdnsEngine
 class Message;
 
 /**
- * @brief Base class for server implementations
+ * @brief Base class for sending and receiving DNS messages
  *
  * Many of the other classes in this library require the ability to send and
- * receive mDNS messages. By having them use this base class, they become far
- * easier to test.
+ * receive DNS messages. By having them use this base class, they become far
+ * easier to test. Any class derived from this one that implements the pure
+ * virtual methods can be used for sending and receiving DNS messages.
  */
 class QMDNSENGINE_EXPORT AbstractServer : public QObject
 {
@@ -47,32 +48,37 @@ class QMDNSENGINE_EXPORT AbstractServer : public QObject
 
 public:
 
+    /**
+     * @brief Abstract constructor
+     */
     explicit AbstractServer(QObject *parent = 0);
 
     /**
      * @brief Send a message to its provided destination
      *
-     * The message will be sent over the IP protocol specified in the message
-     * and to the target address and port specified in the message.
+     * The message should be sent over the IP protocol specified in the
+     * message and to the target address and port specified in the message.
      */
     virtual void sendMessage(const Message &message) = 0;
 
     /**
      * @brief Send a message to the multicast address on each interface
      *
-     * The message will be sent over both IPv4 and IPv6 on all interfaces.
+     * The message should be sent over both IPv4 and IPv6 on all interfaces.
      */
     virtual void sendMessageToAll(const Message &message) = 0;
 
 Q_SIGNALS:
 
     /**
-     * @brief Indicate that an mDNS message was received
+     * @brief Indicate that a DNS message was received
+     * @param message newly received message
      */
     void messageReceived(const Message &message);
 
     /**
-     * @brief Indicate an error has occurred
+     * @brief Indicate that an error has occurred
+     * @param message brief description of the error
      */
     void error(const QString &message);
 };
