@@ -38,7 +38,26 @@ class Record;
 class QMDNSENGINE_EXPORT ProberPrivate;
 
 /**
- * @brief Propose a record before using it to confirm its uniqueness
+ * @brief %Prober to confirm that a record is unique
+ *
+ * Before responding to queries for a record, its uniqueness on the network
+ * must be confirmed. This class takes care of probing for existing records
+ * that match and adjusts the record's name until a unique one is found.
+ *
+ * For example, to probe for a SRV record:
+ *
+ * @code
+ * QMdnsEngine::Record record;
+ * record.setName("My Service._http._tcp.local.");
+ * record.setType(QMdnsEngine::SRV);
+ * record.setPort(1234);
+ * record.setTarget(hostname.hostname());
+ *
+ * QMdnsEngine::Prober prober(&server, record);
+ * connect(&prober, &QMdnsEngine::Prober::nameConfirmed, [](const QByteArray &name) {
+ *     qDebug() << "Name confirmed:" << name;
+ * });
+ * @endcode
  */
 class QMDNSENGINE_EXPORT Prober : public QObject
 {
@@ -46,6 +65,9 @@ class QMDNSENGINE_EXPORT Prober : public QObject
 
 public:
 
+    /**
+     * @brief Create a new prober
+     */
     Prober(AbstractServer *server, const Record &record, QObject *parent = 0);
 
 Q_SIGNALS:
