@@ -39,7 +39,21 @@ class Cache;
 class QMDNSENGINE_EXPORT ResolverPrivate;
 
 /**
- * @brief Resolve a service to an address
+ * @brief %Resolver for services
+ *
+ * When [Browser](@ref QMdnsEngine::Browser) indicates that a new service has
+ * been found, it becomes necessary to resolve the service in order to connect
+ * to it. This class serves that role. A [Cache](@ref QMdnsEngine::Cache) can
+ * optionally be provided to speed up the resolving process.
+ *
+ * For example, assuming that `record` is a SRV record:
+ *
+ * @code
+ * QMdnsEngine::Resolver resolver(&server, record.target());
+ * connect(&resolver, &QMdnsEngine::Resolver::resolved, [](const QHostAddress &address) {
+ *     qDebug() << "Address:" << address;
+ * });
+ * @endcode
  */
 class QMDNSENGINE_EXPORT Resolver : public QObject
 {
@@ -47,6 +61,9 @@ class QMDNSENGINE_EXPORT Resolver : public QObject
 
 public:
 
+    /**
+     * @brief Create a new resolver
+     */
     Resolver(AbstractServer *server, const QByteArray &name, Cache *cache = 0, QObject *parent = 0);
 
 Q_SIGNALS:
@@ -55,7 +72,9 @@ Q_SIGNALS:
      * @brief Indicate that the host resolved to an address
      * @param address service address
      *
-     * This signal will be emitted once for each address.
+     * This signal will be emitted once for each resolved address. For
+     * example, if a host provides both A and AAAA records, this signal will
+     * be emitted twice.
      */
     void resolved(const QHostAddress &address);
 

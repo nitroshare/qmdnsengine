@@ -41,18 +41,53 @@ class QMDNSENGINE_EXPORT RecordPrivate;
 /**
  * @brief DNS record
  *
- * This class maintains information for an individual record. Not all records
- * use all of the fields.
+ * This class maintains information for an individual record. Not all record
+ * types use every field.
+ *
+ * For example, to create a TXT record:
+ *
+ * @code
+ * QMdnsEngine::Record record;
+ * record.setName("My Service._http._tcp.local.");
+ * record.setType(QMdnsEngine::TXT);
+ * record.addAttribute("a", "value1");
+ * record.addAttribute("b", "value2");
+ *
+ * message.addRecord(record);
+ * @endcode
  */
 class QMDNSENGINE_EXPORT Record
 {
 public:
 
+    /**
+     * @brief Create an uninitialized record
+     */
     Record();
+
+    /**
+     * @brief Create a copy of an existing record
+     */
     Record(const Record &other);
+
+    /**
+     * @brief Assignment operator
+     */
     Record &operator=(const Record &other);
+
+    /**
+     * @brief Equality operator
+     */
     bool operator==(const Record &other) const;
+
+    /**
+     * @brief Inequality operator
+     */
     bool operator!=(const Record &other) const;
+
+    /**
+     * @brief Destroy the record
+     */
     virtual ~Record();
 
     /**
