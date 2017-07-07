@@ -38,6 +38,10 @@ class QMDNSENGINE_EXPORT ServerPrivate;
 
 /**
  * @brief mDNS server
+ *
+ * This class provides an implementation of
+ * [AbstractServer](@ref QMdnsEngine::AbstractServer) that uses all available
+ * local network adapters to send and receive mDNS messages.
  */
 class QMDNSENGINE_EXPORT Server : public AbstractServer
 {
@@ -45,6 +49,9 @@ class QMDNSENGINE_EXPORT Server : public AbstractServer
 
 public:
 
+    /**
+     * @brief Create a new server
+     */
     explicit Server(QObject *parent = 0);
 
     /**

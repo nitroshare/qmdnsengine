@@ -30,6 +30,7 @@
 #  include <sys/socket.h>
 #endif
 
+#include <QHostAddress>
 #include <QNetworkInterface>
 
 #include <qmdnsengine/dns.h>
@@ -49,6 +50,7 @@ ServerPrivate::ServerPrivate(Server *server)
     connect(&ipv6Socket, &QUdpSocket::readyRead, this, &ServerPrivate::onReadyRead);
 
     timer.setInterval(60 * 1000);
+    timer.setSingleShot(true);
     onTimeout();
 }
 

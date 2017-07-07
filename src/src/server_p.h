@@ -25,10 +25,11 @@
 #ifndef QMDNSENGINE_SERVER_P_H
 #define QMDNSENGINE_SERVER_P_H
 
-#include <QHostAddress>
 #include <QObject>
 #include <QTimer>
 #include <QUdpSocket>
+
+class QHostAddress;
 
 namespace QMdnsEngine
 {
