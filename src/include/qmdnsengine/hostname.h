@@ -37,7 +37,7 @@ class AbstractServer;
 class QMDNSENGINE_EXPORT HostnamePrivate;
 
 /**
- * @brief Hostname reserved for exclusive use
+ * @brief %Hostname reserved for exclusive use
  *
  * In order to provide services on the local network, a unique hostname must
  * be used. This class asserts a hostname (by first confirming that it is not

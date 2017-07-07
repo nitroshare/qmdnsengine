@@ -41,15 +41,44 @@ class QMDNSENGINE_EXPORT MessagePrivate;
 /**
  * @brief DNS message
  *
- * A DNS message consists of a header and any number of queries and records.
+ * A DNS message consists of a header and zero or more queries and records.
+ * Instances of this class are created and initialized by
+ * [AbstractServer](@ref QMdnsEngine::AbstractServer) when messages are
+ * received from the network.
+ *
+ * If a message is being constructed in reply to one received from the
+ * network, the reply() method can be used to simplify initialization:
+ *
+ * @code
+ * connect(&server, &QMdnsEngine::Server::messageReceived, [](const QMdnsEngine::Message &message) {
+ *     QMdnsEngine::Message reply;
+ *     reply.reply(message);
+ *     server.sendMessage(reply);
+ * });
+ * @endcode
  */
 class QMDNSENGINE_EXPORT Message
 {
 public:
 
+    /**
+     * @brief Create an empty message
+     */
     Message();
+
+    /**
+     * @brief Create a copy of an existing message
+     */
     Message(const Message &other);
+
+    /**
+     * @brief Assignment operator
+     */
     Message &operator=(const Message &other);
+
+    /**
+     * @brief Destroy the message
+     */
     virtual ~Message();
 
     /**
@@ -65,7 +94,7 @@ public:
      *
      * When sending messages, this is the address that the message will be
      * sent to. QMdnsEngine::MdnsIpv4Address and QMdnsEngine::MdnsIpv6Address
-     * can be used for mDNS.
+     * can be used for mDNS messages.
      */
     void setAddress(const QHostAddress &address);
 

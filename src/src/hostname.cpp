@@ -63,11 +63,17 @@ void HostnamePrivate::resetHostname()
 
 void HostnamePrivate::assertHostname()
 {
+    // Begin with the local hostname and replace any "." with "-" (I'm looking
+    // at you, macOS)
     QByteArray localHostname = QHostInfo::localHostName().toUtf8();
     localHostname = localHostname.replace('.', '-');
+
+    // If the suffix > 1, then append a "-2", "-3", etc. to the hostname to
+    // aid in finding one that is unique and not in use
     hostname = (hostnameSuffix == 1 ? localHostname:
         localHostname + "-" + QByteArray::number(hostnameSuffix)) + ".local.";
 
+    // Compose a query for A and AAAA records matching the hostname
     Query ipv4Query;
     ipv4Query.setName(hostname);
     ipv4Query.setType(A);
@@ -88,7 +94,7 @@ void HostnamePrivate::assertHostname()
 bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record)
 {
     // Attempt to find the interface that corresponds with the provided
-    // address and determine this device's address from the interface.
+    // address and determine this device's address from the interface
 
     foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
         foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
