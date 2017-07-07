@@ -37,12 +37,19 @@ class Message;
 class Record;
 
 enum {
+    /// IPv4 address record
     A = 1,
+    /// IPv6 address record
     AAAA = 28,
+    /// Wildcard for cache lookups
     ANY = 255,
+    /// List of records
     NSEC = 47,
+    /// Pointer to hostname
     PTR = 12,
+    /// %Service information
     SRV = 33,
+    /// Arbitrary metadata
     TXT = 16
 };
 

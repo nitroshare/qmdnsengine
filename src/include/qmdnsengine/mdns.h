@@ -33,9 +33,24 @@
 namespace QMdnsEngine
 {
 
+/**
+ * @brief Standard port for mDNS
+ */
 QMDNSENGINE_EXPORT extern const quint16 MdnsPort;
+
+/**
+ * @brief Standard IPv4 address for mDNS
+ */
 QMDNSENGINE_EXPORT extern const QHostAddress MdnsIpv4Address;
+
+/**
+ * @brief Standard IPv6 address for mDNS
+ */
 QMDNSENGINE_EXPORT extern const QHostAddress MdnsIpv6Address;
+
+/**
+ * @brief Service type for browsing service types
+ */
 QMDNSENGINE_EXPORT extern const QByteArray MdnsBrowseType;
 
 }
