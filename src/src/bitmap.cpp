@@ -48,6 +48,7 @@ void BitmapPrivate::free()
 
 void BitmapPrivate::fromData(quint8 newLength, const quint8 *newData)
 {
+    data = new quint8[newLength];
     for (int i = 0; i < newLength; ++i) {
         data[i] = newData[i];
     }
