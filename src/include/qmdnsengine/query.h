@@ -36,14 +36,40 @@ class QMDNSENGINE_EXPORT QueryPrivate;
 
 /**
  * @brief DNS query
+ *
+ * This class represents a query for a DNS record. For example, to query for
+ * the IPv4 address of a local host:
+ *
+ * @code
+ * QMdnsEngine::Query query;
+ * query.setName("myserver.local.");
+ * query.setType(QMdnsEngine::A);
+ *
+ * message.addQuery(query);
+ * @endcode
  */
 class QMDNSENGINE_EXPORT Query
 {
 public:
 
+    /**
+     * @brief Create an empty query
+     */
     Query();
+
+    /**
+     * @brief Create a copy of an existing query
+     */
     Query(const Query &other);
+
+    /**
+     * @brief Assignment operator
+     */
     Query &operator=(const Query &other);
+
+    /**
+     * @brief Destroy the query
+     */
     virtual ~Query();
 
     /**

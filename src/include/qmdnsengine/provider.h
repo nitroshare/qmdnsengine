@@ -39,7 +39,26 @@ class Service;
 class QMDNSENGINE_EXPORT ProviderPrivate;
 
 /**
- * @brief Provide an mDNS service on the local network
+ * @brief %Provider for a single mDNS service
+ *
+ * This class provide a [Service](@ref QMdnsEngine::Service) on the local
+ * network by responding to the appropriate DNS queries. A hostname is
+ * required for creating the SRV record.
+ *
+ * The provider needs to be given a reference to the service through the
+ * update() method so that it can construct DNS records:
+ *
+ * @code
+ * QMdnsEngine::Service service;
+ * service.setType("_http._tcp.local.");
+ * service.setName("My Service");
+ * service.setPort(1234);
+ *
+ * QMdnsEngine::Provider provider;
+ * provider.update(service);
+ * @endcode
+ *
+ * This method can also be used to update the provider's records.
  */
 class QMDNSENGINE_EXPORT Provider : public QObject
 {
@@ -47,10 +66,17 @@ class QMDNSENGINE_EXPORT Provider : public QObject
 
 public:
 
+    /**
+     * @brief Create a new service provider
+     */
     Provider(AbstractServer *server, Hostname *hostname, QObject *parent = 0);
 
     /**
      * @brief Update the service with the provided information
+     * @param service updated service description
+     *
+     * This class will not respond to any DNS queries until the hostname is
+     * confirmed and this method is called.
      */
     void update(const Service &service);
 
