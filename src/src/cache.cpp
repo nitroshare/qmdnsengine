@@ -40,7 +40,6 @@ CachePrivate::CachePrivate(Cache *cache)
 
 void CachePrivate::onTimeout()
 {
-
     // Loop through all of the records in the cache, emitting the appropriate
     // signal when a trigger has passed, determining when the next trigger
     // will occur, and removing records that have expired
@@ -97,7 +96,9 @@ void Cache::addRecord(const Record &record)
     bool flushCache = record.flushCache();
     bool ttlZero = record.ttl() == 0;
     for (auto i = d->entries.begin(); i != d->entries.end();) {
-        if (flushCache && (*i).record.name() == record.name() && (*i).record.type() == record.type() ||
+        if ((flushCache &&
+             (*i).record.name() == record.name() &&
+             (*i).record.type() == record.type()) ||
                 (*i).record == record) {
 
             // If the TTL is set to 0, indicate that the record was removed
@@ -152,11 +153,13 @@ bool Cache::lookupRecord(const QByteArray &name, quint16 type, Record &record) c
 
 bool Cache::lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records) const
 {
+    bool recordsAdded = false;
     foreach (CachePrivate::Entry entry, d->entries) {
         if ((name.isNull() || entry.record.name() == name) &&
                 (type == ANY || entry.record.type() == type)) {
             records.append(entry.record);
+            recordsAdded = true;
         }
     }
-    return records.length();
+    return recordsAdded;
 }

@@ -32,7 +32,8 @@
 
 #include <qmdnsengine/record.h>
 
-namespace QMdnsEngine {
+namespace QMdnsEngine
+{
 
 class Cache;
 
