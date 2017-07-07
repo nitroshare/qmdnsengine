@@ -38,17 +38,47 @@ namespace QMdnsEngine
 class QMDNSENGINE_EXPORT ServicePrivate;
 
 /**
- * @brief Service available on the local network
+ * @brief %Service available on the local network
+ *
+ * This class contains the descriptive information necessary to represent an
+ * individual service made available to the local network. Instances are
+ * provided by [Browser](@ref QMdnsEngine::Browser) as services are
+ * discovered. Instances must be created and passed to
+ * [Provider::update()](@ref QMdnsEngine::Provider::update) to provide a
+ * service.
  */
 class QMDNSENGINE_EXPORT Service
 {
 public:
 
+    /**
+     * @brief Create an uninitialized service
+     */
     Service();
+
+    /**
+     * @brief Create a copy of an existing service
+     */
     Service(const Service &other);
+
+    /**
+     * @brief Assignment operator
+     */
     Service &operator=(const Service &other);
+
+    /**
+     * @brief Equality operator
+     */
     bool operator==(const Service &other) const;
+
+    /**
+     * @brief Inequality operator
+     */
     bool operator!=(const Service &other) const;
+
+    /**
+     * @brief Destroy the service
+     */
     virtual ~Service();
 
     /**
@@ -108,6 +138,11 @@ public:
      * @brief Set the attributes for the service
      */
     void setAttributes(const QMap<QByteArray, QByteArray> &attributes);
+
+    /**
+     * @brief Add an attribute to the service
+     */
+    void addAttribute(const QByteArray &key, const QByteArray &value);
 
 private:
 

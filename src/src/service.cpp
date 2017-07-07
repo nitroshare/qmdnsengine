@@ -116,3 +116,8 @@ void Service::setAttributes(const QMap<QByteArray, QByteArray> &attributes)
 {
     d->attributes = attributes;
 }
+
+void Service::addAttribute(const QByteArray &key, const QByteArray &value)
+{
+    d->attributes.insert(key, value);
+}
