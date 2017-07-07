@@ -37,11 +37,19 @@ class AbstractServer;
 class QMDNSENGINE_EXPORT HostnamePrivate;
 
 /**
- * @brief Register and utilize a unique hostname
+ * @brief Hostname reserved for exclusive use
  *
- * In order to use SRV records, a unique hostname must be used. This class
- * asserts a hostname (by first confirming that it is not in use) and then
- * responds to A and AAAA queries for the hostname.
+ * In order to provide services on the local network, a unique hostname must
+ * be used. This class asserts a hostname (by first confirming that it is not
+ * in use) and then responds to A and AAAA queries for the hostname.
+ *
+ * @code
+ * QMdnsEngine::Hostname hostname(&server);
+ *
+ * connect(&hostname, &QMdnsEngine::Hostname::hostnameChanged, [](const QByteArray &hostname) {
+ *     qDebug() << "New hostname:" << hostname;
+ * });
+ * @endcode
  */
 class QMDNSENGINE_EXPORT Hostname : public QObject
 {
@@ -49,10 +57,16 @@ class QMDNSENGINE_EXPORT Hostname : public QObject
 
 public:
 
+    /**
+     * @brief Create a new hostname
+     */
     Hostname(AbstractServer *server, QObject *parent = 0);
 
     /**
-     * @brief Determines if a hostname has been registered
+     * @brief Determine if a hostname has been registered
+     *
+     * A hostname is not considered registered until a probe for the desired
+     * name has been completed and no matching records were received.
      */
     bool isRegistered() const;
 
@@ -67,6 +81,7 @@ Q_SIGNALS:
 
     /**
      * @brief Indicate that the current hostname has changed
+     * @param hostname new hostname
      */
     void hostnameChanged(const QByteArray &hostname);
 
