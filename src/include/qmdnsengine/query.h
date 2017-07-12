@@ -109,7 +109,7 @@ private:
     QueryPrivate *const d;
 };
 
-QDebug operator<<(QDebug dbg, const Query &query);
+QMDNSENGINE_EXPORT QDebug operator<<(QDebug dbg, const Query &query);
 
 }
 

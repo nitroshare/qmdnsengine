@@ -248,7 +248,7 @@ private:
     RecordPrivate *const d;
 };
 
-QDebug operator<<(QDebug dbg, const Record &record);
+QMDNSENGINE_EXPORT QDebug operator<<(QDebug dbg, const Record &record);
 
 }
 
