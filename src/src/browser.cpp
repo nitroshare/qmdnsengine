@@ -150,16 +150,18 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     }
 
     // Build and send a query for all of the SRV records
-    Message queryMessage;
-    foreach (QByteArray name, queryNames) {
-        Query query;
-        query.setName(name);
-        query.setType(SRV);
-        queryMessage.addQuery(query);
-        query.setType(TXT);
-        queryMessage.addQuery(query);
+    if (queryNames.count()) {
+        Message queryMessage;
+        foreach (QByteArray name, queryNames) {
+            Query query;
+            query.setName(name);
+            query.setType(SRV);
+            queryMessage.addQuery(query);
+            query.setType(TXT);
+            queryMessage.addQuery(query);
+        }
+        server->sendMessageToAll(queryMessage);
     }
-    server->sendMessageToAll(queryMessage);
 }
 
 void BrowserPrivate::onShouldQuery(const Record &record)
