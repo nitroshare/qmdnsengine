@@ -225,19 +225,21 @@ void BrowserPrivate::onQueryTimeout()
 
 void BrowserPrivate::onServiceTimeout()
 {
-    Message message;
-    foreach (QByteArray target, ptrTargets) {
-        Query query;
-        query.setName(target);
-        query.setType(PTR);
-        message.addQuery(query);
+    if (ptrTargets.count()) {
+        Message message;
+        foreach (QByteArray target, ptrTargets) {
+            Query query;
+            query.setName(target);
+            query.setType(PTR);
+            message.addQuery(query);
+        }
+
+        // TODO: cached PTR records
+
+        server->sendMessageToAll(message);
+
+        ptrTargets.clear();
     }
-
-    // TODO: cached PTR records
-
-    server->sendMessageToAll(message);
-
-    ptrTargets.clear();
 }
 
 Browser::Browser(AbstractServer *server, const QByteArray &type, Cache *cache, QObject *parent)
