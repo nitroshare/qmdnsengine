@@ -54,7 +54,7 @@ set_target_properties(qmdnsengine PROPERTIES
 target_include_directories(qmdnsengine PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-    "$<INSTALL_INTERFACE:include>"
+    "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
 
 target_link_libraries(qmdnsengine Qt5::Network)
