@@ -43,7 +43,8 @@
 using namespace QMdnsEngine;
 
 ServerPrivate::ServerPrivate(Server *server)
-    : q(server)
+    : QObject(server),
+      q(server)
 {
     connect(&timer, &QTimer::timeout, this, &ServerPrivate::onTimeout);
     connect(&ipv4Socket, &QUdpSocket::readyRead, this, &ServerPrivate::onReadyRead);
