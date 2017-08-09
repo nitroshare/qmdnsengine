@@ -25,7 +25,9 @@
 #ifndef QMDNSENGINE_RESOLVER_P_H
 #define QMDNSENGINE_RESOLVER_P_H
 
+#include <QHostAddress>
 #include <QObject>
+#include <QSet>
 #include <QTimer>
 
 namespace QMdnsEngine
@@ -51,7 +53,7 @@ public:
     AbstractServer *server;
     QByteArray name;
     Cache *cache;
-
+    QSet<QHostAddress> addresses;
     QTimer timer;
 
 private Q_SLOTS:

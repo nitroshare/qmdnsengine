@@ -72,10 +72,11 @@ void TestResolver::testResolver()
     QMdnsEngine::Message message;
     message.setResponse(true);
     message.addRecord(record);
+    message.addRecord(record);
     server.deliverMessage(message);
 
     // Ensure resolved() was emitted with the right address
-    QTRY_VERIFY(resolvedSpy.count() > 0);
+    QTRY_COMPARE(resolvedSpy.count(), 1);
     QCOMPARE(resolvedSpy.at(0).at(0).value<QHostAddress>(), Address);
 }
 

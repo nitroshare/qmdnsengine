@@ -91,7 +91,10 @@ void ResolverPrivate::onMessageReceived(const Message &message)
     foreach (Record record, message.records()) {
         if (record.name() == name && (record.type() == A || record.type() == AAAA)) {
             cache->addRecord(record);
-            emit q->resolved(record.address());
+            if (!addresses.contains(record.address())) {
+                emit q->resolved(record.address());
+                addresses.insert(record.address());
+            }
         }
     }
 }
