@@ -11,3 +11,8 @@ set_target_properties(browser PROPERTIES
 )
 
 target_link_libraries(browser qmdnsengine Qt5::Widgets)
+
+install(TARGETS browser
+    RUNTIME DESTINATION "${EXAMPLE_DIR}"
+    COMPONENT examples
+)
