@@ -9,6 +9,6 @@ This library provides an implementation of multicast DNS as per [RFC 6762](https
 
 ### Documentation
 
-To learn more about the building and using the library, please visit this page:
+To learn more about building and using the library, please visit this page:
 
 https://ci.quickmediasolutions.com/job/qmdnsengine-documentation/doxygen/
