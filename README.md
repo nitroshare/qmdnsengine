@@ -5,8 +5,6 @@
 
 This library provides an implementation of multicast DNS as per [RFC 6762](https://tools.ietf.org/html/rfc6762).
 
-> **Note:** the library is under active development and may change drastically before the first release.
-
 ### Documentation
 
 To learn more about building and using the library, please visit this page:
