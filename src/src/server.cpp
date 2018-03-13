@@ -116,7 +116,7 @@ void ServerPrivate::onTimeout()
 void ServerPrivate::onReadyRead()
 {
     // Read the packet from the socket
-    QUdpSocket *socket = dynamic_cast<QUdpSocket*>(sender());
+    QUdpSocket *socket = qobject_cast<QUdpSocket*>(sender());
     QByteArray packet;
     packet.resize(socket->pendingDatagramSize());
     QHostAddress address;
