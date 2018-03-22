@@ -42,7 +42,7 @@ if(WIN32)
     set(SRC ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
 endif()
 
-add_library(qmdnsengine SHARED ${HEADERS} ${SRC})
+add_library(qmdnsengine ${HEADERS} ${SRC})
 
 set_target_properties(qmdnsengine PROPERTIES
     CXX_STANDARD  11

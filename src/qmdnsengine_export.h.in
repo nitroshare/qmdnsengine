@@ -27,10 +27,16 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(QMDNSENGINE_LIBRARY)
-#  define QMDNSENGINE_EXPORT Q_DECL_EXPORT
+#cmakedefine BUILD_SHARED_LIBS
+
+#if defined(BUILD_SHARED_LIBS)
+#  if defined(QMDNSENGINE_LIBRARY)
+#    define QMDNSENGINE_EXPORT Q_DECL_EXPORT
+#  else
+#    define QMDNSENGINE_EXPORT Q_DECL_IMPORT
+#  endif
 #else
-#  define QMDNSENGINE_EXPORT Q_DECL_IMPORT
+#  define QHTTPENGINE_EXPORT
 #endif
 
 #endif // QMDNSENGINE_EXPORT_H
