@@ -1,3 +1,5 @@
+configure_file(qmdnsengine_export.h.in "${CMAKE_CURRENT_BINARY_DIR}/qmdnsengine_export.h")
+
 set(HEADERS
     include/qmdnsengine/abstractserver.h
     include/qmdnsengine/bitmap.h
@@ -9,12 +11,12 @@ set(HEADERS
     include/qmdnsengine/message.h
     include/qmdnsengine/prober.h
     include/qmdnsengine/provider.h
-    include/qmdnsengine/qmdnsengine_export.h
     include/qmdnsengine/query.h
     include/qmdnsengine/record.h
     include/qmdnsengine/resolver.h
     include/qmdnsengine/server.h
     include/qmdnsengine/service.h
+    "${CMAKE_CURRENT_BINARY_DIR}/qmdnsengine_export.h"
 )
 
 set(SRC
