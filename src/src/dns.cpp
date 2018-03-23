@@ -309,6 +309,7 @@ bool fromPacket(const QByteArray &packet, Message &message)
     }
     message.setTransactionId(transactionId);
     message.setResponse(flags & 0x8400);
+    message.setTruncated(flags & 0x0200);
     for (int i = 0; i < nQuestion; ++i) {
         QByteArray name;
         quint16 type, class_;
@@ -337,8 +338,10 @@ bool fromPacket(const QByteArray &packet, Message &message)
 void toPacket(const Message &message, QByteArray &packet)
 {
     quint16 offset = 0;
+    quint16 flags = (message.isResponse() ? 0x8400 : 0) |
+        (message.isTruncated() ? 0x200 : 0);
     writeInteger<quint16>(packet, offset, message.transactionId());
-    writeInteger<quint16>(packet, offset, message.isResponse() ? 0x8400 : 0);
+    writeInteger<quint16>(packet, offset, flags);
     writeInteger<quint16>(packet, offset, message.queries().length());
     writeInteger<quint16>(packet, offset, message.records().length());
     writeInteger<quint16>(packet, offset, 0);

@@ -44,6 +44,7 @@ public:
     quint16 port;
     quint16 transactionId;
     bool isResponse;
+    bool isTruncated;
     QList<Query> queries;
     QList<Record> records;
 };

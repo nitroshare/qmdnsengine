@@ -34,7 +34,8 @@ using namespace QMdnsEngine;
 MessagePrivate::MessagePrivate()
     : port(0),
       transactionId(0),
-      isResponse(false)
+      isResponse(false),
+      isTruncated(false)
 {
 }
 
@@ -98,6 +99,16 @@ bool Message::isResponse() const
 void Message::setResponse(bool isResponse)
 {
     d->isResponse = isResponse;
+}
+
+bool Message::isTruncated() const
+{
+    return d->isTruncated;
+}
+
+void Message::setTruncated(bool isTruncated)
+{
+    d->isTruncated = isTruncated;
 }
 
 QList<Query> Message::queries() const

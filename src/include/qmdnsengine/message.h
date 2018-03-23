@@ -143,6 +143,16 @@ public:
     void setResponse(bool isResponse);
 
     /**
+     * @brief Determine if the message is truncated
+     */
+    bool isTruncated() const;
+
+    /**
+     * @brief Set whether the message is truncated
+     */
+    void setTruncated(bool isTruncated);
+
+    /**
      * @brief Retrieve a list of queries in the message
      */
     QList<Query> queries() const;
