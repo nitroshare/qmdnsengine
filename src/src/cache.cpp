@@ -47,15 +47,14 @@ void CachePrivate::onTimeout()
     QDateTime newNextTrigger;
 
     for (auto i = entries.begin(); i != entries.end();) {
-        auto &triggers = (*i).triggers;
 
         // Loop through the triggers and remove ones that have already
         // passed
         bool shouldQuery = false;
-        for (auto j = triggers.begin(); j != triggers.end();) {
+        for (auto j = i->triggers.begin(); j != i->triggers.end();) {
             if ((*j) <= now) {
                 shouldQuery = true;
-                j = triggers.erase(j);
+                j = i->triggers.erase(j);
             } else {
                 break;
             }
@@ -63,16 +62,16 @@ void CachePrivate::onTimeout()
 
         // If triggers remain, determine the next earliest one; if none
         // remain, the record has expired and should be removed
-        if (triggers.length()) {
-            if (newNextTrigger.isNull() || triggers.at(0) < newNextTrigger) {
-                newNextTrigger = triggers.at(0);
+        if (i->triggers.length()) {
+            if (newNextTrigger.isNull() || i->triggers.at(0) < newNextTrigger) {
+                newNextTrigger = i->triggers.at(0);
             }
             if (shouldQuery) {
-                emit q->shouldQuery((*i).record);
+                emit q->shouldQuery(i->record);
             }
             ++i;
         } else {
-            emit q->recordExpired((*i).record);
+            emit q->recordExpired(i->record);
             i = entries.erase(i);
         }
     }
@@ -93,23 +92,23 @@ Cache::Cache(QObject *parent)
 
 void Cache::addRecord(const Record &record)
 {
-    bool flushCache = record.flushCache();
-    bool ttlZero = record.ttl() == 0;
+    // If a record exists that matches, remove it from the cache; if the TTL
+    // is nonzero, it will be added back to the cache with updated times
     for (auto i = d->entries.begin(); i != d->entries.end();) {
-        if ((flushCache &&
-             (*i).record.name() == record.name() &&
-             (*i).record.type() == record.type()) ||
+        if ((record.flushCache() &&
+                (*i).record.name() == record.name() &&
+                (*i).record.type() == record.type()) ||
                 (*i).record == record) {
 
             // If the TTL is set to 0, indicate that the record was removed
-            if (ttlZero) {
+            if (record.ttl() == 0) {
                 emit recordExpired((*i).record);
             }
 
             i = d->entries.erase(i);
 
             // No need to continue further if the TTL was set to 0
-            if (ttlZero) {
+            if (record.ttl() == 0) {
                 return;
             }
         } else {
@@ -132,11 +131,10 @@ void Cache::addRecord(const Record &record)
     // Append the record and its triggers
     d->entries.append({record, triggers});
 
-    // Check if half of this record's lifetime is earlier than the next
+    // Check if the new record's first trigger is earlier than the next
     // scheduled trigger; if so, restart the timer
     if (d->nextTrigger.isNull() || triggers.at(0) < d->nextTrigger) {
         d->nextTrigger = triggers.at(0);
-        d->timer.stop();
         d->timer.start(now.msecsTo(d->nextTrigger));
     }
 }
