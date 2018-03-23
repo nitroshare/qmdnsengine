@@ -44,7 +44,7 @@ public:
 
     explicit ServerPrivate(Server *server);
 
-    void bindSocket(QUdpSocket &socket, const QHostAddress &address);
+    bool bindSocket(QUdpSocket &socket, const QHostAddress &address);
 
     QTimer timer;
     QUdpSocket ipv4Socket;

@@ -42,6 +42,10 @@ class QMDNSENGINE_EXPORT ServerPrivate;
  * This class provides an implementation of
  * [AbstractServer](@ref QMdnsEngine::AbstractServer) that uses all available
  * local network adapters to send and receive mDNS messages.
+ *
+ * The class takes care of watching for the addition and removal of network
+ * interfaces, automatically joining multicast groups when new interfaces are
+ * available.
  */
 class QMDNSENGINE_EXPORT Server : public AbstractServer
 {

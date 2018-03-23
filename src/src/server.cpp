@@ -55,8 +55,13 @@ ServerPrivate::ServerPrivate(Server *server)
     onTimeout();
 }
 
-void ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
+bool ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
 {
+    // Exit early if the socket is already bound
+    if (socket.state() == QAbstractSocket::BoundState) {
+        return true;
+    }
+
     // I cannot find the correct combination of flags that allows the socket
     // to bind properly on Linux, so on that platform, we must manually create
     // the socket and initialize the QUdpSocket with it
@@ -67,49 +72,44 @@ void ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
         if (setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR,
                 reinterpret_cast<char*>(&arg), sizeof(int))) {
             emit q->error(strerror(errno));
+            return false;
         }
 #endif
         if (!socket.bind(address, MdnsPort, QAbstractSocket::ReuseAddressHint)) {
             emit q->error(socket.errorString());
+            return false;
         }
 #ifdef Q_OS_UNIX
     }
 #endif
+
+    return true;
 }
 
 void ServerPrivate::onTimeout()
 {
-    // Bind the sockets if not already bound
-    if (ipv4Socket.state() != QAbstractSocket::BoundState) {
-        bindSocket(ipv4Socket, QHostAddress::AnyIPv4);
-    }
-    if (ipv6Socket.state() != QAbstractSocket::BoundState) {
-        bindSocket(ipv6Socket, QHostAddress::AnyIPv6);
-    }
-    bool ipv4Bound = ipv4Socket.state() == QAbstractSocket::BoundState;
-    bool ipv6Bound = ipv6Socket.state() == QAbstractSocket::BoundState;
+    // A timer is used to run a set of operations once per minute; first, the
+    // two sockets are bound - if this fails, another attempt is made once per
+    // timeout; secondly, all network interfaces are enumerated; if the
+    // interface supports multicast, the socket will join the mDNS multicast
+    // groups
 
-    // Assuming either of the sockets are bound, join multicast groups
+    bool ipv4Bound = bindSocket(ipv4Socket, QHostAddress::AnyIPv4);
+    bool ipv6Bound = bindSocket(ipv6Socket, QHostAddress::AnyIPv6);
+
     if (ipv4Bound || ipv6Bound) {
         foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
             if (interface.flags() & QNetworkInterface::CanMulticast) {
-                bool ipv4Address = false;
-                bool ipv6Address = false;
-                foreach (QHostAddress address, interface.allAddresses()) {
-                    ipv4Address = ipv4Address || address.protocol() == QAbstractSocket::IPv4Protocol;
-                    ipv6Address = ipv6Address || address.protocol() == QAbstractSocket::IPv6Protocol;
-                }
-                if (ipv4Bound && ipv4Address) {
+                if (ipv4Bound) {
                     ipv4Socket.joinMulticastGroup(MdnsIpv4Address, interface);
                 }
-                if (ipv6Bound && ipv6Address) {
+                if (ipv6Bound) {
                     ipv6Socket.joinMulticastGroup(MdnsIpv6Address, interface);
                 }
             }
         }
     }
 
-    // Schedule the timeout in one minute
     timer.start();
 }
 
