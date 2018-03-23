@@ -117,29 +117,27 @@ void BrowserPrivate::onMessageReceived(const Message &message)
         return;
     }
 
-    // Use a set to track all services that are updated in the message - this
-    // avoids extraneous signals being emitted if SRV and TXT are provided
+    // Use a set to track all services that are updated in the message to
+    // prevent unnecessary queries for SRV and TXT records
     QSet<QByteArray> updateNames;
     foreach (Record record, message.records()) {
+        cache->addRecord(record);
         bool any = type == MdnsBrowseType;
-        if (record.type() == PTR && record.name() == MdnsBrowseType) {
-            cache->addRecord(record);
-            ptrTargets.insert(record.target());
-            serviceTimer.stop();
-            serviceTimer.start();
-        } else if ((record.type() == PTR && (any || record.name() == type)) ||
-                (record.type() == SRV && (any || record.name().endsWith("." + type))) ||
-                (record.type() == TXT && (any || record.name().endsWith("." + type)))) {
-            cache->addRecord(record);
-            switch (record.type()) {
-            case PTR:
+        switch (record.type()) {
+        case PTR:
+            if (any && record.name() == MdnsBrowseType) {
+                ptrTargets.insert(record.target());
+                serviceTimer.start();
+            } else if (any || record.name() == type) {
                 updateNames.insert(record.target());
-                break;
-            case SRV:
-            case TXT:
-                updateNames.insert(record.name());
-                break;
             }
+            break;
+        case SRV:
+        case TXT:
+            if (any || record.name().endsWith("." + type)) {
+                updateNames.insert(record.name());
+            }
+            break;
         }
     }
 
@@ -152,7 +150,7 @@ void BrowserPrivate::onMessageReceived(const Message &message)
         }
     }
 
-    // Build and send a query for all of the SRV records
+    // Build and send a query for all of the SRV and TXT records
     if (queryNames.count()) {
         Message queryMessage;
         foreach (QByteArray name, queryNames) {
