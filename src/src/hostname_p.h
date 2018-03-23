@@ -46,7 +46,6 @@ public:
 
     HostnamePrivate(Hostname *hostname, AbstractServer *server);
 
-    void resetHostname();
     void assertHostname();
     bool generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record);
 

@@ -47,18 +47,14 @@ HostnamePrivate::HostnamePrivate(Hostname *hostname, AbstractServer *server)
     connect(&registrationTimer, &QTimer::timeout, this, &HostnamePrivate::onRegistrationTimeout);
     connect(&rebroadcastTimer, &QTimer::timeout, this, &HostnamePrivate::onRebroadcastTimeout);
 
+    registrationTimer.setInterval(2 * 1000);
     registrationTimer.setSingleShot(true);
+
+    rebroadcastTimer.setInterval(30 * 60 * 1000);
     rebroadcastTimer.setSingleShot(true);
 
     // Immediately assert the hostname
     onRebroadcastTimeout();
-}
-
-void HostnamePrivate::resetHostname()
-{
-    hostnamePrev = hostname;
-    hostnameRegistered = false;
-    hostnameSuffix = 1;
 }
 
 void HostnamePrivate::assertHostname()
@@ -87,8 +83,7 @@ void HostnamePrivate::assertHostname()
     server->sendMessageToAll(message);
 
     // If no reply is received after two seconds, the hostname is available
-    registrationTimer.stop();
-    registrationTimer.start(2 * 1000);
+    registrationTimer.start();
 }
 
 bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record)
@@ -155,12 +150,15 @@ void HostnamePrivate::onRegistrationTimeout()
     }
 
     // Re-assert the hostname in half an hour
-    rebroadcastTimer.start(30 * 60 * 1000);
+    rebroadcastTimer.start();
 }
 
 void HostnamePrivate::onRebroadcastTimeout()
 {
-    resetHostname();
+    hostnamePrev = hostname;
+    hostnameRegistered = false;
+    hostnameSuffix = 1;
+
     assertHostname();
 }
 
