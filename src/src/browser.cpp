@@ -48,7 +48,10 @@ BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const Q
     connect(&queryTimer, &QTimer::timeout, this, &BrowserPrivate::onQueryTimeout);
     connect(&serviceTimer, &QTimer::timeout, this, &BrowserPrivate::onServiceTimeout);
 
+    queryTimer.setInterval(60 * 1000);
     queryTimer.setSingleShot(true);
+
+    serviceTimer.setInterval(100);
     serviceTimer.setSingleShot(true);
 
     // Immediately begin browsing for services
@@ -123,7 +126,7 @@ void BrowserPrivate::onMessageReceived(const Message &message)
             cache->addRecord(record);
             ptrTargets.insert(record.target());
             serviceTimer.stop();
-            serviceTimer.start(100);
+            serviceTimer.start();
         } else if ((record.type() == PTR && (any || record.name() == type)) ||
                 (record.type() == SRV && (any || record.name().endsWith("." + type))) ||
                 (record.type() == TXT && (any || record.name().endsWith("." + type)))) {
@@ -193,9 +196,11 @@ void BrowserPrivate::onRecordExpired(const Record &record)
     case TXT:
         updateService(record.name());
         return;
+    default:
+        return;
     }
     Service service = services.value(serviceName);
-    if (!service.name().isNull() && (record.type() == PTR || record.type() == SRV)) {
+    if (!service.name().isNull()) {
         emit q->serviceRemoved(service);
         services.remove(serviceName);
     }
@@ -220,7 +225,7 @@ void BrowserPrivate::onQueryTimeout()
     }
 
     server->sendMessageToAll(message);
-    queryTimer.start(60 * 1000);
+    queryTimer.start();
 }
 
 void BrowserPrivate::onServiceTimeout()
@@ -228,16 +233,23 @@ void BrowserPrivate::onServiceTimeout()
     if (ptrTargets.count()) {
         Message message;
         foreach (QByteArray target, ptrTargets) {
+
+            // Add a query for PTR records
             Query query;
             query.setName(target);
             query.setType(PTR);
             message.addQuery(query);
+
+            // Include PTR records for the target that are already known
+            QList<Record> records;
+            if (cache->lookupRecords(target, PTR, records)) {
+                foreach (Record record, records) {
+                    message.addRecord(record);
+                }
+            }
         }
 
-        // TODO: cached PTR records
-
         server->sendMessageToAll(message);
-
         ptrTargets.clear();
     }
 }
