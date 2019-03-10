@@ -36,7 +36,7 @@
 #    define QMDNSENGINE_EXPORT Q_DECL_IMPORT
 #  endif
 #else
-#  define QHTTPENGINE_EXPORT
+#  define QMDNSENGINE_EXPORT
 #endif
 
 #endif // QMDNSENGINE_EXPORT_H
