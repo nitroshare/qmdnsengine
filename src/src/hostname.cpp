@@ -86,28 +86,26 @@ void HostnamePrivate::assertHostname()
     registrationTimer.start();
 }
 
-bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record)
+void HostnamePrivate::addMatchingAddressRecords(const QHostAddress &srcAddress, quint16 type, Message &reply)
 {
-    // Attempt to find the interface that corresponds with the provided
-    // address and determine this device's address from the interface
+    // Add all addresses that in the same subnet as the source address from all the active network interfaces
 
-    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
-        foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
-            if (srcAddress.isInSubnet(entry.ip(), entry.prefixLength())) {
-                foreach (entry, interface.addressEntries()) {
-                    QHostAddress address = entry.ip();
-                    if ((address.protocol() == QAbstractSocket::IPv4Protocol && type == A) ||
-                            (address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA)) {
-                        record.setName(hostname);
-                        record.setType(type);
-                        record.setAddress(address);
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
+	foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+		if (interface.flags() & QNetworkInterface::IsUp && interface.flags() & QNetworkInterface::IsRunning) {
+			foreach(QNetworkAddressEntry entry, interface.addressEntries())	{
+				QHostAddress address = entry.ip();
+				if (((address.protocol() == QAbstractSocket::IPv4Protocol && type == A) ||
+					(address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA)) &&
+					srcAddress.isInSubnet(address, entry.prefixLength())) {
+					Record record;
+					record.setName(hostname);
+					record.setType(type);
+					record.setAddress(address);
+					reply.addRecord(record);
+				}
+			}
+		}
+	}
 }
 
 void HostnamePrivate::onMessageReceived(const Message &message)
@@ -130,10 +128,7 @@ void HostnamePrivate::onMessageReceived(const Message &message)
         reply.reply(message);
         foreach (Query query, message.queries()) {
             if ((query.type() == A || query.type() == AAAA) && query.name() == hostname) {
-                Record record;
-                if (generateRecord(message.address(), query.type(), record)) {
-                    reply.addRecord(record);
-                }
+				addMatchingAddressRecords(message.address(), query.type(), reply);
             }
         }
         if (reply.records().count()) {
