@@ -76,7 +76,7 @@ QObject::connect(&browser, &QMdnsEngine::Browser::serviceAdded,
 To resolve the service, use a [Resolver](@ref QMdnsEngine::Resolver):
 
 @code
-QMdnsEngine::Resolver resolver(&server, service.name(), &cache);
+QMdnsEngine::Resolver resolver(&server, service.hostname(), &cache);
 QObject::connect(&resolver, &QMdnsEngine::Resolver::resolved,
     [](const QHostAddress &address) {
         qDebug() << "resolved to" << address;
