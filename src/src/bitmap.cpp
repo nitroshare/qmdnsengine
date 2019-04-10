@@ -42,7 +42,7 @@ BitmapPrivate::~BitmapPrivate()
 void BitmapPrivate::free()
 {
     if (data) {
-        delete data;
+        delete[] data;
     }
 }
 
