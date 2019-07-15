@@ -92,28 +92,9 @@ Cache::Cache(QObject *parent)
 
 void Cache::addRecord(const Record &record)
 {
-    // If a record exists that matches, remove it from the cache; if the TTL
-    // is nonzero, it will be added back to the cache with updated times
-    for (auto i = d->entries.begin(); i != d->entries.end();) {
-        if ((record.flushCache() &&
-                (*i).record.name() == record.name() &&
-                (*i).record.type() == record.type()) ||
-                (*i).record == record) {
-
-            // If the TTL is set to 0, indicate that the record was removed
-            if (record.ttl() == 0) {
-                emit recordExpired((*i).record);
-            }
-
-            i = d->entries.erase(i);
-
-            // No need to continue further if the TTL was set to 0
-            if (record.ttl() == 0) {
-                return;
-            }
-        } else {
-            ++i;
-        }
+    // No need to add anything if the TTL was set to 0
+    if (record.ttl() == 0) {
+        return;
     }
 
     // Use the current time to calculate the triggers and add a random offset
@@ -136,6 +117,27 @@ void Cache::addRecord(const Record &record)
     if (d->nextTrigger.isNull() || triggers.at(0) < d->nextTrigger) {
         d->nextTrigger = triggers.at(0);
         d->timer.start(now.msecsTo(d->nextTrigger));
+    }
+}
+
+void Cache::invalidateRecord(const Record &record)
+{
+    // If a record exists that matches, remove it from the cache
+    for (auto i = d->entries.begin(); i != d->entries.end();) {
+        if ((record.flushCache() &&
+                (*i).record.name() == record.name() &&
+                (*i).record.type() == record.type()) ||
+                (*i).record == record) {
+
+            // If the TTL is set to 0, indicate that the record was removed
+            if (record.ttl() == 0) {
+                emit recordExpired((*i).record);
+            }
+
+            i = d->entries.erase(i);
+        } else {
+            ++i;
+        }
     }
 }
 

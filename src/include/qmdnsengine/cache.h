@@ -78,8 +78,8 @@ public:
      * @param record add this record to the cache
      *
      * The TTL for the record will be added to the current time to calculate
-     * when the record expires. Existing records of the same name and type
-     * will be replaced, resetting their expiration.
+     * when the record expires. Call invalidateRecord() before addRecord()
+     * to ensure any superseded records are removed.
      */
     void addRecord(const Record &record);
 
@@ -105,6 +105,15 @@ public:
      */
     bool lookupRecords(const QByteArray &name, quint16 type, QList<Record> &records) const;
 
+    /**
+     * @brief Invalidates the specified record in the cache
+     * @param record invalidate this record in the cache
+     *
+     * This must be called for all records in a message prior to adding
+     * any records to the cache to ensure the case of multiple records with
+     * the same type and 'flush cache' set is handled properly.
+     */
+    void invalidateRecord(const Record &record);
 Q_SIGNALS:
 
     /**
