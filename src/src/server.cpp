@@ -153,6 +153,14 @@ void Server::sendMessageToAll(const Message &message)
 {
     QByteArray packet;
     toPacket(message, packet);
-    d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
-    d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
+
+    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+        if (interface.flags() & QNetworkInterface::CanMulticast) {
+            d->ipv4Socket.setMulticastInterface(interface);
+            d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
+
+            d->ipv6Socket.setMulticastInterface(interface);
+            d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
+        }
+    }
 }
