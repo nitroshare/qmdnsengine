@@ -214,9 +214,9 @@ void BrowserPrivate::onQueryTimeout()
 
     // TODO: including too many records could cause problems
 
-    // Include all currently valid PTR records
+    // Include PTR records for the target that are already known
     QList<Record> records;
-    if (cache->lookupRecords(QByteArray(), PTR, records)) {
+    if (cache->lookupRecords(query.name(), PTR, records)) {
         foreach (Record record, records) {
             message.addRecord(record);
         }
