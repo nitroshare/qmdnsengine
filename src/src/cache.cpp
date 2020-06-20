@@ -22,6 +22,8 @@
  * IN THE SOFTWARE.
  */
 
+#include <QRandomGenerator>
+
 #include <qmdnsengine/cache.h>
 #include <qmdnsengine/dns.h>
 
@@ -118,7 +120,7 @@ void Cache::addRecord(const Record &record)
 
     // Use the current time to calculate the triggers and add a random offset
     QDateTime now = QDateTime::currentDateTime();
-    qint64 random = qrand() % 20;
+    qint64 random = QRandomGenerator::global()->bounded(20);
 
     QList<QDateTime> triggers{
         now.addMSecs(record.ttl() * 500 + random),  // 50%
