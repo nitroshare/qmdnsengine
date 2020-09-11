@@ -94,6 +94,7 @@ void TestCache::testRemoval()
 
     // Purge the record from the cache by setting its TTL to 0
     record.setTtl(0);
+    cache.invalidateRecord(record);
     cache.addRecord(record);
 
     // Verify that the record is gone
@@ -115,6 +116,7 @@ void TestCache::testCacheFlush()
     // Insert a new record with the cache clear bit set
     QMdnsEngine::Record record = createRecord();
     record.setFlushCache(true);
+    cache.invalidateRecord(record);
     cache.addRecord(record);
 
     // Confirm that only a single record exists

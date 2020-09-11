@@ -88,6 +88,14 @@ void ResolverPrivate::onMessageReceived(const Message &message)
     if (!message.isResponse()) {
         return;
     }
+
+    // Invalidate each record in the cache first. This ensures
+    // that we properly handle the case where we have multiple
+    // records of the same type with 'flush cache' set.
+    foreach (Record record, message.records()) {
+        cache->invalidateRecord(record);
+    }
+
     foreach (Record record, message.records()) {
         if (record.name() == name && (record.type() == A || record.type() == AAAA)) {
             cache->addRecord(record);

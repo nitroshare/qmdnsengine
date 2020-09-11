@@ -117,6 +117,13 @@ void BrowserPrivate::onMessageReceived(const Message &message)
         return;
     }
 
+    // Invalidate each record in the cache first. This ensures
+    // that we properly handle the case where we have multiple
+    // records of the same type with 'flush cache' set.
+    foreach (Record record, message.records()) {
+        cache->invalidateRecord(record);
+    }
+
     // Use a set to track all services that are updated in the message to
     // prevent unnecessary queries for SRV and TXT records
     QSet<QByteArray> updateNames;

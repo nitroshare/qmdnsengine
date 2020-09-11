@@ -38,6 +38,7 @@ Q_DECLARE_METATYPE(QHostAddress)
 
 const QByteArray Name = "test.localhost.";
 const QHostAddress Address("127.0.0.1");
+const QHostAddress Address2("127.0.0.2");
 
 class TestResolver : public QObject
 {
@@ -47,6 +48,7 @@ private Q_SLOTS:
 
     void initTestCase();
     void testResolver();
+    void testResolverCacheFlush();
 };
 
 void TestResolver::initTestCase()
@@ -78,6 +80,38 @@ void TestResolver::testResolver()
     // Ensure resolved() was emitted with the right address
     QTRY_COMPARE(resolvedSpy.count(), 1);
     QCOMPARE(resolvedSpy.at(0).at(0).value<QHostAddress>(), Address);
+}
+
+void TestResolver::testResolverCacheFlush()
+{
+    TestServer server;
+    QMdnsEngine::Resolver resolver(&server, Name);
+    QSignalSpy resolvedSpy(&resolver, SIGNAL(resolved(QHostAddress)));
+
+    // Ensure two queries were dispatched
+    QTRY_VERIFY(queryReceived(&server, Name, QMdnsEngine::A));
+    QVERIFY(queryReceived(&server, Name, QMdnsEngine::AAAA));
+
+    // Send a response with 2 flush cache records
+    QMdnsEngine::Message message;
+    message.setResponse(true);
+
+    QMdnsEngine::Record record;
+    record.setName(Name);
+    record.setType(QMdnsEngine::A);
+    record.setFlushCache(true);
+    record.setAddress(Address);
+    message.addRecord(record);
+
+    record.setAddress(Address2);
+    message.addRecord(record);
+
+    server.deliverMessage(message);
+
+    // Ensure resolved() was emitted with both addresses
+    QTRY_COMPARE(resolvedSpy.count(), 2);
+    QCOMPARE(resolvedSpy.at(0).at(0).value<QHostAddress>(), Address);
+    QCOMPARE(resolvedSpy.at(1).at(0).value<QHostAddress>(), Address2);
 }
 
 QTEST_MAIN(TestResolver)
