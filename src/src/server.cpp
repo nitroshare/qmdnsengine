@@ -98,7 +98,8 @@ void ServerPrivate::onTimeout()
     bool ipv6Bound = bindSocket(ipv6Socket, QHostAddress::AnyIPv6);
 
     if (ipv4Bound || ipv6Bound) {
-        foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+        const auto interfaces = QNetworkInterface::allInterfaces();
+        for (const QNetworkInterface &interface : interfaces) {
             if (interface.flags() & QNetworkInterface::CanMulticast) {
                 if (ipv4Bound) {
                     ipv4Socket.joinMulticastGroup(MdnsIpv4Address, interface);
