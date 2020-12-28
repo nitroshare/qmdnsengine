@@ -82,7 +82,8 @@ void ProberPrivate::onMessageReceived(const Message &message)
     if (confirmed || !message.isResponse()) {
         return;
     }
-    foreach (Record record, message.records()) {
+    const auto records = message.records();
+    for (const Record &record : records) {
         if (record.name() == proposedRecord.name() && record.type() == proposedRecord.type()) {
             ++suffix;
             assertRecord();

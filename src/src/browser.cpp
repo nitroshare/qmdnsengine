@@ -89,7 +89,7 @@ bool BrowserPrivate::updateService(const QByteArray &fqName)
     QList<Record> txtRecords;
     if (cache->lookupRecords(fqName, TXT, txtRecords)) {
         QMap<QByteArray, QByteArray> attributes;
-        foreach (Record record, txtRecords) {
+        for (const Record &record : qAsConst(txtRecords)) {
             for (auto i = record.attributes().constBegin();
                     i != record.attributes().constEnd(); ++i) {
                 attributes.insert(i.key(), i.value());
@@ -120,7 +120,8 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     // Use a set to track all services that are updated in the message to
     // prevent unnecessary queries for SRV and TXT records
     QSet<QByteArray> updateNames;
-    foreach (Record record, message.records()) {
+    const auto records = message.records();
+    for (const Record &record : records) {
         cache->addRecord(record);
         bool any = type == MdnsBrowseType;
         switch (record.type()) {
@@ -144,7 +145,7 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     // For each of the services marked to be updated, perform the update and
     // make a list of all missing SRV records
     QSet<QByteArray> queryNames;
-    foreach (QByteArray name, updateNames) {
+    for (const QByteArray &name : qAsConst(updateNames)) {
         if (updateService(name)) {
             queryNames.insert(name);
         }
@@ -153,7 +154,7 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     // Build and send a query for all of the SRV and TXT records
     if (queryNames.count()) {
         Message queryMessage;
-        foreach (QByteArray name, queryNames) {
+        for (const QByteArray &name : qAsConst(queryNames)) {
             Query query;
             query.setName(name);
             query.setType(SRV);
@@ -217,7 +218,7 @@ void BrowserPrivate::onQueryTimeout()
     // Include PTR records for the target that are already known
     QList<Record> records;
     if (cache->lookupRecords(query.name(), PTR, records)) {
-        foreach (Record record, records) {
+        for (const Record &record : qAsConst(records)) {
             message.addRecord(record);
         }
     }
@@ -230,7 +231,7 @@ void BrowserPrivate::onServiceTimeout()
 {
     if (ptrTargets.count()) {
         Message message;
-        foreach (QByteArray target, ptrTargets) {
+        for (const QByteArray &target : qAsConst(ptrTargets)) {
 
             // Add a query for PTR records
             Query query;
@@ -241,7 +242,7 @@ void BrowserPrivate::onServiceTimeout()
             // Include PTR records for the target that are already known
             QList<Record> records;
             if (cache->lookupRecords(target, PTR, records)) {
-                foreach (Record record, records) {
+                for (const Record &record : qAsConst(records)) {
                     message.addRecord(record);
                 }
             }

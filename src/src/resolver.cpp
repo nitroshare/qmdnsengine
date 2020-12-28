@@ -75,7 +75,8 @@ void ResolverPrivate::query() const
     message.addQuery(query);
 
     // Add existing (known) records to the query
-    foreach (Record record, existing()) {
+    const auto records = existing();
+    for (const Record &record : records) {
         message.addRecord(record);
     }
 
@@ -88,7 +89,8 @@ void ResolverPrivate::onMessageReceived(const Message &message)
     if (!message.isResponse()) {
         return;
     }
-    foreach (Record record, message.records()) {
+    const auto records = message.records();
+    for (const Record &record : records) {
         if (record.name() == name && (record.type() == A || record.type() == AAAA)) {
             cache->addRecord(record);
             if (!addresses.contains(record.address())) {
@@ -101,7 +103,8 @@ void ResolverPrivate::onMessageReceived(const Message &message)
 
 void ResolverPrivate::onTimeout()
 {
-    foreach (Record record, existing()) {
+    const auto records = existing();
+    for (const Record &record : records) {
         emit q->resolved(record.address());
     }
 }
