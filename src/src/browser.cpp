@@ -63,7 +63,7 @@ BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const Q
 bool BrowserPrivate::updateService(const QByteArray &fqName)
 {
     // Split the FQDN into service name and type
-    int index = fqName.indexOf('.');
+    int index = fqName.indexOf('_') - 1;
     QByteArray serviceName = fqName.left(index);
     QByteArray serviceType = fqName.mid(index + 1);
 
