@@ -107,9 +107,9 @@ QMDNSENGINE_EXPORT bool fromPacket(const QByteArray &packet, Message &message);
 /**
  * @brief Create a raw DNS packet from a Message
  * @param message Message to create the packet from
- * @param packet storage for raw DNS packet
+ * @return packet storage for raw DNS packet
  */
-QMDNSENGINE_EXPORT void toPacket(const Message &message, QByteArray &packet);
+QMDNSENGINE_EXPORT QByteArray toPacket(const Message &message);
 
 /**
  * @brief Retrieve the string representation of a DNS type

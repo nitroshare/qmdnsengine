@@ -335,8 +335,9 @@ bool fromPacket(const QByteArray &packet, Message &message)
     return true;
 }
 
-void toPacket(const Message &message, QByteArray &packet)
+QByteArray toPacket(const Message &message)
 {
+    QByteArray packet;
     quint16 offset = 0;
     quint16 flags = (message.isResponse() ? 0x8400 : 0) |
         (message.isTruncated() ? 0x200 : 0);
@@ -357,6 +358,7 @@ void toPacket(const Message &message, QByteArray &packet)
     for (Record record : records) {
         writeRecord(packet, offset, record, nameMap);
     }
+    return packet;
 }
 
 QString typeName(quint16 type)
