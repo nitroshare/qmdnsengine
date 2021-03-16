@@ -31,15 +31,17 @@
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
 
+#include <utility>
+
 #include "browser_p.h"
 
 using namespace QMdnsEngine;
 
-BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const QByteArray &type, Cache *existingCache)
+BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, QByteArray type, Cache *existingCache)
     : QObject(browser),
       q(browser),
       server(server),
-      type(type),
+      type(std::move(type)),
       cache(existingCache ? existingCache : new Cache(this))
 {
     connect(server, &AbstractServer::messageReceived, this, &BrowserPrivate::onMessageReceived);
