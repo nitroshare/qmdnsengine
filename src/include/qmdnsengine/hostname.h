@@ -60,7 +60,7 @@ public:
     /**
      * @brief Create a new hostname
      */
-    Hostname(AbstractServer *server, QObject *parent = nullptr);
+    explicit Hostname(AbstractServer *server, QObject *parent = nullptr);
 
     /**
      * @brief Determine if a hostname has been registered
