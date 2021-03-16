@@ -40,7 +40,7 @@
 
 MainWindow::MainWindow()
     : mHostname(&mServer),
-      mProvider(0),
+      mProvider(nullptr),
       mServiceName(new QLineEdit(tr("Test Service"))),
       mServiceType(new QLineEdit(tr("_test._tcp.local."))),
       mServicePort(new QLineEdit("1234")),
@@ -94,7 +94,7 @@ void MainWindow::onClicked()
     if (mProvider) {
         mLog->append(tr("Destroying provider"));
         delete mProvider;
-        mProvider = 0;
+        mProvider = nullptr;
     } else {
         mLog->append(tr("Creating provider"));
         QMdnsEngine::Service service;

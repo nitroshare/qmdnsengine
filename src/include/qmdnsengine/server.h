@@ -56,7 +56,7 @@ public:
     /**
      * @brief Create a new server
      */
-    explicit Server(QObject *parent = 0);
+    explicit Server(QObject *parent = nullptr);
 
     /**
      * @brief Implementation of AbstractServer::sendMessage()

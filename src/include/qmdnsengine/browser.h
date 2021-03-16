@@ -82,7 +82,7 @@ public:
      * @param cache DNS cache to use or null to create one
      * @param parent QObject
      */
-    Browser(AbstractServer *server, const QByteArray &type, Cache *cache = 0, QObject *parent = 0);
+    Browser(AbstractServer *server, const QByteArray &type, Cache *cache = nullptr, QObject *parent = nullptr);
 
 Q_SIGNALS:
 

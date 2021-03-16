@@ -68,7 +68,7 @@ public:
     /**
      * @brief Create a new prober
      */
-    Prober(AbstractServer *server, const Record &record, QObject *parent = 0);
+    Prober(AbstractServer *server, const Record &record, QObject *parent = nullptr);
 
 Q_SIGNALS:
 

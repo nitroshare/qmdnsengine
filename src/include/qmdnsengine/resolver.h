@@ -64,7 +64,7 @@ public:
     /**
      * @brief Create a new resolver
      */
-    Resolver(AbstractServer *server, const QByteArray &name, Cache *cache = 0, QObject *parent = 0);
+    Resolver(AbstractServer *server, const QByteArray &name, Cache *cache = nullptr, QObject *parent = nullptr);
 
 Q_SIGNALS:
 

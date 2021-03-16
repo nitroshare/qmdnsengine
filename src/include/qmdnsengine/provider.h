@@ -69,7 +69,7 @@ public:
     /**
      * @brief Create a new service provider
      */
-    Provider(AbstractServer *server, Hostname *hostname, QObject *parent = 0);
+    Provider(AbstractServer *server, Hostname *hostname, QObject *parent = nullptr);
 
     /**
      * @brief Update the service with the provided information

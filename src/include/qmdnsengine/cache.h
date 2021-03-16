@@ -71,7 +71,7 @@ public:
     /**
      * @brief Create an empty cache.
      */
-    explicit Cache(QObject *parent = 0);
+    explicit Cache(QObject *parent = nullptr);
 
     /**
      * @brief Add a record to the cache
