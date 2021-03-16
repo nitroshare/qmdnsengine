@@ -76,9 +76,7 @@ void ProviderPrivate::confirm()
 {
     // Confirm that the desired name is unique through probing
 
-    if (prober) {
-        delete prober;
-    }
+    delete prober;
     prober = new Prober(server, srvProposed, this);
     connect(prober, &Prober::nameConfirmed, [this](const QByteArray &name) {
 

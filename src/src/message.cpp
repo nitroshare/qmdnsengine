@@ -31,14 +31,6 @@
 
 using namespace QMdnsEngine;
 
-MessagePrivate::MessagePrivate()
-    : port(0),
-      transactionId(0),
-      isResponse(false),
-      isTruncated(false)
-{
-}
-
 Message::Message()
     : d(new MessagePrivate)
 {

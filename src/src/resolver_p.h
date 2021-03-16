@@ -45,7 +45,7 @@ class ResolverPrivate : public QObject
 
 public:
 
-    explicit ResolverPrivate(Resolver *resolver, AbstractServer *server, const QByteArray &name, Cache *cache);
+    explicit ResolverPrivate(Resolver *resolver, AbstractServer *server, QByteArray name, Cache *cache);
 
     QList<Record> existing() const;
     void query() const;

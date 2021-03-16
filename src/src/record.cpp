@@ -31,16 +31,6 @@
 
 using namespace QMdnsEngine;
 
-RecordPrivate::RecordPrivate()
-    : type(0),
-      flushCache(false),
-      ttl(3600),
-      priority(0),
-      weight(0),
-      port(0)
-{
-}
-
 Record::Record()
     : d(new RecordPrivate)
 {

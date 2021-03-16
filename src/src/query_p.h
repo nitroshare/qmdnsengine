@@ -30,15 +30,11 @@
 namespace QMdnsEngine
 {
 
-class QueryPrivate
+struct QueryPrivate
 {
-public:
-
-    QueryPrivate();
-
     QByteArray name;
-    quint16 type;
-    bool unicastResponse;
+    quint16 type = 0;
+    bool unicastResponse = false;
 };
 
 }

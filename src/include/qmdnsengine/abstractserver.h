@@ -51,7 +51,7 @@ public:
     /**
      * @brief Abstract constructor
      */
-    explicit AbstractServer(QObject *parent = 0);
+    explicit AbstractServer(QObject *parent = nullptr);
 
     /**
      * @brief Send a message to its provided destination

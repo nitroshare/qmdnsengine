@@ -117,7 +117,7 @@ void ServerPrivate::onTimeout()
 void ServerPrivate::onReadyRead()
 {
     // Read the packet from the socket
-    QUdpSocket *socket = qobject_cast<QUdpSocket*>(sender());
+    auto *socket = qobject_cast<QUdpSocket*>(sender());
     QByteArray packet;
     packet.resize(socket->pendingDatagramSize());
     QHostAddress address;
@@ -141,8 +141,7 @@ Server::Server(QObject *parent)
 
 void Server::sendMessage(const Message &message)
 {
-    QByteArray packet;
-    toPacket(message, packet);
+    const auto packet = toPacket(message);
     if (message.address().protocol() == QAbstractSocket::IPv4Protocol) {
         d->ipv4Socket.writeDatagram(packet, message.address(), message.port());
     } else {
@@ -152,8 +151,7 @@ void Server::sendMessage(const Message &message)
 
 void Server::sendMessageToAll(const Message &message)
 {
-    QByteArray packet;
-    toPacket(message, packet);
+    const auto packet = toPacket(message);
     d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
     d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
 }

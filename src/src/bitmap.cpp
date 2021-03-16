@@ -41,9 +41,7 @@ BitmapPrivate::~BitmapPrivate()
 
 void BitmapPrivate::free()
 {
-    if (data) {
-        delete[] data;
-    }
+    delete[] data;
 }
 
 void BitmapPrivate::fromData(quint8 newLength, const quint8 *newData)

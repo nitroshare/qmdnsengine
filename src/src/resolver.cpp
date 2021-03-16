@@ -23,6 +23,7 @@
  */
 
 #include <QTimer>
+#include <utility>
 
 #include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/dns.h>
@@ -36,11 +37,11 @@
 
 using namespace QMdnsEngine;
 
-ResolverPrivate::ResolverPrivate(Resolver *resolver, AbstractServer *server, const QByteArray &name, Cache *cache)
+ResolverPrivate::ResolverPrivate(Resolver *resolver, AbstractServer *server, QByteArray name, Cache *cache)
     : QObject(resolver),
       q(resolver),
       server(server),
-      name(name),
+      name(std::move(name)),
       cache(cache ? cache : new Cache(this))
 {
     connect(server, &AbstractServer::messageReceived, this, &ResolverPrivate::onMessageReceived);

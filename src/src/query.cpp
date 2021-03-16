@@ -31,12 +31,6 @@
 
 using namespace QMdnsEngine;
 
-QueryPrivate::QueryPrivate()
-    : type(0),
-      unicastResponse(false)
-{
-}
-
 Query::Query()
     : d(new QueryPrivate)
 {

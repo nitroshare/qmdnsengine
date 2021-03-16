@@ -28,10 +28,6 @@
 
 using namespace QMdnsEngine;
 
-ServicePrivate::ServicePrivate()
-{
-}
-
 Service::Service()
     : d(new ServicePrivate)
 {

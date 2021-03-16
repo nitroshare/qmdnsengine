@@ -40,7 +40,7 @@
 
 MainWindow::MainWindow()
     : mHostname(&mServer),
-      mProvider(0),
+      mProvider(nullptr),
       mServiceName(new QLineEdit(tr("Test Service"))),
       mServiceType(new QLineEdit(tr("_test._tcp.local."))),
       mServicePort(new QLineEdit("1234")),
@@ -55,17 +55,17 @@ MainWindow::MainWindow()
     mLog->setReadOnly(true);
 
     // Create the root layout
-    QVBoxLayout *rootLayout = new QVBoxLayout;
-    QWidget *widget = new QWidget;
+    auto *rootLayout = new QVBoxLayout;
+    auto *widget = new QWidget;
     widget->setLayout(rootLayout);
     setCentralWidget(widget);
 
     // Create the horizontal layout for the grid and buttons
-    QHBoxLayout *upperLayout = new QHBoxLayout;
+    auto *upperLayout = new QHBoxLayout;
     rootLayout->addLayout(upperLayout);
 
     // Create the grid layout for the line edits
-    QGridLayout *gridLayout = new QGridLayout;
+    auto *gridLayout = new QGridLayout;
     gridLayout->addWidget(new QLabel(tr("Service name:")), 0, 0);
     gridLayout->addWidget(mServiceName, 0, 1);
     gridLayout->addWidget(new QLabel(tr("Service type:")), 1, 0);
@@ -75,7 +75,7 @@ MainWindow::MainWindow()
     upperLayout->addLayout(gridLayout);
 
     // Create the layout for the buttons
-    QVBoxLayout *buttonLayout = new QVBoxLayout;
+    auto *buttonLayout = new QVBoxLayout;
     buttonLayout->addWidget(mButton);
     buttonLayout->addWidget(mShowQueries);
     buttonLayout->addWidget(new QWidget, 1);
@@ -94,7 +94,7 @@ void MainWindow::onClicked()
     if (mProvider) {
         mLog->append(tr("Destroying provider"));
         delete mProvider;
-        mProvider = 0;
+        mProvider = nullptr;
     } else {
         mLog->append(tr("Creating provider"));
         QMdnsEngine::Service service;

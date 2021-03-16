@@ -31,12 +31,8 @@
 namespace QMdnsEngine
 {
 
-class ServicePrivate
+struct ServicePrivate
 {
-public:
-
-    ServicePrivate();
-
     QByteArray type;
     QByteArray name;
     QByteArray hostname;

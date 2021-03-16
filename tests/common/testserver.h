@@ -40,8 +40,8 @@ class TestServer : public QMdnsEngine::AbstractServer
 
 public:
 
-    virtual void sendMessage(const QMdnsEngine::Message &message);
-    virtual void sendMessageToAll(const QMdnsEngine::Message &message);
+    void sendMessage(const QMdnsEngine::Message &message) override;
+    void sendMessageToAll(const QMdnsEngine::Message &message) override;
 
     void deliverMessage(const QMdnsEngine::Message &message);
 

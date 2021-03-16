@@ -56,17 +56,17 @@ public:
     /**
      * @brief Create a new server
      */
-    explicit Server(QObject *parent = 0);
+    explicit Server(QObject *parent = nullptr);
 
     /**
      * @brief Implementation of AbstractServer::sendMessage()
      */
-    virtual void sendMessage(const Message &message);
+    void sendMessage(const Message &message) override;
 
     /**
      * @brief Implementation of AbstractServer::sendMessageToAll()
      */
-    virtual void sendMessageToAll(const Message &message);
+    void sendMessageToAll(const Message &message) override;
 
 private:
 

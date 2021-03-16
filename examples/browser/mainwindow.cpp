@@ -56,29 +56,29 @@ MainWindow::MainWindow()
     mAttributes = new QTableWidget;
     mAttributes->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    QVBoxLayout *rootLayout = new QVBoxLayout;
-    QWidget *widget = new QWidget;
+    auto *rootLayout = new QVBoxLayout;
+    auto *widget = new QWidget;
     widget->setLayout(rootLayout);
     setCentralWidget(widget);
 
-    QCheckBox *any = new QCheckBox(tr("Any"));
+    auto *any = new QCheckBox(tr("Any"));
 
-    QHBoxLayout *typeLayout = new QHBoxLayout;
+    auto *typeLayout = new QHBoxLayout;
     typeLayout->addWidget(mServiceType, 1);
     typeLayout->addWidget(any);
     typeLayout->addWidget(mStartStop);
     rootLayout->addLayout(typeLayout);
 
-    QSplitter *vSplitter = new QSplitter;
+    auto *vSplitter = new QSplitter;
     vSplitter->setOrientation(Qt::Vertical);
     vSplitter->addWidget(mAddresses);
     vSplitter->addWidget(mAttributes);
 
-    QSplitter *hSplitter = new QSplitter;
+    auto *hSplitter = new QSplitter;
     hSplitter->addWidget(mServices);
     hSplitter->addWidget(vSplitter);
 
-    QHBoxLayout *servicesLayout = new QHBoxLayout;
+    auto *servicesLayout = new QHBoxLayout;
     servicesLayout->addWidget(hSplitter);
     rootLayout->addLayout(servicesLayout);
 

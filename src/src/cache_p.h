@@ -49,7 +49,7 @@ public:
         QList<QDateTime> triggers;
     };
 
-    CachePrivate(Cache *cache);
+    explicit CachePrivate(Cache *cache);
 
     QTimer timer;
     QList<Entry> entries;

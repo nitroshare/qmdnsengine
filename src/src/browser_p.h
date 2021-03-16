@@ -48,7 +48,7 @@ class BrowserPrivate : public QObject
 
 public:
 
-    explicit BrowserPrivate(Browser *browser, AbstractServer *server, const QByteArray &type, Cache *existingCache);
+    explicit BrowserPrivate(Browser *browser, AbstractServer *server, QByteArray type, Cache *existingCache);
 
     bool updateService(const QByteArray &fqName);
 
