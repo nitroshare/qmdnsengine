@@ -34,17 +34,13 @@ namespace QMdnsEngine
 class Query;
 class Record;
 
-class MessagePrivate
+struct MessagePrivate
 {
-public:
-
-    MessagePrivate();
-
     QHostAddress address;
-    quint16 port;
-    quint16 transactionId;
-    bool isResponse;
-    bool isTruncated;
+    quint16 port = 0;
+    quint16 transactionId = 0;
+    bool isResponse = false;
+    bool isTruncated = false;
     QList<Query> queries;
     QList<Record> records;
 };

@@ -33,23 +33,19 @@
 
 namespace QMdnsEngine {
 
-class RecordPrivate
+struct RecordPrivate
 {
-public:
-
-    RecordPrivate();
-
     QByteArray name;
-    quint16 type;
-    bool flushCache;
-    quint32 ttl;
+    quint16 type = 0;
+    bool flushCache = false;
+    quint32 ttl = 3600;
 
     QHostAddress address;
     QByteArray target;
     QByteArray nextDomainName;
-    quint16 priority;
-    quint16 weight;
-    quint16 port;
+    quint16 priority = 0;
+    quint16 weight = 0;
+    quint16 port = 0;
     QMap<QByteArray, QByteArray> attributes;
     Bitmap bitmap;
 };
