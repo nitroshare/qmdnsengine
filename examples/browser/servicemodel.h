@@ -41,8 +41,8 @@ public:
 
     ServiceModel(QMdnsEngine::Server *server, const QByteArray &type);
 
-    virtual int rowCount(const QModelIndex &parent) const;
-    virtual QVariant data(const QModelIndex &index, int role) const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
 private Q_SLOTS:
 

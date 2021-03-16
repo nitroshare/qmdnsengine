@@ -61,12 +61,12 @@ public:
     /**
      * @brief Implementation of AbstractServer::sendMessage()
      */
-    virtual void sendMessage(const Message &message);
+    void sendMessage(const Message &message) override;
 
     /**
      * @brief Implementation of AbstractServer::sendMessageToAll()
      */
-    virtual void sendMessageToAll(const Message &message);
+    void sendMessageToAll(const Message &message) override;
 
 private:
 
