@@ -37,10 +37,10 @@ using namespace QMdnsEngine;
 
 BrowserPrivate::BrowserPrivate(Browser *browser, AbstractServer *server, const QByteArray &type, Cache *existingCache)
     : QObject(browser),
-      q(browser),
       server(server),
       type(type),
-      cache(existingCache ? existingCache : new Cache(this))
+      cache(existingCache ? existingCache : new Cache(this)),
+      q(browser)
 {
     connect(server, &AbstractServer::messageReceived, this, &BrowserPrivate::onMessageReceived);
     connect(cache, &Cache::shouldQuery, this, &BrowserPrivate::onShouldQuery);

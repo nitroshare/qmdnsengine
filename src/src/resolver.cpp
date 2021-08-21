@@ -38,10 +38,10 @@ using namespace QMdnsEngine;
 
 ResolverPrivate::ResolverPrivate(Resolver *resolver, AbstractServer *server, const QByteArray &name, Cache *cache)
     : QObject(resolver),
-      q(resolver),
       server(server),
       name(name),
-      cache(cache ? cache : new Cache(this))
+      cache(cache ? cache : new Cache(this)),
+      q(resolver)
 {
     connect(server, &AbstractServer::messageReceived, this, &ResolverPrivate::onMessageReceived);
     connect(&timer, &QTimer::timeout, this, &ResolverPrivate::onTimeout);

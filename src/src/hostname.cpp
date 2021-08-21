@@ -40,8 +40,8 @@ using namespace QMdnsEngine;
 
 HostnamePrivate::HostnamePrivate(Hostname *hostname, AbstractServer *server)
     : QObject(hostname),
-      q(hostname),
-      server(server)
+      server(server),
+      q(hostname)
 {
     connect(server, &AbstractServer::messageReceived, this, &HostnamePrivate::onMessageReceived);
     connect(&registrationTimer, &QTimer::timeout, this, &HostnamePrivate::onRegistrationTimeout);
