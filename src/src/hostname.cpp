@@ -96,8 +96,8 @@ bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 typ
         const auto entries = networkInterface.addressEntries();
         for (const QNetworkAddressEntry &entry : entries) {
             if (srcAddress.isInSubnet(entry.ip(), entry.prefixLength())) {
-                for (const QNetworkAddressEntry &entry : entries) {
-                    QHostAddress address = entry.ip();
+                for (const QNetworkAddressEntry &newEntry : entries) {
+                    QHostAddress address = newEntry.ip();
                     if ((address.protocol() == QAbstractSocket::IPv4Protocol && type == A) ||
                             (address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA)) {
                         record.setName(hostname);
