@@ -92,8 +92,8 @@ bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 typ
     // address and determine this device's address from the interface
 
     const auto interfaces = QNetworkInterface::allInterfaces();
-    for (const QNetworkInterface &interface : interfaces) {
-        const auto entries = interface.addressEntries();
+    for (const QNetworkInterface &networkInterface : interfaces) {
+        const auto entries = networkInterface.addressEntries();
         for (const QNetworkAddressEntry &entry : entries) {
             if (srcAddress.isInSubnet(entry.ip(), entry.prefixLength())) {
                 for (const QNetworkAddressEntry &entry : entries) {
