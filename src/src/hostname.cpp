@@ -40,8 +40,8 @@ using namespace QMdnsEngine;
 
 HostnamePrivate::HostnamePrivate(Hostname *hostname, AbstractServer *server)
     : QObject(hostname),
-      q(hostname),
-      server(server)
+      server(server),
+      q(hostname)
 {
     connect(server, &AbstractServer::messageReceived, this, &HostnamePrivate::onMessageReceived);
     connect(&registrationTimer, &QTimer::timeout, this, &HostnamePrivate::onRegistrationTimeout);
@@ -92,12 +92,12 @@ bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 typ
     // address and determine this device's address from the interface
 
     const auto interfaces = QNetworkInterface::allInterfaces();
-    for (const QNetworkInterface &interface : interfaces) {
-        const auto entries = interface.addressEntries();
+    for (const QNetworkInterface &networkInterface : interfaces) {
+        const auto entries = networkInterface.addressEntries();
         for (const QNetworkAddressEntry &entry : entries) {
             if (srcAddress.isInSubnet(entry.ip(), entry.prefixLength())) {
-                for (const QNetworkAddressEntry &entry : entries) {
-                    QHostAddress address = entry.ip();
+                for (const QNetworkAddressEntry &newEntry : entries) {
+                    QHostAddress address = newEntry.ip();
                     if ((address.protocol() == QAbstractSocket::IPv4Protocol && type == A) ||
                             (address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA)) {
                         record.setName(hostname);

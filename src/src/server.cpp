@@ -99,13 +99,13 @@ void ServerPrivate::onTimeout()
 
     if (ipv4Bound || ipv6Bound) {
         const auto interfaces = QNetworkInterface::allInterfaces();
-        for (const QNetworkInterface &interface : interfaces) {
-            if (interface.flags() & QNetworkInterface::CanMulticast) {
+        for (const QNetworkInterface &networkInterface : interfaces) {
+            if (networkInterface.flags() & QNetworkInterface::CanMulticast) {
                 if (ipv4Bound) {
-                    ipv4Socket.joinMulticastGroup(MdnsIpv4Address, interface);
+                    ipv4Socket.joinMulticastGroup(MdnsIpv4Address, networkInterface);
                 }
                 if (ipv6Bound) {
-                    ipv6Socket.joinMulticastGroup(MdnsIpv6Address, interface);
+                    ipv6Socket.joinMulticastGroup(MdnsIpv6Address, networkInterface);
                 }
             }
         }

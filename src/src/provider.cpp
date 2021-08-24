@@ -187,10 +187,10 @@ void ProviderPrivate::onMessageReceived(const Message &message)
     }
 }
 
-void ProviderPrivate::onHostnameChanged(const QByteArray &hostname)
+void ProviderPrivate::onHostnameChanged(const QByteArray &newHostname)
 {
     // Update the proposed SRV record
-    srvProposed.setTarget(hostname);
+    srvProposed.setTarget(newHostname);
 
     // If initialized, confirm the record
     if (initialized) {

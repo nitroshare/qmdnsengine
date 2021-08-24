@@ -34,11 +34,11 @@ using namespace QMdnsEngine;
 
 ProberPrivate::ProberPrivate(Prober *prober, AbstractServer *server, const Record &record)
     : QObject(prober),
-      q(prober),
       server(server),
       confirmed(false),
       proposedRecord(record),
-      suffix(1)
+      suffix(1),
+      q(prober)
 {
     // All records should contain at least one "."
     int index = record.name().indexOf('.');
