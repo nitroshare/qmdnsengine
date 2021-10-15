@@ -107,6 +107,7 @@ bool BrowserPrivate::updateService(const QByteArray &fqName)
     }
 
     services.insert(fqName, service);
+    hostnames.insert(service.hostname());
 
     return false;
 }
@@ -117,28 +118,36 @@ void BrowserPrivate::onMessageReceived(const Message &message)
         return;
     }
 
+    const bool any = type == MdnsBrowseType;
+
     // Use a set to track all services that are updated in the message to
     // prevent unnecessary queries for SRV and TXT records
     QSet<QByteArray> updateNames;
     const auto records = message.records();
     for (const Record &record : records) {
-        cache->addRecord(record);
-        bool any = type == MdnsBrowseType;
+        bool cacheRecord = false;
+
         switch (record.type()) {
         case PTR:
             if (any && record.name() == MdnsBrowseType) {
                 ptrTargets.insert(record.target());
                 serviceTimer.start();
+                cacheRecord = true;
             } else if (any || record.name() == type) {
                 updateNames.insert(record.target());
+                cacheRecord = true;
             }
             break;
         case SRV:
         case TXT:
             if (any || record.name().endsWith("." + type)) {
                 updateNames.insert(record.name());
+                cacheRecord = true;
             }
             break;
+        }
+        if (cacheRecord) {
+            cache->addRecord(record);
         }
     }
 
@@ -148,6 +157,21 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     for (const QByteArray &name : qAsConst(updateNames)) {
         if (updateService(name)) {
             queryNames.insert(name);
+        }
+    }
+
+    // Cache A / AAAA records after services are processed to ensure hostnames are known
+    for (const Record &record : records) {
+        bool cacheRecord = false;
+
+        switch (record.type()) {
+            case A:
+            case AAAA:
+                cacheRecord = hostnames.contains(record.name());
+                break;
+        }
+        if (cacheRecord) {
+            cache->addRecord(record);
         }
     }
 
@@ -199,6 +223,7 @@ void BrowserPrivate::onRecordExpired(const Record &record)
     if (!service.name().isNull()) {
         emit q->serviceRemoved(service);
         services.remove(serviceName);
+        updateHostnames();
     }
 }
 
@@ -247,6 +272,15 @@ void BrowserPrivate::onServiceTimeout()
 
         server->sendMessageToAll(message);
         ptrTargets.clear();
+    }
+}
+
+void BrowserPrivate::updateHostnames()
+{
+    hostnames.clear();
+
+    for (const auto& service : services) {
+        hostnames.insert(service.hostname());
     }
 }
 
