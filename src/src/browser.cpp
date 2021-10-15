@@ -181,14 +181,11 @@ void BrowserPrivate::onShouldQuery(const Record &record)
 
 void BrowserPrivate::onRecordExpired(const Record &record)
 {
-    // If the PTR or SRV record has expired for a service, then it must be
+    // If the SRV record has expired for a service, then it must be
     // removed - TXT records on the other hand, cause an update
 
     QByteArray serviceName;
     switch (record.type()) {
-    case PTR:
-        serviceName = record.target();
-        break;
     case SRV:
         serviceName = record.name();
         break;
