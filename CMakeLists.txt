@@ -25,7 +25,7 @@ if (CMAKE_PREFIX_PATH)
 	message( STATUS "QMdnsEngine: Use CMAKE_PREFIX_PATH to locate Qt version to be used: ${CMAKE_PREFIX_PATH}" )
 endif()
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Network Widgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Network REQUIRED)
 message( STATUS "QMdnsEngine: Found Qt Version: ${QT_VERSION}" )
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 )
@@ -38,7 +38,7 @@ if ( "${QT_VERSION}" VERSION_LESS "${QT_MIN_VERSION}" )
 	message( FATAL_ERROR "Your Qt version is to old! Minimum required ${QT_MIN_VERSION}" )
 endif()
 
-find_package(Qt${QT_VERSION_MAJOR} ${QT_VERSION} COMPONENTS Network Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} ${QT_VERSION} COMPONENTS Network REQUIRED)
 
 message( STATUS "QMdnsEngine: Qt version used: ${QT_VERSION}" )
 
