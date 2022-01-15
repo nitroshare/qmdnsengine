@@ -55,12 +55,12 @@ ProberPrivate::ProberPrivate(Prober *prober, AbstractServer *server, const Recor
 
 void ProberPrivate::assertRecord()
 {
-    // Use the current suffix to set the name of the proposed record
-    QString name = suffix == 1
-        ? QStringLiteral("%1%2").arg(name, type)
-        : QStringLiteral("%1-%2%3").arg(name, QByteArray::number(suffix), type);
+	// Use the current suffix to set the name of the proposed record
+	QString tmpName = suffix == 1
+						  ? QString("%1%2").arg(name, type.constData())
+						  : QString("%1-%2%3").arg(name.constData(), QByteArray::number(suffix), type);
 
-    proposedRecord.setName(name.toLatin1());
+	proposedRecord.setName(tmpName.toUtf8());
 
     // Broadcast a query for the proposed name (using an ANY query) and
     // include the proposed record in the query
