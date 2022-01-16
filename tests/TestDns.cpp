@@ -230,7 +230,6 @@ void TestDns::testWriteName()
 {
     QFETCH(QByteArray, initialPacket);
     QFETCH(quint16, initialOffset);
-    QFETCH(quint16, correctOffset);
     QFETCH(QByteArray, name);
     QFETCH(NameMap, nameMap);
     QFETCH(QByteArray, correctPacket);
