@@ -22,8 +22,12 @@
  * IN THE SOFTWARE.
  */
 
+#include "common/util.h"
+
+BEGIN_IGNORE_QT_WARNINGS()
 #include <QSignalSpy>
 #include <QTest>
+END_IGNORE_QT_WARNINGS()
 
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/message.h>

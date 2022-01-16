@@ -29,6 +29,16 @@
 
 #include "testserver.h"
 
+#define BEGIN_IGNORE_QT_WARNINGS() \
+    _Pragma("warning( push )") \
+    _Pragma("warning( disable : 4127 68 )") \
+    _Pragma("clang diagnostic push") \
+    _Pragma("clang diagnostic ignored \"-Wgnu-zero-variadic-macro-arguments\"")
+
+#define END_IGNORE_QT_WARNINGS() \
+    _Pragma("clang diagnostic pop") \
+    _Pragma("warning( pop )")
+
 bool queryReceived(TestServer *server, const QByteArray &name, quint16 type);
 
 #endif // COMMON_UTIL_H

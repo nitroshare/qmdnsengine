@@ -22,10 +22,14 @@
  * IN THE SOFTWARE.
  */
 
+#include "common/util.h"
+
+BEGIN_IGNORE_QT_WARNINGS()
 #include <QHostAddress>
 #include <QMap>
 #include <QObject>
 #include <QTest>
+END_IGNORE_QT_WARNINGS()
 
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/record.h>
