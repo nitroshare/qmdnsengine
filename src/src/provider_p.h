@@ -30,20 +30,17 @@
 #include <qmdnsengine/record.h>
 #include <qmdnsengine/service.h>
 
-namespace QMdnsEngine
-{
+namespace QMdnsEngine {
 
 class AbstractServer;
 class Hostname;
 class Message;
 class Prober;
 
-class ProviderPrivate : public QObject
-{
+class ProviderPrivate : public QObject {
     Q_OBJECT
 
-public:
-
+  public:
     ProviderPrivate(QObject *parent, AbstractServer *server, Hostname *hostname);
     virtual ~ProviderPrivate();
 
@@ -64,18 +61,19 @@ public:
     Record ptrRecord;
     Record srvRecord;
     Record txtRecord;
+    Record ARecord;
 
     Record browsePtrProposed;
     Record ptrProposed;
     Record srvProposed;
     Record txtProposed;
 
-private Q_SLOTS:
+  private Q_SLOTS:
 
     void onMessageReceived(const Message &message);
     void onHostnameChanged(const QByteArray &hostname);
 };
 
-}
+} // namespace QMdnsEngine
 
 #endif // QMDNSENGINE_PROVIDER_P_H
