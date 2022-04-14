@@ -48,6 +48,7 @@ class ProviderPrivate : public QObject {
     void confirm();
     void farewell();
     void publish();
+    QHostAddress getIP(const QHostAddress &srcAddress);
 
     AbstractServer *server;
     Hostname *hostname;

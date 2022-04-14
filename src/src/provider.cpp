@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <QNetworkInterface>
 #include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/hostname.h>
@@ -114,9 +115,31 @@ void ProviderPrivate::publish() {
     // zwift
     ARecord.setType(A);
     ARecord.setName(srvRecord.target());
-    ARecord.setAddress(QHostAddress("172.31.100.161"));
+    // set directly when we receive a message
+    // ARecord.setAddress(QHostAddress("172.31.100.161"));
 
     announce();
+}
+
+QHostAddress ProviderPrivate::getIP(const QHostAddress &srcAddress) {
+    // Attempt to find the interface that corresponds with the provided
+    // address and determine this device's address from the interface
+
+    const auto interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &networkInterface : interfaces) {
+        const auto entries = networkInterface.addressEntries();
+        for (const QNetworkAddressEntry &entry : entries) {
+            if (srcAddress.isInSubnet(entry.ip(), entry.prefixLength())) {
+                for (const QNetworkAddressEntry &newEntry : entries) {
+                    QHostAddress address = newEntry.ip();
+                    if ((address.protocol() == QAbstractSocket::IPv4Protocol)) {
+                        return address;
+                    }
+                }
+            }
+        }
+    }
+    return QHostAddress();
 }
 
 void ProviderPrivate::onMessageReceived(const Message &message) {
@@ -128,6 +151,8 @@ void ProviderPrivate::onMessageReceived(const Message &message) {
     bool sendPtr = false;
     bool sendSrv = false;
     bool sendTxt = false;
+
+    ARecord.setAddress(getIP(message.address()));
 
     // Determine which records to send based on the queries
     const auto queries = message.queries();
