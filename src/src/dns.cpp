@@ -142,6 +142,9 @@ bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
     record.setType(type);
     record.setFlushCache(class_ & 0x8000);
     record.setTtl(ttl);
+
+    quint16 next_offset = offset + dataLen;
+
     switch (type) {
     case A:
     {
@@ -234,6 +237,7 @@ bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
         offset += dataLen;
         break;
     }
+    offset = next_offset;
     return true;
 }
 
