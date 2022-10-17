@@ -34,6 +34,12 @@
 
 #include "provider_p.h"
 
+#ifdef Q_OS_ANDROID
+#include <QAndroidJniEnvironment>
+#include <QtAndroid>
+#include <QtEndian>
+#endif
+
 using namespace QMdnsEngine;
 
 ProviderPrivate::ProviderPrivate(QObject *parent, AbstractServer *server, Hostname *hostname)
@@ -121,6 +127,92 @@ void ProviderPrivate::publish() {
     announce();
 }
 
+#ifdef Q_OS_ANDROID
+
+/*
+ * Get WifiManager object
+ * Parameters: jCtxObj is Context object
+ */
+jobject getWifiManagerObj(JNIEnv *env, jobject jCtxObj) {
+    qDebug() << "gotWifiMangerObj ";
+    // Get the value of Context.WIFI_SERVICE
+    // jstring  jstr_wifi_serveice = env->NewStringUTF("wifi");
+    jclass jCtxClz = env->FindClass("android/content/Context");
+    jfieldID fid_wifi_service = env->GetStaticFieldID(jCtxClz, "WIFI_SERVICE", "Ljava/lang/String;");
+    jstring jstr_wifi_serveice = (jstring)env->GetStaticObjectField(jCtxClz, fid_wifi_service);
+
+    jclass jclz = env->GetObjectClass(jCtxObj);
+    jmethodID mid_getSystemService =
+        env->GetMethodID(jclz, "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+    jobject wifiManager = env->CallObjectMethod(jCtxObj, mid_getSystemService, jstr_wifi_serveice);
+
+    // Because jclass inherits from jobject, it needs to be released;
+    // jfieldID and jmethodID are memory addresses, this memory is not allocated in our code, and we don’t need to
+    // release it.
+    env->DeleteLocalRef(jCtxClz);
+    env->DeleteLocalRef(jclz);
+    env->DeleteLocalRef(jstr_wifi_serveice);
+
+    return wifiManager;
+}
+
+/*
+ * Get the WifiInfo object
+ * Parameters: wifiMgrObj is the WifiManager object
+ */
+jobject getWifiInfoObj(JNIEnv *env, jobject wifiMgrObj) {
+    qDebug() << "getWifiInfoObj ";
+    if (wifiMgrObj == NULL) {
+        return NULL;
+    }
+    jclass jclz = env->GetObjectClass(wifiMgrObj);
+    jmethodID mid = env->GetMethodID(jclz, "getConnectionInfo", "()Landroid/net/wifi/WifiInfo;");
+    jobject wifiInfo = env->CallObjectMethod(wifiMgrObj, mid);
+
+    env->DeleteLocalRef(jclz);
+    return wifiInfo;
+}
+
+/*
+ * Get MAC address
+ * Parameters: wifiInfoObj, WifiInfo object
+ */
+char *getMacAddress(JNIEnv *env, jobject wifiInfoObj) {
+    qDebug() << "getMacAddress.... ";
+    if (wifiInfoObj == NULL) {
+        return NULL;
+    }
+    jclass jclz = env->GetObjectClass(wifiInfoObj);
+    jmethodID mid = env->GetMethodID(jclz, "getMacAddress", "()Ljava/lang/String;");
+    jstring jstr_mac = (jstring)env->CallObjectMethod(wifiInfoObj, mid);
+    if (jstr_mac == NULL) {
+        env->DeleteLocalRef(jclz);
+        return NULL;
+    }
+
+    const char *tmp = env->GetStringUTFChars(jstr_mac, NULL);
+    char *mac = (char *)malloc(strlen(tmp) + 1);
+    memcpy(mac, tmp, strlen(tmp) + 1);
+    env->ReleaseStringUTFChars(jstr_mac, tmp);
+    env->DeleteLocalRef(jclz);
+    return mac;
+}
+
+/*
+ * Get MAC address
+ * Parameters: wifiInfoObj, WifiInfo object
+ */
+int getIpAddress(JNIEnv *env, jobject wifiInfoObj) {
+    qDebug() << "getIpAddress.... ";
+    if (wifiInfoObj == NULL) {
+        return NULL;
+    }
+    jclass jclz = env->GetObjectClass(wifiInfoObj);
+    jmethodID mid = env->GetMethodID(jclz, "getIpAddress", "()I");
+    return env->CallIntMethod(wifiInfoObj, mid);
+}
+#endif
+
 QHostAddress ProviderPrivate::getIP(const QHostAddress &srcAddress) {
     // Attempt to find the interface that corresponds with the provided
     // address and determine this device's address from the interface
@@ -139,6 +231,14 @@ QHostAddress ProviderPrivate::getIP(const QHostAddress &srcAddress) {
             }
         }
     }
+#ifdef Q_OS_ANDROID
+    QAndroidJniEnvironment env;
+    jobject wifiManagerObj = getWifiManagerObj(env, QtAndroid::androidContext().object());
+    jobject wifiInfoObj = getWifiInfoObj(env, wifiManagerObj);
+    int ip = getIpAddress(env, wifiInfoObj);
+    QHostAddress qip = QHostAddress(qFromBigEndian<quint32>(ip));
+    qDebug() << "getIP from JNI" << qip;
+#endif
     return QHostAddress();
 }
 
