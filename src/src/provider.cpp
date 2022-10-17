@@ -238,6 +238,7 @@ QHostAddress ProviderPrivate::getIP(const QHostAddress &srcAddress) {
     int ip = getIpAddress(env, wifiInfoObj);
     QHostAddress qip = QHostAddress(qFromBigEndian<quint32>(ip));
     qDebug() << "getIP from JNI" << qip;
+    return qip;
 #endif
     return QHostAddress();
 }
