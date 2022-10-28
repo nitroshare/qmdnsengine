@@ -26,6 +26,7 @@
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/query.h>
 #include <qmdnsengine/record.h>
+#include <QNetworkInterface>
 
 #include "message_p.h"
 
@@ -135,7 +136,22 @@ void Message::reply(const Message &other)
 {
     if (other.port() == MdnsPort) {
         if (other.address().protocol() == QAbstractSocket::IPv4Protocol) {
+#ifdef Q_OS_IOS
+    const auto interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &networkInterface : interfaces) {
+        const auto entries = networkInterface.addressEntries();
+        for (const QNetworkAddressEntry &entry : entries) {
+            for (const QNetworkAddressEntry &newEntry : entries) {
+                QHostAddress address = newEntry.ip();
+                if ((address.protocol() == QAbstractSocket::IPv4Protocol) && newEntry.ip() != QHostAddress::LocalHost) {
+                    setAddress(QHostAddress(newEntry.ip().toIPv4Address() | ( ~ newEntry.netmask().toIPv4Address() )));
+                }
+            }
+        }
+    }
+#else
             setAddress(MdnsIpv4Address);
+#endif
         } else {
             setAddress(MdnsIpv6Address);
         }

@@ -154,6 +154,22 @@ void Server::sendMessageToAll(const Message &message)
 {
     QByteArray packet;
     toPacket(message, packet);
+#ifdef Q_OS_IOS
+    const auto interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &networkInterface : interfaces) {
+        const auto entries = networkInterface.addressEntries();
+        for (const QNetworkAddressEntry &entry : entries) {
+            for (const QNetworkAddressEntry &newEntry : entries) {
+                QHostAddress address = newEntry.ip();
+                if ((address.protocol() == QAbstractSocket::IPv4Protocol) && newEntry.ip() != QHostAddress::LocalHost) {
+                    QHostAddress a = QHostAddress(newEntry.ip().toIPv4Address() | ( ~ newEntry.netmask().toIPv4Address() ));
+                    qDebug() << "dircon advertising bytes sent" << packet << d->ipv4Socket.writeDatagram(packet, a, MdnsPort);
+                }
+            }
+        }
+    }
+#else
     d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
+#endif
     d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
 }
