@@ -142,6 +142,9 @@ bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
     record.setType(type);
     record.setFlushCache(class_ & 0x8000);
     record.setTtl(ttl);
+
+    quint16 next_offset = offset + dataLen;
+
     switch (type) {
     case A:
     {
@@ -234,6 +237,7 @@ bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
         offset += dataLen;
         break;
     }
+    offset = next_offset;
     return true;
 }
 
@@ -297,6 +301,9 @@ void writeRecord(QByteArray &packet, quint16 &offset, Record &record, QMap<QByte
 
 bool fromPacket(const QByteArray &packet, Message &message)
 {
+    static int reported_errors = 0;
+    const int MAX_REPORTED_ERRORS = 10;
+
     quint16 offset = 0;
     quint16 transactionId, flags, nQuestion, nAnswer, nAuthority, nAdditional;
     if (!parseInteger<quint16>(packet, offset, transactionId) ||
@@ -325,14 +332,29 @@ bool fromPacket(const QByteArray &packet, Message &message)
         message.addQuery(query);
     }
     quint16 nRecord = nAnswer + nAuthority + nAdditional;
+    bool with_error = false;
+    uint records = 0;
     for (int i = 0; i < nRecord; ++i) {
         Record record;
         if (!parseRecord(packet, offset, record)) {
-            return false;
+            with_error = true;
         }
-        message.addRecord(record);
+        else {
+            message.addRecord(record);
+            records++;
+        }
     }
-    return true;
+
+    if (with_error && reported_errors < MAX_REPORTED_ERRORS) {
+        qWarning() << "qmdnsengine: mDNS parse error, UDP payload is" << packet.toHex();
+        reported_errors++;
+        if (reported_errors == MAX_REPORTED_ERRORS) {
+            qWarning() << "qmdnsengine: no more similar errors be reported: maximum report count is reached.";
+        }
+    }
+
+    // this message will be processed further if at least one record was parsed
+    return records > 0;
 }
 
 void toPacket(const Message &message, QByteArray &packet)
