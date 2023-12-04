@@ -30,21 +30,19 @@
 
 class QHostAddress;
 
-namespace QMdnsEngine
-{
+namespace QMdnsEngine {
 
 class AbstractServer;
 class Hostname;
 class Message;
 class Record;
 
-class HostnamePrivate : public QObject
-{
+class HostnamePrivate : public QObject {
     Q_OBJECT
 
-public:
-
+  public:
     HostnamePrivate(Hostname *hostname, AbstractServer *server);
+    HostnamePrivate(Hostname *hostname, const QByteArray &desired, AbstractServer *server);
 
     void assertHostname();
     bool generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record);
@@ -53,23 +51,22 @@ public:
 
     QByteArray hostnamePrev;
     QByteArray hostname;
+    QByteArray desiredHostname;
     bool hostnameRegistered;
     int hostnameSuffix;
 
     QTimer registrationTimer;
     QTimer rebroadcastTimer;
 
-private Q_SLOTS:
+  private Q_SLOTS:
 
     void onMessageReceived(const Message &message);
     void onRegistrationTimeout();
     void onRebroadcastTimeout();
 
-private:
-
+  private:
     Hostname *const q;
 };
-
 }
 
 #endif // QMDNSENGINE_HOSTNAME_P_H
