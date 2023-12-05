@@ -44,8 +44,8 @@ endif()
 
 add_library(qmdnsengine ${HEADERS} ${SRC})
 
-if ( "${QT_VERSION}" VERSION_GREATER_EQUAL "6.7.0" )
-    message( STATUS "QMdnsEngine: Enable C++17 for Qt 6.7 and newer" )
+if ( "${QT_VERSION}" VERSION_GREATER_EQUAL "6.6.0" )
+    message( STATUS "QMdnsEngine: Enable C++17 for Qt 6.6 and newer" )
     set_target_properties(qmdnsengine PROPERTIES
         CXX_STANDARD          17
     )

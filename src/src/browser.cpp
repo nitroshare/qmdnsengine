@@ -91,7 +91,7 @@ bool BrowserPrivate::updateService(const QByteArray &fqName)
     QList<Record> txtRecords;
     if (cache->lookupRecords(fqName, TXT, txtRecords)) {
         QMap<QByteArray, QByteArray> attributes;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
 		for (const Record &record : std::as_const(txtRecords)) {
 #else
 		for (const Record &record : qAsConst(txtRecords)) {
@@ -160,7 +160,7 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     // For each of the services marked to be updated, perform the update and
     // make a list of all missing SRV records
     QSet<QByteArray> queryNames;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
 	for (const QByteArray &name : std::as_const(updateNames)) {
 #else
 	for (const QByteArray &name : qAsConst(updateNames)) {
@@ -188,7 +188,7 @@ void BrowserPrivate::onMessageReceived(const Message &message)
     // Build and send a query for all of the SRV and TXT records
     if (queryNames.count()) {
         Message queryMessage;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
 		for (const QByteArray &name : std::as_const(queryNames)) {
 #else
 		for (const QByteArray &name : qAsConst(queryNames)) {
@@ -254,7 +254,7 @@ void BrowserPrivate::onQueryTimeout()
     // Include PTR records for the target that are already known
     QList<Record> records;
     if (cache->lookupRecords(query.name(), PTR, records)) {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
 		for (const Record &record : std::as_const(records)) {
 #else
 		for (const Record &record : qAsConst(records)) {
@@ -271,7 +271,7 @@ void BrowserPrivate::onServiceTimeout()
 {
     if (ptrTargets.count()) {
         Message message;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
 		for (const QByteArray &target : std::as_const(ptrTargets)) {
 #else
 		for (const QByteArray &target : qAsConst(ptrTargets)) {
@@ -285,7 +285,7 @@ void BrowserPrivate::onServiceTimeout()
             // Include PTR records for the target that are already known
             QList<Record> records;
             if (cache->lookupRecords(target, PTR, records)) {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
 				for (const Record &record : std::as_const(records)) {
 #else
 				for (const Record &record : qAsConst(records)) {
