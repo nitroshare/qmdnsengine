@@ -117,7 +117,11 @@ void ProviderPrivate::publish() {
     ARecord.setType(A);
     ARecord.setName(srvRecord.target());
     // set directly when we receive a message
-    // ARecord.setAddress(QHostAddress("172.31.100.161"));
+    //ARecord.setAddress(QHostAddress("172.31.100.161"));
+
+    QHostAddress r = localipaddress::getIP(QHostAddress());
+    if(!r.isNull())
+        ARecord.setAddress(r);
 
     announce();
 }
