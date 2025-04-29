@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.5)
 project(qmdnsengine)
 
 set(PROJECT_NAME "QMdnsEngine")
