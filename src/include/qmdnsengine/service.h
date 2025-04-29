@@ -29,6 +29,7 @@
 #include <QHostAddress>
 #include <QList>
 #include <QMap>
+#include <QDebug>
 
 #include "qmdnsengine_export.h"
 
