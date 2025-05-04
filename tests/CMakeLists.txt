@@ -4,6 +4,7 @@ set(TESTS
     TestBrowser
     TestCache
     TestDns
+    TestFromPacket
     TestHostname
     TestProber
     TestProvider
