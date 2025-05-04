@@ -38,7 +38,7 @@
 
 Q_DECLARE_METATYPE(QMdnsEngine::Service)
 
-const QByteArray Name = "Test";
+const QByteArray Name = "Test.DotTest";
 const QByteArray Type = "_test._tcp.local.";
 const QByteArray Fqdn = Name + "." + Type;
 const QByteArray Target = "Test.local.";
