@@ -73,9 +73,13 @@ void ProviderPrivate::confirm() {
         delete prober;
     }
     prober = new Prober(server, srvProposed, this);
+    qDebug() << "ProviderPrivate::confirm()";
     connect(prober, &Prober::nameConfirmed, [this](const QByteArray &name) {
         // If existing records were confirmed, indicate that they are no
         // longer valid
+
+        qDebug() << "Prober::nameConfirmed" << confirmed;
+        
         if (confirmed) {
             farewell();
         } else {
