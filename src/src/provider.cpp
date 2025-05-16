@@ -120,6 +120,7 @@ void ProviderPrivate::publish() {
     //ARecord.setAddress(QHostAddress("172.31.100.161"));
 
     QHostAddress r = localipaddress::getIP(QHostAddress());
+    qDebug() << "ProviderPrivate::publish" << r;
     if(!r.isNull())
         ARecord.setAddress(r);
 
