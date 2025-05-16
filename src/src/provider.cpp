@@ -62,6 +62,7 @@ void ProviderPrivate::announce() {
     message.setResponse(true);
     message.addRecord(ptrRecord);
     message.addRecord(srvRecord);
+    message.addRecord(ARecord);
     message.addRecord(txtRecord);
     server->sendMessageToAll(message);
 }
@@ -73,9 +74,13 @@ void ProviderPrivate::confirm() {
         delete prober;
     }
     prober = new Prober(server, srvProposed, this);
+    qDebug() << "ProviderPrivate::confirm()";
     connect(prober, &Prober::nameConfirmed, [this](const QByteArray &name) {
         // If existing records were confirmed, indicate that they are no
         // longer valid
+
+        qDebug() << "Prober::nameConfirmed" << confirmed;
+        
         if (confirmed) {
             farewell();
         } else {
@@ -117,7 +122,12 @@ void ProviderPrivate::publish() {
     ARecord.setType(A);
     ARecord.setName(srvRecord.target());
     // set directly when we receive a message
-    // ARecord.setAddress(QHostAddress("172.31.100.161"));
+    //ARecord.setAddress(QHostAddress("172.31.100.161"));
+
+    QHostAddress r = localipaddress::getIP(QHostAddress());
+    qDebug() << "ProviderPrivate::publish" << r;
+    if(!r.isNull())
+        ARecord.setAddress(r);
 
     announce();
 }
