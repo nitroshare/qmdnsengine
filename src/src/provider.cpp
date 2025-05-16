@@ -62,6 +62,7 @@ void ProviderPrivate::announce() {
     message.setResponse(true);
     message.addRecord(ptrRecord);
     message.addRecord(srvRecord);
+    message.addRecord(ARecord);
     message.addRecord(txtRecord);
     server->sendMessageToAll(message);
 }
