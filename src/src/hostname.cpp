@@ -39,10 +39,10 @@
 using namespace QMdnsEngine;
 
 HostnamePrivate::HostnamePrivate(Hostname *hostname, AbstractServer *server)
-    : QObject(hostname),
-      server(server),
-      q(hostname)
-{
+    : HostnamePrivate(hostname, QByteArray(), server) {}
+
+HostnamePrivate::HostnamePrivate(Hostname *hostname, const QByteArray &desired, AbstractServer *server)
+    : QObject(hostname), server(server), desiredHostname(desired), q(hostname) {
     connect(server, &AbstractServer::messageReceived, this, &HostnamePrivate::onMessageReceived);
     connect(&registrationTimer, &QTimer::timeout, this, &HostnamePrivate::onRegistrationTimeout);
     connect(&rebroadcastTimer, &QTimer::timeout, this, &HostnamePrivate::onRebroadcastTimeout);
@@ -57,17 +57,16 @@ HostnamePrivate::HostnamePrivate(Hostname *hostname, AbstractServer *server)
     onRebroadcastTimeout();
 }
 
-void HostnamePrivate::assertHostname()
-{
+void HostnamePrivate::assertHostname() {
     // Begin with the local hostname and replace any "." with "-" (I'm looking
     // at you, macOS)
-    QByteArray localHostname = QHostInfo::localHostName().toUtf8();
+    QByteArray localHostname = desiredHostname.isEmpty() ? QHostInfo::localHostName().toUtf8() : desiredHostname;
     localHostname = localHostname.replace('.', '-');
 
     // If the suffix > 1, then append a "-2", "-3", etc. to the hostname to
     // aid in finding one that is unique and not in use
-    hostname = (hostnameSuffix == 1 ? localHostname:
-        localHostname + "-" + QByteArray::number(hostnameSuffix)) + ".local.";
+    hostname =
+        (hostnameSuffix == 1 ? localHostname : localHostname + "-" + QByteArray::number(hostnameSuffix)) + ".local.";
 
     // Compose a query for A and AAAA records matching the hostname
     Query ipv4Query;
@@ -86,8 +85,7 @@ void HostnamePrivate::assertHostname()
     registrationTimer.start();
 }
 
-bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record)
-{
+bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 type, Record &record) {
     // Attempt to find the interface that corresponds with the provided
     // address and determine this device's address from the interface
 
@@ -99,7 +97,7 @@ bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 typ
                 for (const QNetworkAddressEntry &newEntry : entries) {
                     QHostAddress address = newEntry.ip();
                     if ((address.protocol() == QAbstractSocket::IPv4Protocol && type == A) ||
-                            (address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA)) {
+                        (address.protocol() == QAbstractSocket::IPv6Protocol && type == AAAA)) {
                         record.setName(hostname);
                         record.setType(type);
                         record.setAddress(address);
@@ -112,8 +110,7 @@ bool HostnamePrivate::generateRecord(const QHostAddress &srcAddress, quint16 typ
     return false;
 }
 
-void HostnamePrivate::onMessageReceived(const Message &message)
-{
+void HostnamePrivate::onMessageReceived(const Message &message) {
     if (message.isResponse()) {
         if (hostnameRegistered) {
             return;
@@ -146,8 +143,7 @@ void HostnamePrivate::onMessageReceived(const Message &message)
     }
 }
 
-void HostnamePrivate::onRegistrationTimeout()
-{
+void HostnamePrivate::onRegistrationTimeout() {
     hostnameRegistered = true;
     if (hostname != hostnamePrev) {
         emit q->hostnameChanged(hostname);
@@ -157,8 +153,7 @@ void HostnamePrivate::onRegistrationTimeout()
     rebroadcastTimer.start();
 }
 
-void HostnamePrivate::onRebroadcastTimeout()
-{
+void HostnamePrivate::onRebroadcastTimeout() {
     hostnamePrev = hostname;
     hostnameRegistered = false;
     hostnameSuffix = 1;
@@ -166,18 +161,11 @@ void HostnamePrivate::onRebroadcastTimeout()
     assertHostname();
 }
 
-Hostname::Hostname(AbstractServer *server, QObject *parent)
-    : QObject(parent),
-      d(new HostnamePrivate(this, server))
-{
-}
+Hostname::Hostname(AbstractServer *server, QObject *parent) : QObject(parent), d(new HostnamePrivate(this, server)) {}
 
-bool Hostname::isRegistered() const
-{
-    return d->hostnameRegistered;
-}
+Hostname::Hostname(AbstractServer *server, const QByteArray &desired, QObject *parent)
+    : QObject(parent), d(new HostnamePrivate(this, desired, server)) {}
 
-QByteArray Hostname::hostname() const
-{
-    return d->hostname;
-}
+bool Hostname::isRegistered() const { return d->hostnameRegistered; }
+
+QByteArray Hostname::hostname() const { return d->hostname; }
