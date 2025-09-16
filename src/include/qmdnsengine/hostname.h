@@ -29,8 +29,7 @@
 
 #include "qmdnsengine_export.h"
 
-namespace QMdnsEngine
-{
+namespace QMdnsEngine {
 
 class AbstractServer;
 
@@ -51,16 +50,19 @@ class QMDNSENGINE_EXPORT HostnamePrivate;
  * });
  * @endcode
  */
-class QMDNSENGINE_EXPORT Hostname : public QObject
-{
+class QMDNSENGINE_EXPORT Hostname : public QObject {
     Q_OBJECT
 
-public:
-
+  public:
     /**
      * @brief Create a new hostname
      */
     Hostname(AbstractServer *server, QObject *parent = 0);
+
+    /**
+     * @brief Create a new hostname with desired value to register
+     */
+    Hostname(AbstractServer *server, const QByteArray &desired, QObject *parent = 0);
 
     /**
      * @brief Determine if a hostname has been registered
@@ -77,7 +79,7 @@ public:
      */
     QByteArray hostname() const;
 
-Q_SIGNALS:
+  Q_SIGNALS:
 
     /**
      * @brief Indicate that the current hostname has changed
@@ -85,11 +87,9 @@ Q_SIGNALS:
      */
     void hostnameChanged(const QByteArray &hostname);
 
-private:
-
+  private:
     HostnamePrivate *const d;
 };
-
 }
 
 #endif // QMDNSENGINE_HOSTNAME_H

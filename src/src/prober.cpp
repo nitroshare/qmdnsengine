@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <QDebug>
 #include <qmdnsengine/abstractserver.h>
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/message.h>
@@ -50,6 +51,7 @@ ProberPrivate::ProberPrivate(Prober *prober, AbstractServer *server, const Recor
 
     timer.setSingleShot(true);
 
+    qDebug() << "ProberPrivate::ProberPrivate()" << record.name();
     assertRecord();
 }
 
@@ -97,6 +99,7 @@ void ProberPrivate::onMessageReceived(const Message &message)
 void ProberPrivate::onTimeout()
 {
     confirmed = true;
+    qDebug() << "ProberPrivate::onTimeout()";
     emit q->nameConfirmed(proposedRecord.name());
 }
 
