@@ -44,7 +44,7 @@ using namespace QMdnsEngine;
 
 ServerPrivate::ServerPrivate(Server *server)
     : QObject(server),
-      q(server)
+    q(server)
 {
     connect(&timer, &QTimer::timeout, this, &ServerPrivate::onTimeout);
     connect(&ipv4Socket, &QUdpSocket::readyRead, this, &ServerPrivate::onReadyRead);
@@ -62,26 +62,10 @@ bool ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
         return true;
     }
 
-    // I cannot find the correct combination of flags that allows the socket
-    // to bind properly on Linux, so on that platform, we must manually create
-    // the socket and initialize the QUdpSocket with it
-
-#ifdef Q_OS_UNIX
-    if (!socket.bind(address, MdnsPort, QAbstractSocket::ShareAddress)) {
-        int arg = 1;
-        if (setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR,
-                reinterpret_cast<char*>(&arg), sizeof(int))) {
-            emit q->error(strerror(errno));
-            return false;
-        }
-#endif
-        if (!socket.bind(address, MdnsPort, QAbstractSocket::ReuseAddressHint)) {
-            emit q->error(socket.errorString());
-            return false;
-        }
-#ifdef Q_OS_UNIX
+    if (!socket.bind(address, MdnsPort, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint)) {
+        emit q->error(socket.errorString());
+        return false;
     }
-#endif
 
     return true;
 }
@@ -135,7 +119,7 @@ void ServerPrivate::onReadyRead()
 
 Server::Server(QObject *parent)
     : AbstractServer(parent),
-      d(new ServerPrivate(this))
+    d(new ServerPrivate(this))
 {
 }
 
