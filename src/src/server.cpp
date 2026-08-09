@@ -44,7 +44,7 @@ using namespace QMdnsEngine;
 
 ServerPrivate::ServerPrivate(Server *server)
     : QObject(server),
-      q(server)
+    q(server)
 {
     connect(&timer, &QTimer::timeout, this, &ServerPrivate::onTimeout);
     connect(&ipv4Socket, &QUdpSocket::readyRead, this, &ServerPrivate::onReadyRead);
@@ -62,26 +62,10 @@ bool ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
         return true;
     }
 
-    // I cannot find the correct combination of flags that allows the socket
-    // to bind properly on Linux, so on that platform, we must manually create
-    // the socket and initialize the QUdpSocket with it
-
-#ifdef Q_OS_UNIX
-    if (!socket.bind(address, MdnsPort, QAbstractSocket::ShareAddress)) {
-        int arg = 1;
-        if (setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR,
-                reinterpret_cast<char*>(&arg), sizeof(int))) {
-            emit q->error(strerror(errno));
-            return false;
-        }
-#endif
-        if (!socket.bind(address, MdnsPort, QAbstractSocket::ReuseAddressHint)) {
-            emit q->error(socket.errorString());
-            return false;
-        }
-#ifdef Q_OS_UNIX
+    if (!socket.bind(address, MdnsPort, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint)) {
+        emit q->error(socket.errorString());
+        return false;
     }
-#endif
 
     return true;
 }
@@ -135,7 +119,7 @@ void ServerPrivate::onReadyRead()
 
 Server::Server(QObject *parent)
     : AbstractServer(parent),
-      d(new ServerPrivate(this))
+    d(new ServerPrivate(this))
 {
 }
 
@@ -143,10 +127,23 @@ void Server::sendMessage(const Message &message)
 {
     QByteArray packet;
     toPacket(message, packet);
-    if (message.address().protocol() == QAbstractSocket::IPv4Protocol) {
-        d->ipv4Socket.writeDatagram(packet, message.address(), message.port());
+
+    QUdpSocket *socket = (message.address().protocol() == QAbstractSocket::IPv4Protocol)
+                             ? &d->ipv4Socket
+                             : &d->ipv6Socket;
+
+    if (message.address().isMulticast()) {
+        const auto interfaces = QNetworkInterface::allInterfaces();
+        for (const QNetworkInterface &iface : interfaces) {
+            if ((iface.flags() & QNetworkInterface::IsUp) &&
+                (iface.flags() & QNetworkInterface::CanMulticast)) {
+
+                socket->setMulticastInterface(iface);
+                socket->writeDatagram(packet, message.address(), message.port());
+            }
+        }
     } else {
-        d->ipv6Socket.writeDatagram(packet, message.address(), message.port());
+        socket->writeDatagram(packet, message.address(), message.port());
     }
 }
 
@@ -154,6 +151,18 @@ void Server::sendMessageToAll(const Message &message)
 {
     QByteArray packet;
     toPacket(message, packet);
-    d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
-    d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
+
+    const auto interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface : interfaces) {
+
+        if ((iface.flags() & QNetworkInterface::IsUp) &&
+            (iface.flags() & QNetworkInterface::CanMulticast)) {
+
+            d->ipv4Socket.setMulticastInterface(iface);
+            d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
+
+            d->ipv6Socket.setMulticastInterface(iface);
+            d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
+        }
+    }
 }
