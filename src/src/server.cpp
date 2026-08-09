@@ -127,10 +127,23 @@ void Server::sendMessage(const Message &message)
 {
     QByteArray packet;
     toPacket(message, packet);
-    if (message.address().protocol() == QAbstractSocket::IPv4Protocol) {
-        d->ipv4Socket.writeDatagram(packet, message.address(), message.port());
+
+    QUdpSocket *socket = (message.address().protocol() == QAbstractSocket::IPv4Protocol)
+                             ? &d->ipv4Socket
+                             : &d->ipv6Socket;
+
+    if (message.address().isMulticast()) {
+        const auto interfaces = QNetworkInterface::allInterfaces();
+        for (const QNetworkInterface &iface : interfaces) {
+            if ((iface.flags() & QNetworkInterface::IsUp) &&
+                (iface.flags() & QNetworkInterface::CanMulticast)) {
+
+                socket->setMulticastInterface(iface);
+                socket->writeDatagram(packet, message.address(), message.port());
+            }
+        }
     } else {
-        d->ipv6Socket.writeDatagram(packet, message.address(), message.port());
+        socket->writeDatagram(packet, message.address(), message.port());
     }
 }
 
@@ -138,6 +151,18 @@ void Server::sendMessageToAll(const Message &message)
 {
     QByteArray packet;
     toPacket(message, packet);
-    d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
-    d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
+
+    const auto interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface : interfaces) {
+
+        if ((iface.flags() & QNetworkInterface::IsUp) &&
+            (iface.flags() & QNetworkInterface::CanMulticast)) {
+
+            d->ipv4Socket.setMulticastInterface(iface);
+            d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);
+
+            d->ipv6Socket.setMulticastInterface(iface);
+            d->ipv6Socket.writeDatagram(packet, MdnsIpv6Address, MdnsPort);
+        }
+    }
 }
