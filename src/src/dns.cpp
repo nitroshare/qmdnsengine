@@ -138,6 +138,11 @@ bool parseRecord(const QByteArray &packet, quint16 &offset, Record &record)
             !parseInteger<quint16>(packet, offset, dataLen)) {
         return false;
     }
+    // The record data must fit in the packet. Otherwise skipping over it
+    // can wrap the 16-bit offset back to data that was already parsed.
+    if (offset + dataLen > packet.length()) {
+        return false;
+    }
     record.setName(name);
     record.setType(type);
     record.setFlushCache(class_ & 0x8000);
